@@ -56,12 +56,14 @@ type WordWithStats struct {
 }
 
 type WordDetailResponse struct {
-	WordWithStats
-	Stats struct {
+	Japanese string `json:"japanese"`
+	Romaji   string `json:"romaji"`
+	English  string `json:"english"`
+	Stats    struct {
 		CorrectCount int `json:"correct_count"`
 		WrongCount   int `json:"wrong_count"`
 	} `json:"stats"`
-	Groups []Group `json:"groups"`
+	Groups []GroupWithStats `json:"groups"`
 }
 
 type GroupWithStats struct {
@@ -82,6 +84,13 @@ type StudySessionResponse struct {
 	ReviewItemsCount int       `json:"review_items_count"`
 }
 
+type StudyActivitySessionResponse struct {
+	ID              int       `json:"id"`
+	GroupID         int       `json:"group_id"`
+	CreatedAt       time.Time `json:"created_at"`
+	StudyActivityID int       `json:"study_activity_id"`
+}
+
 type LastStudySessionResponse struct {
 	ID              int       `json:"id"`
 	GroupID         int       `json:"group_id"`
@@ -100,6 +109,16 @@ type QuickStatsResponse struct {
 	TotalStudySessions int    `json:"total_study_sessions"`
 	TotalActiveGroups  int    `json:"total_active_groups"`
 	StudyStreakDays    int    `json:"study_streak_days"`
+}
+
+type WordsResponse struct {
+	Items      []WordWithStats `json:"items"`
+	Pagination *Pagination    `json:"pagination"`
+}
+
+type GroupsResponse struct {
+	Items      []GroupWithStats `json:"items"`
+	Pagination *Pagination     `json:"pagination"`
 }
 
 type DB struct {

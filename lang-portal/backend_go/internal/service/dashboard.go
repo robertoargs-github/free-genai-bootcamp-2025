@@ -1,6 +1,8 @@
 package service
 
 import (
+	"database/sql"
+	"fmt"
 	"time"
 
 	"lang-portal/internal/models"
@@ -32,6 +34,8 @@ type QuickStats struct {
 	TotalStudySessions int     `json:"total_study_sessions"`
 	TotalActiveGroups  int     `json:"total_active_groups"`
 	StudyStreakDays    int     `json:"study_streak_days"`
+	WordsLearned       int     `json:"words_learned"`
+	WordsInProgress    int     `json:"words_in_progress"`
 }
 
 func (s *DashboardService) GetLastStudySession() (*LastStudySession, error) {
@@ -52,6 +56,9 @@ func (s *DashboardService) GetLastStudySession() (*LastStudySession, error) {
 		&session.StudyActivityID,
 		&session.GroupName,
 	)
+	if err == sql.ErrNoRows {
+		return nil, fmt.Errorf("no study sessions found")
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -78,10 +85,12 @@ func (s *DashboardService) GetStudyProgress() (*StudyProgress, error) {
 }
 
 func (s *DashboardService) GetQuickStats() (*QuickStats, error) {
-	// Get success rate
+	// Get success rate and word counts
 	successRateQuery := `
 		SELECT 
-			CAST(SUM(CASE WHEN correct THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) * 100
+			CAST(COALESCE(CAST(SUM(CASE WHEN correct THEN 1 ELSE 0 END) AS REAL) / NULLIF(CAST(COUNT(*) AS REAL), 0) * 100, 0.0) AS REAL),
+			COALESCE(COUNT(DISTINCT CASE WHEN correct THEN word_id END), 0),
+			COALESCE(COUNT(DISTINCT CASE WHEN NOT correct THEN word_id END), 0)
 		FROM word_review_items
 	`
 	
@@ -116,7 +125,7 @@ func (s *DashboardService) GetQuickStats() (*QuickStats, error) {
 	`
 	
 	var stats QuickStats
-	if err := s.db.QueryRow(successRateQuery).Scan(&stats.SuccessRate); err != nil {
+	if err := s.db.QueryRow(successRateQuery).Scan(&stats.SuccessRate, &stats.WordsLearned, &stats.WordsInProgress); err != nil {
 		return nil, err
 	}
 	if err := s.db.QueryRow(sessionsQuery).Scan(&stats.TotalStudySessions); err != nil {

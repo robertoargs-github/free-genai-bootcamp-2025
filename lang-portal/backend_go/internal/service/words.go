@@ -1,6 +1,7 @@
 package service
 
 import (
+	"database/sql"
 	"lang-portal/internal/models"
 )
 
@@ -39,7 +40,7 @@ type GroupInfo struct {
 	TotalWordCount int    `json:"total_word_count"`
 }
 
-func (s *WordService) GetWords(page int) (*PaginatedResponse, error) {
+func (s *WordService) GetWords(page int) (*models.WordsResponse, error) {
 	const itemsPerPage = 100
 	offset := (page - 1) * itemsPerPage
 
@@ -52,7 +53,7 @@ func (s *WordService) GetWords(page int) (*PaginatedResponse, error) {
 			COUNT(CASE WHEN NOT wri.correct THEN 1 END) as wrong_count
 		FROM words w
 		LEFT JOIN word_review_items wri ON w.id = wri.word_id
-		GROUP BY w.id
+		GROUP BY w.id, w.japanese, w.romaji, w.english
 		ORDER BY w.id
 		LIMIT ? OFFSET ?
 	`
@@ -65,9 +66,9 @@ func (s *WordService) GetWords(page int) (*PaginatedResponse, error) {
 	}
 	defer rows.Close()
 
-	var words []WordWithStats
+	words := make([]models.WordWithStats, 0)
 	for rows.Next() {
-		var word WordWithStats
+		var word models.WordWithStats
 		if err := rows.Scan(
 			&word.Japanese,
 			&word.Romaji,
@@ -87,16 +88,25 @@ func (s *WordService) GetWords(page int) (*PaginatedResponse, error) {
 
 	totalPages := (totalItems + itemsPerPage - 1) / itemsPerPage
 
-	return &PaginatedResponse{
-		Items:        words,
-		CurrentPage:  page,
-		TotalPages:   totalPages,
-		TotalItems:   totalItems,
-		ItemsPerPage: itemsPerPage,
-	}, nil
+	response := &models.WordsResponse{
+		Items: words,
+		Pagination: &models.Pagination{
+			CurrentPage:  page,
+			TotalPages:   totalPages,
+			TotalItems:   totalItems,
+			ItemsPerPage: itemsPerPage,
+		},
+	}
+
+	// Ensure items is never nil
+	if response.Items == nil {
+		response.Items = make([]models.WordWithStats, 0)
+	}
+
+	return response, nil
 }
 
-func (s *WordService) GetWordByID(id int) (*WordDetails, error) {
+func (s *WordService) GetWordByID(id int) (*models.WordDetailResponse, error) {
 	wordQuery := `
 		SELECT 
 			w.japanese,
@@ -124,7 +134,19 @@ func (s *WordService) GetWordByID(id int) (*WordDetails, error) {
 		WHERE wg.word_id = ?
 	`
 
-	var word WordDetails
+	// First check if word exists
+	var exists bool
+	checkQuery := `SELECT EXISTS(SELECT 1 FROM words WHERE id = ?)`
+	if err := s.db.QueryRow(checkQuery, id).Scan(&exists); err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, sql.ErrNoRows
+	}
+
+	var word models.WordDetailResponse
+	word.Groups = make([]models.GroupWithStats, 0)
+
 	if err := s.db.QueryRow(wordQuery, id).Scan(
 		&word.Japanese,
 		&word.Romaji,
@@ -147,11 +169,11 @@ func (s *WordService) GetWordByID(id int) (*WordDetails, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var group GroupInfo
+		var group models.GroupWithStats
 		if err := rows.Scan(
 			&group.ID,
 			&group.Name,
-			&group.TotalWordCount,
+			&group.Stats.TotalWordCount,
 		); err != nil {
 			return nil, err
 		}

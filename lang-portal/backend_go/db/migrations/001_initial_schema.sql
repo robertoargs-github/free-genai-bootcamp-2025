@@ -1,6 +1,6 @@
 -- Create words table
 CREATE TABLE IF NOT EXISTS words (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY,
     japanese TEXT NOT NULL,
     romaji TEXT NOT NULL,
     english TEXT NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS words (
 
 -- Create groups table
 CREATE TABLE IF NOT EXISTS groups (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY,
     name TEXT NOT NULL
 );
 
@@ -34,20 +34,18 @@ CREATE TABLE IF NOT EXISTS study_sessions (
 -- Create study_activities table
 CREATE TABLE IF NOT EXISTS study_activities (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    study_session_id INTEGER NOT NULL,
-    group_id INTEGER NOT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (study_session_id) REFERENCES study_sessions(id),
-    FOREIGN KEY (group_id) REFERENCES groups(id)
+    name TEXT NOT NULL,
+    thumbnail_url TEXT,
+    description TEXT
 );
 
 -- Create word_review_items table
 CREATE TABLE IF NOT EXISTS word_review_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     word_id INTEGER NOT NULL,
     study_session_id INTEGER NOT NULL,
     correct BOOLEAN NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (word_id, study_session_id),
     FOREIGN KEY (word_id) REFERENCES words(id),
     FOREIGN KEY (study_session_id) REFERENCES study_sessions(id)
 );

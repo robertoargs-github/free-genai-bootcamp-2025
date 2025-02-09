@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"database/sql"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -75,6 +77,10 @@ func (h *Handlers) RegisterRoutes(r *gin.Engine) {
 func (h *Handlers) GetLastStudySession(c *gin.Context) {
 	session, err := h.dashboard.GetLastStudySession()
 	if err != nil {
+		if err.Error() == "no study sessions found" {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -119,6 +125,10 @@ func (h *Handlers) GetWord(c *gin.Context) {
 
 	word, err := h.words.GetWordByID(id)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{"error": "word not found"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -128,15 +138,16 @@ func (h *Handlers) GetWord(c *gin.Context) {
 // Groups handlers
 func (h *Handlers) GetGroups(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	groups, pagination, err := h.groups.GetGroups(page)
+	if page < 1 {
+		page = 1
+	}
+
+	response, err := h.groups.GetGroups(page)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"items":      groups,
-		"pagination": pagination,
-	})
+	c.JSON(http.StatusOK, response)
 }
 
 func (h *Handlers) GetGroup(c *gin.Context) {
@@ -148,6 +159,10 @@ func (h *Handlers) GetGroup(c *gin.Context) {
 
 	group, err := h.groups.GetGroup(id)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{"error": "group not found"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -162,15 +177,20 @@ func (h *Handlers) GetGroupWords(c *gin.Context) {
 	}
 
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	words, pagination, err := h.groups.GetGroupWords(id, page)
+	if page < 1 {
+		page = 1
+	}
+
+	response, err := h.groups.GetGroupWords(id, page)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{"error": "group not found"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"items":      words,
-		"pagination": pagination,
-	})
+	c.JSON(http.StatusOK, response)
 }
 
 func (h *Handlers) GetGroupStudySessions(c *gin.Context) {
@@ -202,6 +222,10 @@ func (h *Handlers) GetStudyActivity(c *gin.Context) {
 
 	activity, err := h.studyActivities.GetStudyActivity(id)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{"error": "study activity not found"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -215,15 +239,30 @@ func (h *Handlers) GetStudyActivitySessions(c *gin.Context) {
 		return
 	}
 
+	// First check if the study activity exists
+	_, err = h.studyActivities.GetStudyActivity(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{"error": "study activity not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	sessions, pagination, err := h.studyActivities.GetStudyActivitySessions(id, page)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"items":      sessions,
-		"pagination": pagination,
+		"items":         sessions,
+		"current_page":  pagination.CurrentPage,
+		"total_pages":   pagination.TotalPages,
+		"total_items":   pagination.TotalItems,
+		"items_per_page": pagination.ItemsPerPage,
 	})
 }
 
@@ -243,7 +282,7 @@ func (h *Handlers) CreateStudySession(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusCreated, session)
+	c.JSON(http.StatusOK, session)
 }
 
 // Study sessions handlers
@@ -255,8 +294,11 @@ func (h *Handlers) GetStudySessions(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"items":      sessions,
-		"pagination": pagination,
+		"items":         sessions,
+		"current_page":  pagination.CurrentPage,
+		"total_pages":   pagination.TotalPages,
+		"total_items":   pagination.TotalItems,
+		"items_per_page": pagination.ItemsPerPage,
 	})
 }
 
@@ -307,16 +349,14 @@ func (h *Handlers) ReviewWord(c *gin.Context) {
 		return
 	}
 
-	var req struct {
-		Correct bool `json:"correct"`
-	}
+	correctStr := c.Query("correct")
+	correct := correctStr == "true"
 
-	if err := c.BindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
-		return
-	}
-
-	if err := h.studySessions.ReviewWord(sessionID, wordID, req.Correct); err != nil {
+	if err := h.studySessions.ReviewWord(sessionID, wordID, correct); err != nil {
+		if strings.Contains(err.Error(), "does not exist") {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -325,7 +365,7 @@ func (h *Handlers) ReviewWord(c *gin.Context) {
 		"success":          true,
 		"word_id":         wordID,
 		"study_session_id": sessionID,
-		"correct":         req.Correct,
+		"correct":         correct,
 		"created_at":      time.Now(),
 	})
 }
