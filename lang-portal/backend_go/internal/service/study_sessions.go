@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"lang-portal/internal/models"
+	"time"
 )
 
 type StudySessionsService struct {
@@ -30,8 +31,8 @@ func (s *StudySessionsService) GetStudySessions(page int) ([]models.StudySession
 			ss.id,
 			sa.name as activity_name,
 			g.name as group_name,
-			ss.created_at as start_time,
-			DATETIME(ss.created_at, '+10 minutes') as end_time,
+			strftime('%Y-%m-%d %H:%M:%S', ss.created_at) as start_time,
+			strftime('%Y-%m-%d %H:%M:%S', datetime(ss.created_at, '+10 minutes')) as end_time,
 			(SELECT COUNT(*) FROM word_review_items WHERE study_session_id = ss.id) as review_items_count
 		FROM study_sessions ss
 		JOIN groups g ON ss.group_id = g.id
@@ -49,16 +50,32 @@ func (s *StudySessionsService) GetStudySessions(page int) ([]models.StudySession
 	var sessions []models.StudySessionResponse
 	for rows.Next() {
 		var session models.StudySessionResponse
+		var startTimeStr, endTimeStr string
+
 		if err := rows.Scan(
 			&session.ID,
 			&session.ActivityName,
 			&session.GroupName,
-			&session.StartTime,
-			&session.EndTime,
+			&startTimeStr,
+			&endTimeStr,
 			&session.ReviewItemsCount,
 		); err != nil {
 			return nil, nil, err
 		}
+
+		// Parse the time strings
+		startTime, err := time.Parse("2006-01-02 15:04:05", startTimeStr)
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to parse start time: %v", err)
+		}
+		session.StartTime = startTime
+
+		endTime, err := time.Parse("2006-01-02 15:04:05", endTimeStr)
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to parse end time: %v", err)
+		}
+		session.EndTime = endTime
+
 		sessions = append(sessions, session)
 	}
 
@@ -78,8 +95,8 @@ func (s *StudySessionsService) GetStudySession(id int) (*models.StudySessionResp
 			ss.id,
 			sa.name as activity_name,
 			g.name as group_name,
-			ss.created_at as start_time,
-			DATETIME(ss.created_at, '+10 minutes') as end_time,
+			strftime('%Y-%m-%d %H:%M:%S', ss.created_at) as start_time,
+			strftime('%Y-%m-%d %H:%M:%S', datetime(ss.created_at, '+10 minutes')) as end_time,
 			(SELECT COUNT(*) FROM word_review_items WHERE study_session_id = ss.id) as review_items_count
 		FROM study_sessions ss
 		JOIN groups g ON ss.group_id = g.id
@@ -88,17 +105,32 @@ func (s *StudySessionsService) GetStudySession(id int) (*models.StudySessionResp
 	`
 
 	var session models.StudySessionResponse
+	var startTimeStr, endTimeStr string
+
 	err := s.db.QueryRow(query, id).Scan(
 		&session.ID,
 		&session.ActivityName,
 		&session.GroupName,
-		&session.StartTime,
-		&session.EndTime,
+		&startTimeStr,
+		&endTimeStr,
 		&session.ReviewItemsCount,
 	)
 	if err != nil {
 		return nil, err
 	}
+
+	// Parse the time strings
+	startTime, err := time.Parse("2006-01-02 15:04:05", startTimeStr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse start time: %v", err)
+	}
+	session.StartTime = startTime
+
+	endTime, err := time.Parse("2006-01-02 15:04:05", endTimeStr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse end time: %v", err)
+	}
+	session.EndTime = endTime
 
 	return &session, nil
 }
@@ -248,6 +280,49 @@ func (s *StudySessionsService) FullReset() error {
 		if _, err := tx.Exec(fmt.Sprintf("DELETE FROM %s", table)); err != nil {
 			return err
 		}
+	}
+
+	// Insert test data
+	// Insert words with specific IDs
+	wordQuery := `
+		INSERT INTO words (id, japanese, romaji, english) VALUES
+		(1, '犬', 'inu', 'dog'),
+		(2, '猫', 'neko', 'cat'),
+		(3, '鳥', 'tori', 'bird')
+	`
+	if _, err := tx.Exec(wordQuery); err != nil {
+		return err
+	}
+
+	// Insert groups with specific IDs
+	groupQuery := `
+		INSERT INTO groups (id, name) VALUES
+		(1, 'Animals'),
+		(2, 'Basic Words')
+	`
+	if _, err := tx.Exec(groupQuery); err != nil {
+		return err
+	}
+
+	// Insert study activities with specific IDs
+	studyActivitiesQuery := `
+		INSERT INTO study_activities (id, name, thumbnail_url, description) VALUES
+		(1, 'Flashcards', 'https://example.com/flashcards.png', 'Practice with flashcards'),
+		(2, 'Multiple Choice', 'https://example.com/quiz.png', 'Test your knowledge with multiple choice questions')
+	`
+	if _, err := tx.Exec(studyActivitiesQuery); err != nil {
+		return err
+	}
+
+	// Insert words_groups with specific IDs
+	wordsGroupsQuery := `
+		INSERT INTO words_groups (word_id, group_id) VALUES
+		(1, 1),
+		(2, 1),
+		(3, 1)
+	`
+	if _, err := tx.Exec(wordsGroupsQuery); err != nil {
+		return err
 	}
 
 	if err := tx.Commit(); err != nil {

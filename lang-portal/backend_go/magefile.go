@@ -77,7 +77,9 @@ func InitDB() error {
 
 	CREATE TABLE IF NOT EXISTS study_activities (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		name TEXT NOT NULL
+		name TEXT NOT NULL,
+		thumbnail_url TEXT,
+		description TEXT
 	);
 
 	CREATE TABLE IF NOT EXISTS study_sessions (
@@ -147,5 +149,43 @@ func Reset() error {
 // ResetAndSeed resets the database and seeds it with initial data
 func ResetAndSeed() error {
 	mg.SerialDeps(Reset, InitDB, Seed)
+	return nil
+}
+
+// TestDB initializes the test database with test data
+func TestDB() error {
+	fmt.Println("Initializing test database...")
+
+	// Remove existing test database
+	os.Remove("words.test.db")
+
+	// Initialize database
+	db, err := models.NewDB("words.test.db")
+	if err != nil {
+		return fmt.Errorf("failed to open test database: %v", err)
+	}
+	defer db.Close()
+
+	// Apply schema
+	schema, err := os.ReadFile("db/migrations/001_initial_schema.sql")
+	if err != nil {
+		return fmt.Errorf("failed to read schema: %v", err)
+	}
+
+	if _, err := db.Exec(string(schema)); err != nil {
+		return fmt.Errorf("failed to apply schema: %v", err)
+	}
+
+	// Apply test data
+	testData, err := os.ReadFile("db/test_data.sql")
+	if err != nil {
+		return fmt.Errorf("failed to read test data: %v", err)
+	}
+
+	if _, err := db.Exec(string(testData)); err != nil {
+		return fmt.Errorf("failed to apply test data: %v", err)
+	}
+
+	fmt.Println("Test database initialized successfully")
 	return nil
 }

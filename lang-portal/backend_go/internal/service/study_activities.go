@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"lang-portal/internal/models"
+	"time"
 )
 
 type StudyActivitiesService struct {
@@ -33,7 +34,7 @@ func (s *StudyActivitiesService) GetStudyActivity(id int) (*models.StudyActivity
 	return &activity, nil
 }
 
-func (s *StudyActivitiesService) GetStudyActivitySessions(activityID, page int) ([]models.StudySessionResponse, *models.Pagination, error) {
+func (s *StudyActivitiesService) GetStudyActivitySessions(activityID, page int) ([]models.StudyActivitySessionResponse, *models.Pagination, error) {
 	itemsPerPage := 100
 	offset := (page - 1) * itemsPerPage
 
@@ -54,14 +55,10 @@ func (s *StudyActivitiesService) GetStudyActivitySessions(activityID, page int) 
 	query := `
 		SELECT 
 			ss.id,
-			sa.name as activity_name,
-			g.name as group_name,
-			ss.created_at as start_time,
-			DATETIME(ss.created_at, '+10 minutes') as end_time,
-			(SELECT COUNT(*) FROM word_review_items WHERE study_session_id = ss.id) as review_items_count
+			ss.group_id,
+			strftime('%Y-%m-%d %H:%M:%S', ss.created_at) as created_at,
+			ss.study_activity_id
 		FROM study_sessions ss
-		JOIN groups g ON ss.group_id = g.id
-		JOIN study_activities sa ON ss.study_activity_id = sa.id
 		WHERE ss.study_activity_id = ?
 		ORDER BY ss.created_at DESC
 		LIMIT ? OFFSET ?
@@ -73,19 +70,27 @@ func (s *StudyActivitiesService) GetStudyActivitySessions(activityID, page int) 
 	}
 	defer rows.Close()
 
-	var sessions []models.StudySessionResponse
+	var sessions []models.StudyActivitySessionResponse
 	for rows.Next() {
-		var session models.StudySessionResponse
+		var session models.StudyActivitySessionResponse
+		var createdAtStr string
+
 		if err := rows.Scan(
 			&session.ID,
-			&session.ActivityName,
-			&session.GroupName,
-			&session.StartTime,
-			&session.EndTime,
-			&session.ReviewItemsCount,
+			&session.GroupID,
+			&createdAtStr,
+			&session.StudyActivityID,
 		); err != nil {
 			return nil, nil, err
 		}
+
+		// Parse the time string
+		createdAt, err := time.Parse("2006-01-02 15:04:05", createdAtStr)
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to parse created_at time: %v", err)
+		}
+		session.CreatedAt = createdAt
+
 		sessions = append(sessions, session)
 	}
 
