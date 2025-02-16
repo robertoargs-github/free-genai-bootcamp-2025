@@ -6,6 +6,7 @@ from datetime import datetime
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from backend.question_generator import QuestionGenerator
+from backend.audio_generator import AudioGenerator
 
 # Page config
 st.set_page_config(
@@ -25,7 +26,7 @@ def load_stored_questions():
             return json.load(f)
     return {}
 
-def save_question(question, practice_type, topic):
+def save_question(question, practice_type, topic, audio_file=None):
     """Save a generated question to JSON file"""
     questions_file = os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -43,7 +44,8 @@ def save_question(question, practice_type, topic):
         "question": question,
         "practice_type": practice_type,
         "topic": topic,
-        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "audio_file": audio_file
     }
     
     # Add to stored questions
@@ -53,12 +55,16 @@ def save_question(question, practice_type, topic):
     os.makedirs(os.path.dirname(questions_file), exist_ok=True)
     with open(questions_file, 'w', encoding='utf-8') as f:
         json.dump(stored_questions, f, ensure_ascii=False, indent=2)
+    
+    return question_id
 
 def render_interactive_stage():
     """Render the interactive learning stage"""
     # Initialize session state
     if 'question_generator' not in st.session_state:
         st.session_state.question_generator = QuestionGenerator()
+    if 'audio_generator' not in st.session_state:
+        st.session_state.audio_generator = AudioGenerator()
     if 'current_question' not in st.session_state:
         st.session_state.current_question = None
     if 'feedback' not in st.session_state:
@@ -67,6 +73,8 @@ def render_interactive_stage():
         st.session_state.current_practice_type = None
     if 'current_topic' not in st.session_state:
         st.session_state.current_topic = None
+    if 'current_audio' not in st.session_state:
+        st.session_state.current_audio = None
         
     # Load stored questions for sidebar
     stored_questions = load_stored_questions()
@@ -82,6 +90,7 @@ def render_interactive_stage():
                     st.session_state.current_question = qdata['question']
                     st.session_state.current_practice_type = qdata['practice_type']
                     st.session_state.current_topic = qdata['topic']
+                    st.session_state.current_audio = qdata.get('audio_file')
                     st.session_state.feedback = None
                     st.rerun()
         else:
@@ -117,6 +126,7 @@ def render_interactive_stage():
         
         # Save the generated question
         save_question(new_question, practice_type, topic)
+        st.session_state.current_audio = None
     
     if st.session_state.current_question:
         st.subheader("Practice Scenario")
@@ -190,7 +200,47 @@ def render_interactive_stage():
         
         with col2:
             st.subheader("Audio")
-            st.info("Audio feature coming soon!")
+            if st.session_state.current_audio:
+                # Display audio player
+                st.audio(st.session_state.current_audio)
+            elif st.session_state.current_question:
+                # Show generate audio button
+                if st.button("Generate Audio"):
+                    with st.spinner("Generating audio..."):
+                        try:
+                            # Clear any previous audio
+                            if st.session_state.current_audio and os.path.exists(st.session_state.current_audio):
+                                try:
+                                    os.unlink(st.session_state.current_audio)
+                                except Exception:
+                                    pass
+                            st.session_state.current_audio = None
+                            
+                            # Generate new audio
+                            audio_file = st.session_state.audio_generator.generate_audio(
+                                st.session_state.current_question
+                            )
+                            
+                            # Verify the audio file exists
+                            if not os.path.exists(audio_file):
+                                raise Exception("Audio file was not created")
+                                
+                            st.session_state.current_audio = audio_file
+                            
+                            # Update stored question with audio file
+                            save_question(
+                                st.session_state.current_question,
+                                st.session_state.current_practice_type,
+                                st.session_state.current_topic,
+                                audio_file
+                            )
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Error generating audio: {str(e)}")
+                            # Clear the audio state on error
+                            st.session_state.current_audio = None
+            else:
+                st.info("Generate a question to create audio.")
     else:
         st.info("Click 'Generate New Question' to start practicing!")
 

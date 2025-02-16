@@ -30,5 +30,39 @@
     "practice_type": "Dialogue Practice",
     "topic": "Travel",
     "created_at": "2025-02-15 20:41:53"
+  },
+  "20250215_211441": {
+    "question": {
+      "Introduction": "男の人と女の人がショッピングセンターで話してい",
+      "Conversation": "男の人：このバッグはどれくらいしますか 店員：このバッグは5,000円です。他に何かご覧になりたいものがあれば教えてください。 女の人：あの、赤い靴は在庫ありますか？ 店員：はい、赤い靴はサイズ7とサイズ8があります。 男の人：じゃあ、このバッグを購入します。",
+      "Question": "男の人が購入する商品は何ですか A) バッグ B) 靴 C) 靴とバッグ D) 何も購入しない",
+      "Options": [
+        "ピザを食べる",
+        "ハンバーガーを食べる",
+        "サラダを食べる",
+        "パスタを食べる"
+      ]
+    },
+    "practice_type": "Dialogue Practice",
+    "topic": "Shopping",
+    "created_at": "2025-02-15 21:14:41",
+    "audio_file": "/mnt/c/Users/andre/Sites/omenking/free-genai-bootcamp-2025/listening-comp/frontend/static/audio/question_20250215_211437.mp3"
+  },
+  "20250215_211742": {
+    "question": {
+      "Introduction": "男の人と女の人がショッピングセンターで話してい",
+      "Conversation": "男の人：このバッグはどれくらいしますか 店員：このバッグは5,000円です。他に何かご覧になりたいものがあれば教えてください。 女の人：あの、赤い靴は在庫ありますか？ 店員：はい、赤い靴はサイズ7とサイズ8があります。 男の人：じゃあ、このバッグを購入します。",
+      "Question": "男の人が購入する商品は何ですか A) バッグ B) 靴 C) 靴とバッグ D) 何も購入しない",
+      "Options": [
+        "ピザを食べる",
+        "ハンバーガーを食べる",
+        "サラダを食べる",
+        "パスタを食べる"
+      ]
+    },
+    "practice_type": "Dialogue Practice",
+    "topic": "Shopping",
+    "created_at": "2025-02-15 21:17:42",
+    "audio_file": "/mnt/c/Users/andre/Sites/omenking/free-genai-bootcamp-2025/listening-comp/frontend/static/audio/question_20250215_211737.mp3"
   }
 }
