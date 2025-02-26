@@ -34,7 +34,7 @@ async def get_lyrics(request: LyricsRequest) -> Dict[str, Any]:
     try:
         # Initialize agent
         logger.debug("Initializing SongLyricsAgent")
-        agent = SongLyricsAgent()
+        agent = SongLyricsAgent(stream_llm=False, available_ram_gb=16)
         
         # Process request
         logger.info("Processing request through agent")

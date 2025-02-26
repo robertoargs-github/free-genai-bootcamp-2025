@@ -19,3 +19,21 @@ curl -X POST http://localhost:8000/api/agent \
 ```sh
 sudo snap logs ollama
 ```
+
+### Testing the SERP tool
+
+```sh
+python -m tests.serp-tool-test
+```
+
+### Testing the DGG tool
+
+```sh
+python -m tests.dgg-tool-test
+```
+
+### Testing Ollama SDK
+
+```sh
+python -m tests.ollama-test
+```

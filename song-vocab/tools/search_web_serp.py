@@ -1,4 +1,4 @@
-from serpapi import SerpApiClient
+from serpapi import GoogleSearch
 from typing import List, Dict
 import logging
 import os
@@ -26,26 +26,25 @@ async def search_web_serp(query: str, max_results: int = 5) -> List[Dict[str, st
     
     try:
         # Get API key from environment
-        api_key = os.getenv('SERPAPI_KEY')
-        logger.debug(f"SERPAPI_KEY found: {'yes' if api_key else 'no'}")
+        api_key = os.getenv('SERP_API_KEY')
+        logger.debug(f"SERP_API_KEY found: {'yes' if api_key else 'no'}")
         if not api_key:
-            logger.error("SERPAPI_KEY environment variable not set")
+            logger.error("SERP_API_KEY environment variable not set")
             return []
-        
-        # Configure search parameters
         params = {
+            "engine": "google",
             "q": enhanced_query,
-            "api_key": api_key,
             "num": max_results,
             "hl": "ja",  # Japanese language results
             "gl": "jp",  # Results from Japan
-            "engine": "google"  # Use Google search engine
+            "api_key": api_key
         }
         
         logger.debug(f"Sending request to SERP API with params: {params}")
         try:
-            client = SerpApiClient(api_key)
-            results = client.search(params)
+            search = GoogleSearch(params)
+            results = search.get_dict()
+            organic_results = results.get("organic_results", [])
             logger.debug(f"SERP API response: {results}")
         except Exception as e:
             logger.error(f"SERP API request failed: {e}", exc_info=True)
