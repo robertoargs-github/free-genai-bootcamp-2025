@@ -4,12 +4,13 @@
 
 Build a game like Advetnure using MUD (Minimal Unrealistic Dungeon).
 
-## Technical Requirements
-- Python
-- Gradio
-- OpenAI
 
 ## Backend
+
+### Backend Technical Requirements
+- Python
+- FastAPI
+- OpenAI
 
 ### Backend Components
 
@@ -45,7 +46,30 @@ After each turn the state of the game is updated.
 
 ## Frontend
 
-### UI Inteface Requirements
-- Text chat
-- Text input
+### Frontend Technical Requirements
 
+- React
+- Typescript
+- OpenAI
+- Tailwind CSS
+- Vite.js
+- ShadCN
+
+### UI Inteface Requirements
+
+#### Text chat
+
+This is a text history window.
+It should always be scrolled to the bottom.
+When it recieves a response from the server it should print below.
+It should be like a chat history conversation where there are coloured bubbles for user and bot.
+
+#### Text input
+
+This is a text input field where the user can type their input.
+There is no submit button. When they press enter it will submit
+It should be disabled when the its sending a message.
+It should show a progress spinner when the message is sending.
+It should clear after the message is sent.
+It should enabled again after the message is sent
+In the case of error it should leave the current message in place and show in red text the error below the input box

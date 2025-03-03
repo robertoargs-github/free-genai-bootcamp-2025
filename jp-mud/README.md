@@ -1,6 +1,6 @@
 # Japanese Language Learning MUD
 
-A text-based adventure game for learning Japanese vocabulary, implemented with Gradio for a simple web interface.
+A text-based adventure game for learning Japanese vocabulary, implemented with FastAPI backend and React frontend.
 
 ## Setup
 
@@ -9,12 +9,39 @@ A text-based adventure game for learning Japanese vocabulary, implemented with G
 pip install -r requirements.txt
 ```
 
-2. Run the game:
-```bash
-python game/mud.py
-```
+## Running the Backend
 
-3. Open your browser and navigate to the URL shown in the terminal (typically http://localhost:7860)
+### Option 1: Using the FastAPI server
+```bash
+python run_api.py
+```
+This will start the FastAPI server on http://localhost:8000
+
+### Option 2: Using the Gradio interface (legacy)
+```bash
+python game.py
+```
+This will start the Gradio interface on http://localhost:7860
+
+## API Endpoints
+
+The FastAPI backend provides the following endpoints:
+
+- `GET /` - Welcome message
+- `POST /api/game/new` - Start a new game session or reset an existing one
+- `POST /api/game/message` - Send a message to the game (creates a new session if none provided)
+- `GET /api/game/load/{session_id}` - Load an existing game session
+- `GET /api/game/sessions` - List all active game sessions (for debugging)
+- `POST /api/game/cleanup` - Clean up old game sessions (for maintenance)
+
+Note: Game state is automatically saved to a JSON file after each message, providing persistence across server restarts. The system also automatically cleans up sessions older than 7 days when the server starts.
+
+
+### How to run backend
+
+```sh
+uvicorn api:app --reload
+```
 
 ## How to Play
 
