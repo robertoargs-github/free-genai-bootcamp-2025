@@ -35,8 +35,8 @@ class MenuScene extends Phaser.Scene {
         this.createMenuButtons();
         
         // Add background music
-        if (!this.sound.get('menu-music')) {
-            this.sound.add('menu-music', {
+        if (!this.sound.get('bg-music')) {
+            this.sound.add('bg-music', {
                 volume: config.gameSettings.bgmVolume,
                 loop: true
             }).play();
@@ -58,13 +58,16 @@ class MenuScene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true })
             .on('pointerover', () => {
                 newGameButton.setTexture('button-hover');
-                this.sound.play('click', { volume: 0.5 });
             })
             .on('pointerout', () => {
                 newGameButton.setTexture('button');
             })
             .on('pointerdown', () => {
-                this.sound.play('click');
+                try {
+                    this.sound.play('click');
+                } catch (e) {
+                    console.warn('Click sound not available');
+                }
                 this.startNewGame();
             });
             
@@ -80,7 +83,6 @@ class MenuScene extends Phaser.Scene {
             .on('pointerover', () => {
                 if (hasSave) {
                     continueButton.setTexture('button-hover');
-                    this.sound.play('click', { volume: 0.5 });
                 }
             })
             .on('pointerout', () => {
@@ -88,7 +90,11 @@ class MenuScene extends Phaser.Scene {
             })
             .on('pointerdown', () => {
                 if (hasSave) {
-                    this.sound.play('click');
+                    try {
+                        this.sound.play('click');
+                    } catch (e) {
+                        console.warn('Click sound not available');
+                    }
                     this.continueGame();
                 }
             });
@@ -103,13 +109,16 @@ class MenuScene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true })
             .on('pointerover', () => {
                 settingsButton.setTexture('button-hover');
-                this.sound.play('click', { volume: 0.5 });
             })
             .on('pointerout', () => {
                 settingsButton.setTexture('button');
             })
             .on('pointerdown', () => {
-                this.sound.play('click');
+                try {
+                    this.sound.play('click');
+                } catch (e) {
+                    console.warn('Click sound not available');
+                }
                 this.openSettings();
             });
             
@@ -122,13 +131,16 @@ class MenuScene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true })
             .on('pointerover', () => {
                 helpButton.setTexture('button-hover');
-                this.sound.play('click', { volume: 0.5 });
             })
             .on('pointerout', () => {
                 helpButton.setTexture('button');
             })
             .on('pointerdown', () => {
-                this.sound.play('click');
+                try {
+                    this.sound.play('click');
+                } catch (e) {
+                    console.warn('Click sound not available');
+                }
                 this.openLanguageHelp();
             });
             

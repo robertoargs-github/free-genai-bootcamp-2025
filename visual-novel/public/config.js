@@ -1,8 +1,8 @@
 // Game configuration
 const config = {
     type: Phaser.AUTO,
-    width: 1280,
-    height: 720,
+    width: 1920,
+    height: 1080,
     parent: 'game-container',
     backgroundColor: '#ffffff',
     scale: {
@@ -26,7 +26,7 @@ const config = {
         textSpeed: 30,    // Text display speed (ms per character)
         autoAdvance: false, // Auto-advance dialogue
         sfxVolume: 0.7,   // Sound effects volume
-        bgmVolume: 0.5,   // Background music volume
+        bgmVolume: 0.05,   // Background music volume
         fontSize: 24,     // Base font size
         currentChapter: 1,
         currentScene: 'scene001',

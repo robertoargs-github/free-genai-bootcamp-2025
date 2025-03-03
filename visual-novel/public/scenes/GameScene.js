@@ -58,6 +58,15 @@ class GameScene extends Phaser.Scene {
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
         
+        // Play background music
+        if (!this.sound.get('bg-music')) {
+            this.bgMusic = this.sound.add('bg-music', {
+                volume: config.gameSettings.bgmVolume,
+                loop: true
+            });
+            this.bgMusic.play();
+        }
+        
         // Create the background
         this.createBackground();
         
@@ -186,7 +195,11 @@ class GameScene extends Phaser.Scene {
             .setDisplaySize(buttonSize, buttonSize)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-                this.sound.play('click');
+                try {
+                    this.sound.play('click');
+                } catch (e) {
+                    console.warn('Click sound not available');
+                }
                 this.toggleAutoMode();
             });
         
@@ -195,7 +208,11 @@ class GameScene extends Phaser.Scene {
             .setDisplaySize(buttonSize, buttonSize)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-                this.sound.play('click');
+                try {
+                    this.sound.play('click');
+                } catch (e) {
+                    console.warn('Click sound not available');
+                }
                 this.toggleSkipMode();
             });
         
@@ -204,7 +221,11 @@ class GameScene extends Phaser.Scene {
             .setDisplaySize(buttonSize, buttonSize)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-                this.sound.play('click');
+                try {
+                    this.sound.play('click');
+                } catch (e) {
+                    console.warn('Click sound not available');
+                }
                 this.saveGame();
             });
         
@@ -213,7 +234,11 @@ class GameScene extends Phaser.Scene {
             .setDisplaySize(buttonSize, buttonSize)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-                this.sound.play('click');
+                try {
+                    this.sound.play('click');
+                } catch (e) {
+                    console.warn('Click sound not available');
+                }
                 this.loadGame();
             });
         
@@ -222,7 +247,11 @@ class GameScene extends Phaser.Scene {
             .setDisplaySize(buttonSize, buttonSize)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-                this.sound.play('click');
+                try {
+                    this.sound.play('click');
+                } catch (e) {
+                    console.warn('Click sound not available');
+                }
                 this.openSettings();
             });
         
@@ -231,7 +260,11 @@ class GameScene extends Phaser.Scene {
             .setDisplaySize(buttonSize, buttonSize)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-                this.sound.play('click');
+                try {
+                    this.sound.play('click');
+                } catch (e) {
+                    console.warn('Click sound not available');
+                }
                 this.toggleLanguage();
             });
         
@@ -240,7 +273,11 @@ class GameScene extends Phaser.Scene {
             .setDisplaySize(buttonSize, buttonSize)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-                this.sound.play('click');
+                try {
+                    this.sound.play('click');
+                } catch (e) {
+                    console.warn('Click sound not available');
+                }
                 this.scene.launch('LanguageHelp');
                 this.scene.pause();
             });
@@ -376,13 +413,6 @@ class GameScene extends Phaser.Scene {
         let currentChar = 0;
         const textSpeed = config.gameSettings.textSpeed || this.textSpeed;
         
-        // Start typing sound
-        const typingSound = this.sound.add('typing', {
-            volume: 0.2,
-            loop: true
-        });
-        typingSound.play();
-        
         this.typingEffect = this.time.addEvent({
             delay: textSpeed,
             callback: () => {
@@ -392,7 +422,6 @@ class GameScene extends Phaser.Scene {
                 
                 // Check if typing is complete
                 if (currentChar >= content.length) {
-                    typingSound.stop();
                     this.typingEffect.remove();
                     
                     // If this is the English text (or only text), mark dialogue as complete
@@ -452,7 +481,11 @@ class GameScene extends Phaser.Scene {
                     button.clearTint();
                 })
                 .on('pointerdown', () => {
-                    this.sound.play('click');
+                    try {
+                        this.sound.play('click');
+                    } catch (e) {
+                        console.warn('Click sound not available');
+                    }
                     this.handleChoice(choice);
                 });
                 

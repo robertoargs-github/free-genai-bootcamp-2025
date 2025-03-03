@@ -133,28 +133,22 @@ class PreloadScene extends Phaser.Scene {
         ];
         
         backgrounds.forEach(bg => {
-            this.load.image(bg.id, `assets/scenes/${bg.id}.png`);
+            this.load.image(bg.id, `assets/scenes/${bg.id}.jpg`);
         });
     }
     
     loadAudioAssets() {
         // Load sound effects
-        this.load.audio('click', 'assets/audio/click.mp3');
-        this.load.audio('typing', 'assets/audio/typing.mp3');
+        this.load.audio('click', 'assets/audio/click.wav');
         this.load.audio('transition', 'assets/audio/transition.mp3');
         
-        // Load background music
-        this.load.audio('menu-music', 'assets/audio/menu-music.mp3');
-        this.load.audio('apartment-bgm', 'assets/audio/apartment-bgm.mp3');
-        this.load.audio('classroom-bgm', 'assets/audio/classroom-bgm.mp3');
-        this.load.audio('cafe-bgm', 'assets/audio/cafe-bgm.mp3');
-        this.load.audio('post-office-bgm', 'assets/audio/post-office-bgm.mp3');
-        this.load.audio('store-bgm', 'assets/audio/store-bgm.mp3');
+        // Load background music - using a single background track
+        this.load.audio('bg-music', 'assets/audio/bg.wav');
     }
     
     loadStoryData() {
         // Load all scene data
-        this.load.json('scene001', 'outputs/scenes/scene001.json');
+        this.load.json('scene001', 'data/scenes/scene001.json');
         // In a full game, you would load all scenes here
     }
     

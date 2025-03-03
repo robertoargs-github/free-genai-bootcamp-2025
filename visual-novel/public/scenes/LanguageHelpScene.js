@@ -31,13 +31,16 @@ class LanguageHelpScene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true })
             .on('pointerover', () => {
                 backButton.setTexture('button-hover');
-                this.sound.play('click', { volume: 0.5 });
             })
             .on('pointerout', () => {
                 backButton.setTexture('button');
             })
             .on('pointerdown', () => {
-                this.sound.play('click');
+                try {
+                    this.sound.play('click');
+                } catch (e) {
+                    console.warn('Click sound not available');
+                }
                 this.scene.start('Menu');
             });
             
@@ -69,8 +72,20 @@ class LanguageHelpScene extends Phaser.Scene {
         const basicPhrasesTab = this.add.rectangle(width / 2 - tabWidth - tabSpacing, tabY, tabWidth, tabHeight, 0x4a4e69)
             .setStrokeStyle(2, 0xffffff)
             .setInteractive({ useHandCursor: true })
+            .on('pointerover', () => {
+                basicPhrasesTab.setFillStyle(0x5d6eaa);
+            })
+            .on('pointerout', () => {
+                if (this.activeTab !== basicPhrasesTab) {
+                    basicPhrasesTab.setFillStyle(0x4a4e69);
+                }
+            })
             .on('pointerdown', () => {
-                this.sound.play('click');
+                try {
+                    this.sound.play('click');
+                } catch (e) {
+                    console.warn('Click sound not available');
+                }
                 this.setActiveTab(basicPhrasesTab);
                 this.showBasicPhrases();
             });
@@ -82,8 +97,20 @@ class LanguageHelpScene extends Phaser.Scene {
         const grammarTab = this.add.rectangle(width / 2, tabY, tabWidth, tabHeight, 0x4a4e69)
             .setStrokeStyle(2, 0xffffff)
             .setInteractive({ useHandCursor: true })
+            .on('pointerover', () => {
+                grammarTab.setFillStyle(0x5d6eaa);
+            })
+            .on('pointerout', () => {
+                if (this.activeTab !== grammarTab) {
+                    grammarTab.setFillStyle(0x4a4e69);
+                }
+            })
             .on('pointerdown', () => {
-                this.sound.play('click');
+                try {
+                    this.sound.play('click');
+                } catch (e) {
+                    console.warn('Click sound not available');
+                }
                 this.setActiveTab(grammarTab);
                 this.showGrammar();
             });
@@ -95,8 +122,20 @@ class LanguageHelpScene extends Phaser.Scene {
         const vocabTab = this.add.rectangle(width / 2 + tabWidth + tabSpacing, tabY, tabWidth, tabHeight, 0x4a4e69)
             .setStrokeStyle(2, 0xffffff)
             .setInteractive({ useHandCursor: true })
+            .on('pointerover', () => {
+                vocabTab.setFillStyle(0x5d6eaa);
+            })
+            .on('pointerout', () => {
+                if (this.activeTab !== vocabTab) {
+                    vocabTab.setFillStyle(0x4a4e69);
+                }
+            })
             .on('pointerdown', () => {
-                this.sound.play('click');
+                try {
+                    this.sound.play('click');
+                } catch (e) {
+                    console.warn('Click sound not available');
+                }
                 this.setActiveTab(vocabTab);
                 this.showVocabulary();
             });
@@ -112,6 +151,9 @@ class LanguageHelpScene extends Phaser.Scene {
     }
     
     setActiveTab(activeTab) {
+        // Store the active tab reference
+        this.activeTab = activeTab;
+        
         // Update tab appearances
         this.tabs.forEach(tab => {
             if (tab === activeTab) {
