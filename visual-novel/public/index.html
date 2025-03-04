@@ -10,11 +10,31 @@
 <body>
     <div id="game-container"></div>
     <script src="config.js"></script>
+    
+    <!-- Managers  -->
+    <script src="lib/UIManager.js"></script>
+    <script src="lib/NotificationManager.js"></script>
+    <script src="lib/DialogueManager.js"></script>
+    <script src="lib/CharacterManager.js"></script>
+    <script src="lib/SaveManager.js"></script>
+    <script src="lib/InputManager.js"></script>
+    <script src="lib/AudioManager.js"></script>
+    <script src="lib/SettingsManager.js"></script>
+    <script src="lib/StoryManager.js"></script>
+    
+    <!-- Library Modules - Utilities -->
+    <script src="lib/utils/EventBus.js"></script>
+    <script src="lib/utils/AssetLoader.js"></script>
+    <script src="lib/utils/SceneTransition.js"></script>
+    
+    <!-- Game Scenes -->
     <script src="scenes/BootScene.js"></script>
     <script src="scenes/PreloadScene.js"></script>
     <script src="scenes/MenuScene.js"></script>
     <script src="scenes/GameScene.js"></script>
     <script src="scenes/LanguageHelpScene.js"></script>
+    
+    <!-- Main Game Entry Point -->
     <script src="main.js"></script>
 </body>
 </html>

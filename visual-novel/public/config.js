@@ -7,7 +7,11 @@ const config = {
     backgroundColor: '#ffffff',
     scale: {
         mode: Phaser.Scale.FIT,
-        autoCenter: Phaser.Scale.CENTER_BOTH
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: 1920,
+        height: 1080,
+        parent: 'game-container',
+        expandParent: true
     },
     scene: [], // Scenes will be added in main.js
     physics: {
@@ -25,8 +29,8 @@ const config = {
         language: 'dual', // 'japanese', 'english', or 'dual'
         textSpeed: 30,    // Text display speed (ms per character)
         autoAdvance: false, // Auto-advance dialogue
-        sfxVolume: 0.7,   // Sound effects volume
-        bgmVolume: 0.05,   // Background music volume
+        sfxVolume: 0.2,   // Sound effects volume
+        bgmVolume: 0.01,   // Background music volume
         fontSize: 24,     // Base font size
         currentChapter: 1,
         currentScene: 'scene001',

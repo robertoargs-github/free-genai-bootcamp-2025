@@ -99,6 +99,8 @@ class PreloadScene extends Phaser.Scene {
         this.load.image('auto-icon', 'assets/ui/auto-icon.png');
         this.load.image('skip-icon', 'assets/ui/skip-icon.png');
         this.load.image('help-icon', 'assets/ui/help-icon.png');
+        this.load.image('next-button', 'assets/ui/next-button.png');
+        this.load.image('next-button-hover', 'assets/ui/next-button-hover.png');
         
         // Create placeholder UI elements if they don't exist
         this.createPlaceholderUI();
@@ -186,6 +188,40 @@ class PreloadScene extends Phaser.Scene {
         
         // Add the dialog box to the texture manager
         this.textures.addCanvas('dialog-box', dialogBox);
+        
+        // Create next button placeholder
+        const nextButton = document.createElement('canvas');
+        nextButton.width = 80;
+        nextButton.height = 50;
+        const nextButtonCtx = nextButton.getContext('2d');
+        nextButtonCtx.fillStyle = '#0077cc';
+        nextButtonCtx.fillRect(0, 0, 80, 50);
+        nextButtonCtx.strokeStyle = '#ffffff';
+        nextButtonCtx.lineWidth = 2;
+        nextButtonCtx.strokeRect(2, 2, 76, 46);
+        nextButtonCtx.fillStyle = '#ffffff';
+        nextButtonCtx.font = '18px Arial';
+        nextButtonCtx.textAlign = 'center';
+        nextButtonCtx.textBaseline = 'middle';
+        nextButtonCtx.fillText('Next', 40, 25);
+        this.textures.addCanvas('next-button', nextButton);
+
+        // Create next button hover placeholder
+        const nextButtonHover = document.createElement('canvas');
+        nextButtonHover.width = 80;
+        nextButtonHover.height = 50;
+        const nextButtonHoverCtx = nextButtonHover.getContext('2d');
+        nextButtonHoverCtx.fillStyle = '#00aaff';
+        nextButtonHoverCtx.fillRect(0, 0, 80, 50);
+        nextButtonHoverCtx.strokeStyle = '#ffffff';
+        nextButtonHoverCtx.lineWidth = 2;
+        nextButtonHoverCtx.strokeRect(2, 2, 76, 46);
+        nextButtonHoverCtx.fillStyle = '#ffffff';
+        nextButtonHoverCtx.font = '18px Arial';
+        nextButtonHoverCtx.textAlign = 'center';
+        nextButtonHoverCtx.textBaseline = 'middle';
+        nextButtonHoverCtx.fillText('Next', 40, 25);
+        this.textures.addCanvas('next-button-hover', nextButtonHover);
         
         // Similarly for other UI elements...
     }
