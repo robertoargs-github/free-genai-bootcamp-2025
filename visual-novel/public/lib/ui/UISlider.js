@@ -21,12 +21,18 @@ class UISlider {
         this.value = options.value;
         this.eventHandle = options.eventHandle;
         this.showValue = options.showValue !== undefined ? options.showValue : true;
+        // Track padding to ensure handle is fully visible
+        this.padding = options.padding !== undefined ? options.padding : 5;
 
         // Calculate dimensions
         this.width = options.size[0];
         this.height = options.size[1];
         this.x = options.position[0];
         this.y = options.position[1];
+        
+        // Calculate the center position for the track (converting from top-left to center positioning)
+        this.trackX = this.x + (this.width / 2);
+        this.trackY = this.y + (this.height / 2);
 
         // Define styles
         this.textStyle = {
@@ -36,15 +42,19 @@ class UISlider {
         };
 
         // Create slider track (background)
-        this.track = this.scene.add.image(this.x, this.y, 'slider-track');
-        this.track.setDisplaySize(this.width, this.height);
+        this.track = this.scene.add.image(this.trackX, this.trackY, 'slider-track');
+        // Adjust track size to leave room for handle
+        const effectiveWidth = this.width - (this.padding * 2);
+        this.track.setDisplaySize(effectiveWidth, this.height);
 
         // Calculate handle position based on value
         const handleX = this.getHandleXFromValue(this.value);
         
         // Create slider handle
-        this.handle = this.scene.add.image(handleX, this.y, 'slider-handle');
-        this.handle.setDisplaySize(this.height * 1.5, this.height * 1.5);
+        this.handle = this.scene.add.image(handleX, this.trackY, 'slider-handle');
+        // Make handle size proportional to track height but not too large
+        const handleSize = Math.min(this.height * 1.5, 30);
+        this.handle.setDisplaySize(handleSize, handleSize);
         this.handle.setInteractive({ useHandCursor: true });
 
         // Set up drag events
@@ -52,9 +62,9 @@ class UISlider {
         
         this.scene.input.on('drag', (pointer, gameObject, dragX, dragY) => {
             if (gameObject === this.handle) {
-                // Constrain handle to track bounds
-                const leftBound = this.x - (this.width / 2);
-                const rightBound = this.x + (this.width / 2);
+                // Constrain handle to track bounds with padding
+                const leftBound = this.x + this.padding;
+                const rightBound = this.x + this.width - this.padding;
                 
                 const constrainedX = Phaser.Math.Clamp(dragX, leftBound, rightBound);
                 gameObject.x = constrainedX;
@@ -80,8 +90,8 @@ class UISlider {
         this.track.setInteractive({ useHandCursor: true });
         this.track.on('pointerdown', (pointer) => {
             // Move handle to click position
-            const leftBound = this.x - (this.width / 2);
-            const rightBound = this.x + (this.width / 2);
+            const leftBound = this.x + this.padding;
+            const rightBound = this.x + this.width - this.padding;
             const clickX = Phaser.Math.Clamp(pointer.x, leftBound, rightBound);
             
             this.handle.x = clickX;
@@ -104,8 +114,8 @@ class UISlider {
         // Add value text if showValue is true
         if (this.showValue) {
             this.valueText = this.scene.add.text(
-                this.x + (this.width / 2) + 20, 
-                this.y, 
+                this.x + this.width + 20, 
+                this.trackY, 
                 Math.round(this.value).toString(),
                 this.textStyle
             );
@@ -184,17 +194,16 @@ class UISlider {
      */
     getHandleXFromValue(value) {
         const percentage = (value - this.min) / (this.max - this.min);
-        const trackWidth = this.width;
-        const leftEdge = this.x - (trackWidth / 2);
-        return leftEdge + (percentage * trackWidth);
+        const effectiveWidth = this.width - (this.padding * 2);
+        return this.x + this.padding + (percentage * effectiveWidth);
     }
 
     /**
      * Update the value based on the handle's current position
      */
     updateValueFromHandlePosition() {
-        const leftEdge = this.x - (this.width / 2);
-        const percentage = (this.handle.x - leftEdge) / this.width;
+        const effectiveWidth = this.width - (this.padding * 2);
+        const percentage = (this.handle.x - (this.x + this.padding)) / effectiveWidth;
         this.value = this.min + (percentage * (this.max - this.min));
     }
 
