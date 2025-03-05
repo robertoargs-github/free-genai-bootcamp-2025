@@ -16,9 +16,7 @@ class SettingsManager {
             bgmVolume: 0.01,       // 0-1
             sfxVolume: 0.1,        // 0-1
             fontSize: 24,          // base font size
-            typewriterEffect: true, // use typewriter effect for text
-            currentScene: 'scene001',
-            currentChapter: 1
+            typewriterEffect: true // use typewriter effect for text
         };
     }
     

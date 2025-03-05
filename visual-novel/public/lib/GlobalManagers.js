@@ -57,6 +57,10 @@ class GlobalManagers {
         console.log('ev',ev);
     }
 
+    settingsGame(ev) {
+        console.log('settings ui')
+    }
+
 
 
     /**

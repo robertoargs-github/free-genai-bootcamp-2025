@@ -12,4 +12,9 @@ class UIManager {
         const button = new UIButton(this.scene,options)
         return button;
     }
+
+    createSlider(options) {
+        const slider = new UISlider(this.scene,options)
+        return slider;
+    }
 }
