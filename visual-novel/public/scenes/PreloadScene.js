@@ -1,106 +1,85 @@
+// Import AssetLoader if needed, but we'll assume it's globally available
+// through a script tag in the HTML file
+
 class PreloadScene extends Phaser.Scene {
     constructor() {
         super({ key: 'Preload' });
     }
 
     preload() {
+        // Initialize AssetLoader
+        this.assetLoader = new AssetLoader(this);
+        
         // Create loading bar
-        this.createLoadingBar();
+        this.loadingBar = this.assetLoader.createLoadingBar(
+            this.cameras.main.width / 2 - 200, 
+            this.cameras.main.height / 2 - 20, 
+            400, 
+            40, 
+            2
+        );
         
-        // Load UI assets
-        this.loadUIAssets();
-        
-        // Load character images
-        this.loadCharacterAssets();
-        
-        // Load background images
-        this.loadBackgroundAssets();
-        
-        // Load audio assets
-        this.loadAudioAssets();
-        
-        // Load story data
-        this.loadStoryData();
-        
-        // Load fonts
-        this.loadFonts();
+        // Load all assets using AssetLoader
+        this.loadAllAssets();
+    }
+    
+    loadAllAssets() {
+        this.loadUIAssets(); // Load UI assets
+        this.loadCharacterAssets(); // Load character images
+        this.loadBackgroundAssets(); // Load background images
+        this.loadAudioAssets(); // Load audio assets
+        this.loadStoryData();  // Load story data
     }
 
     create() {
-        // Create animations if needed
-        this.createAnimations();
+        // Complete initialization of global managers now that all assets are loaded
+        this.finalizeGlobalManagers();
         
-        // Go to the menu scene when everything is loaded
+        // Start the menu scene
         this.scene.start('Menu');
     }
     
-    createLoadingBar() {
-        // Create a loading bar using the images loaded in the boot scene
-        const width = this.cameras.main.width;
-        const height = this.cameras.main.height;
+    /**
+     * Complete initialization of global managers after all assets are loaded
+     */
+    finalizeGlobalManagers() {
+        const isPending = this.game.registry.get('globalManagersPending');
         
-        // Position the loading bar in the center of the screen
-        const loadingBg = this.add.image(width / 2, height / 2, 'loading-bg');
-        const loadingBar = this.add.image(width / 2 - 198, height / 2, 'loading-bar');
-        loadingBar.setOrigin(0, 0.5);
-        
-        // Set up loading bar progress
-        const progressBar = this.add.graphics();
-        const progressBox = this.add.graphics();
-        progressBox.fillStyle(0x222222, 0.8);
-        progressBox.fillRect(width / 2 - 200, height / 2 - 20, 400, 40);
-        
-        // Loading text
-        const loadingText = this.add.text(width / 2, height / 2 - 50, 'Loading...', {
-            font: '20px Arial',
-            fill: '#ffffff'
-        });
-        loadingText.setOrigin(0.5, 0.5);
-        
-        // Percentage text
-        const percentText = this.add.text(width / 2, height / 2 + 50, '0%', {
-            font: '18px Arial',
-            fill: '#ffffff'
-        });
-        percentText.setOrigin(0.5, 0.5);
-        
-        // Update the loading bar as assets are loaded
-        this.load.on('progress', (value) => {
-            progressBar.clear();
-            progressBar.fillStyle(0x7289DA, 1);
-            progressBar.fillRect(width / 2 - 198, height / 2 - 19, 396 * value, 38);
-            percentText.setText(parseInt(value * 100) + '%');
-            loadingBar.setScale(value, 1);
-        });
-        
-        // Clean up when loading is complete
-        this.load.on('complete', () => {
-            progressBar.destroy();
-            progressBox.destroy();
-            loadingText.destroy();
-            percentText.destroy();
-            loadingBg.destroy();
-            loadingBar.destroy();
-        });
+        if (isPending) {
+            console.log('Finalizing global managers initialization');
+            
+            // Get the existing GlobalManagers instance from registry
+            const globalManagers = this.game.registry.get('globalManagers');
+            
+            // Now initialize it with all assets loaded
+            globalManagers.create(this);
+
+            // Remove the pending flag
+            this.game.registry.remove('globalManagersPending');
+        }
     }
     
+
+    
     loadUIAssets() {
-        // Load UI elements
-        this.load.image('dialog-box', 'assets/ui/dialog-box.png');
-        this.load.image('name-box', 'assets/ui/name-box.png');
-        this.load.image('choice-box', 'assets/ui/choice-box.png');
-        this.load.image('menu-bg', 'assets/ui/menu-background.png');
-        this.load.image('button', 'assets/ui/button.png');
-        this.load.image('button-hover', 'assets/ui/button-hover.png');
-        this.load.image('settings-icon', 'assets/ui/settings-icon.png');
-        this.load.image('language-icon', 'assets/ui/language-icon.png');
-        this.load.image('save-icon', 'assets/ui/save-icon.png');
-        this.load.image('load-icon', 'assets/ui/load-icon.png');
-        this.load.image('auto-icon', 'assets/ui/auto-icon.png');
-        this.load.image('skip-icon', 'assets/ui/skip-icon.png');
-        this.load.image('help-icon', 'assets/ui/help-icon.png');
-        this.load.image('next-button', 'assets/ui/next-button.png');
-        this.load.image('next-button-hover', 'assets/ui/next-button-hover.png');
+        // Load UI assets using AssetLoader
+        this.assetLoader.preloadImages([
+            { id: 'dialog-box', path: 'ui/dialog-box.png' },
+            { id: 'name-box', path: 'ui/name-box.png' },
+            { id: 'choice-box', path: 'ui/choice-box.png' },
+            { id: 'menu-bg', path: 'ui/menu-background.png' },
+            { id: 'button', path: 'ui/button.png' },
+            { id: 'button-hover', path: 'ui/button-hover.png' },
+            { id: 'settings-icon', path: 'ui/settings-icon.png' },
+            { id: 'language-icon', path: 'ui/language-icon.png' },
+            { id: 'save-icon', path: 'ui/save-icon.png' },
+            { id: 'load-icon', path: 'ui/load-icon.png' },
+            { id: 'auto-icon', path: 'ui/auto-icon.png' },
+            { id: 'skip-icon', path: 'ui/skip-icon.png' },
+            { id: 'help-icon', path: 'ui/help-icon.png' },
+            { id: 'next-button', path: 'ui/next-button.png' },
+            { id: 'next-button-hover', path: 'ui/next-button-hover.png' }
+        ]);
         
         // Create placeholder UI elements if they don't exist
         this.createPlaceholderUI();
@@ -109,62 +88,55 @@ class PreloadScene extends Phaser.Scene {
     loadCharacterAssets() {
         // Load character sprites
         const characters = [
-            { id: 'alex', name: 'Alex Thompson' },
-            { id: 'yamamoto', name: 'Yamamoto Sensei' },
-            { id: 'minji', name: 'Kim Min-ji' },
-            { id: 'carlos', name: 'Garcia Carlos' },
-            { id: 'hiroshi', name: 'Tanaka Hiroshi' },
-            { id: 'yuki', name: 'Nakamura Yuki' },
-            { id: 'kenji', name: 'Suzuki Kenji' },
-            { id: 'akiko', name: 'Watanabe Akiko' }
+            { id: 'alex', path: 'characters/alex.png', name: 'Alex Thompson' },
+            { id: 'yamamoto', path: 'characters/yamamoto.png', name: 'Yamamoto Sensei' },
+            { id: 'minji', path: 'characters/minji.png', name: 'Kim Min-ji' },
+            { id: 'carlos', path: 'characters/carlos.png', name: 'Garcia Carlos' },
+            { id: 'hiroshi', path: 'characters/hiroshi.png', name: 'Tanaka Hiroshi' },
+            { id: 'yuki', path: 'characters/yuki.png', name: 'Nakamura Yuki' },
+            { id: 'kenji', path: 'characters/kenji.png', name: 'Suzuki Kenji' },
+            { id: 'akiko', path: 'characters/akiko.png', name: 'Watanabe Akiko' }
         ];
         
-        characters.forEach(character => {
-            this.load.image(character.id, `assets/characters/${character.id}.png`);
-        });
+        // Load character assets using AssetLoader
+        this.assetLoader.preloadImages(characters);
     }
     
     loadBackgroundAssets() {
         // Load background images
         const backgrounds = [
-            { id: 'apartment', name: 'Apartment Interior' },
-            { id: 'classroom', name: 'Language School Classroom' },
-            { id: 'cafe', name: 'Cafe Interior' },
-            { id: 'post-office', name: 'Post Office Interior' },
-            { id: 'store', name: 'Corner Store Interior' }
+            { id: 'apartment', path: 'scenes/apartment.jpg', name: 'Apartment Interior' },
+            { id: 'classroom', path: 'scenes/classroom.jpg', name: 'Language School Classroom' },
+            { id: 'cafe', path: 'scenes/cafe.jpg', name: 'Cafe Interior' },
+            { id: 'post-office', path: 'scenes/post-office.jpg', name: 'Post Office Interior' },
+            { id: 'store', path: 'scenes/store.jpg', name: 'Corner Store Interior' }
         ];
         
-        backgrounds.forEach(bg => {
-            this.load.image(bg.id, `assets/scenes/${bg.id}.jpg`);
-        });
+        // Load background assets using AssetLoader
+        this.assetLoader.preloadImages(backgrounds);
     }
     
     loadAudioAssets() {
-        // Load sound effects
-        this.load.audio('click', 'assets/audio/click.wav');
-        this.load.audio('transition', 'assets/audio/transition.mp3');
+        // Define audio assets to load
+        const audioAssets = [
+            { id: 'click', path: 'click.wav' },
+            { id: 'transition', path: 'transition.mp3' },
+            { id: 'bg-music', path: 'bg.wav' }
+        ];
         
-        // Load background music - using a single background track
-        this.load.audio('bg-music', 'assets/audio/bg.wav');
+        // Load audio assets using AssetLoader
+        this.assetLoader.preloadAudio(audioAssets);
     }
     
     loadStoryData() {
-        // Load all scene data
-        this.load.json('scene001', 'data/scenes/scene001.json');
-        // In a full game, you would load all scenes here
-    }
-    
-    loadFonts() {
-        // In Phaser, we don't directly load fonts, but we can ensure they're available
-        // by adding a WebFont loader plugin or by using CSS (as we did in styles.css)
-        // For now, we'll just log that we're "loading" fonts
-        console.log('Ensuring fonts are loaded...');
-    }
-    
-    createAnimations() {
-        // Create any animations needed for the game
-        // For a visual novel, this might be minimal, but could include
-        // character entrance/exit animations, text effects, etc.
+        // Define data files to load
+        const dataFiles = [
+            { id: 'scene001', path: 'scenes/scene001.json' }
+            // In a full game, you would load all scenes here
+        ];
+        
+        // Load data files using AssetLoader
+        this.assetLoader.preloadData(dataFiles);
     }
     
     createPlaceholderUI() {

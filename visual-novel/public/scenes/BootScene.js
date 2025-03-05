@@ -1,28 +1,54 @@
+// Import AssetLoader if needed, but we'll assume it's globally available
+// through a script tag in the HTML file
+
+// https://github.com/jdotrjs/phaser-guides/blob/master/Basics/Part3.md
+
 class BootScene extends Phaser.Scene {
     constructor() {
         super({ key: 'Boot' });
     }
 
     preload() {
+        // Initialize AssetLoader
+        this.assetLoader = new AssetLoader(this);
+        
         // Load minimal assets needed for the loading screen
-        this.load.image('loading-bg', 'assets/ui/loading-background.png');
-        this.load.image('loading-bar', 'assets/ui/loading-bar.png');
+        this.assetLoader.preloadImages([
+            { id: 'loading-bg', path: 'ui/loading-background.png' },
+            { id: 'loading-bar', path: 'ui/loading-bar.png' }
+        ]);
         
         // Create loading bar placeholder images if they don't exist yet
         this.createPlaceholderImages();
+        
+        // Initialize global managers
+        this.initializeGlobalManagers();
+    }
+    
+    /**
+     * Initialize global managers that should persist across scenes
+     */
+    initializeGlobalManagers() {
+        // Create global managers instance once and store it in registry
+        const globalManagers = new GlobalManagers(this.game);
+        
+        // Store the instance in registry for later initialization
+        this.game.registry.set('globalManagers', globalManagers);
+        
+        // Set flag to indicate initialization is pending
+        this.game.registry.set('globalManagersPending', true);
     }
 
     create() {
-        // Set up any game configurations that need to happen before the main asset load
-        this.initializeGameSettings();
+        // TODO: Should use settinsManager to initialize game settings
+        // Does this here?
+        //this.initializeGameSettings();
         
         // Transition to the preload scene
         this.scene.start('Preload');
     }
     
     createPlaceholderImages() {
-        // Create directory if it doesn't exist
-        this.checkAndCreateDirectory('assets/ui');
         
         // Generate simple loading background if it doesn't exist
         const loadingBgPath = 'assets/ui/loading-background.png';
@@ -63,26 +89,6 @@ class BootScene extends Phaser.Scene {
             
             // We'll log that we created a placeholder
             console.log('Created placeholder loading bar');
-        }
-    }
-    
-    checkAndCreateDirectory(dirPath) {
-        // In a browser context, we can't directly create directories
-        // This would be implemented in a Node.js environment
-        // For now, we'll just log it
-        console.log(`Ensuring directory exists: ${dirPath}`);
-    }
-    
-    initializeGameSettings() {
-        // Initialize any game settings from local storage if available
-        if (localStorage.getItem('japaneseVNSettings')) {
-            try {
-                const savedSettings = JSON.parse(localStorage.getItem('japaneseVNSettings'));
-                // Merge saved settings with default settings
-                config.gameSettings = {...config.gameSettings, ...savedSettings};
-            } catch (e) {
-                console.error('Error loading saved settings:', e);
-            }
         }
     }
 }

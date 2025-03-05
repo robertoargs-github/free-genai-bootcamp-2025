@@ -2,11 +2,14 @@
  * UIManager.js
  * Manages all UI components in the game
  */
-class UIManager {
+class DialogUI {
     constructor(scene) {
         this.scene = scene;
         this.width = scene.cameras.main.width;
         this.height = scene.cameras.main.height;
+        
+        // Get reference to the event bus from the scene
+        this.eventBus = window.eventBus;
         
         // UI components
         this.dialogueBox = null;
@@ -67,14 +70,27 @@ class UIManager {
         const buttonY = this.height - 40;
         const startX = this.width - 40;
         
-        // Create UI control buttons
-        this.autoButton = this.createControlButton(startX - (buttonSpacing * 0), buttonY, 'auto-icon', this.scene.toggleAutoMode.bind(this.scene));
-        this.skipButton = this.createControlButton(startX - (buttonSpacing * 1), buttonY, 'skip-icon', this.scene.toggleSkipMode.bind(this.scene));
-        this.saveButton = this.createControlButton(startX - (buttonSpacing * 2), buttonY, 'save-icon', this.scene.saveGame.bind(this.scene));
-        this.loadButton = this.createControlButton(startX - (buttonSpacing * 3), buttonY, 'load-icon', this.scene.loadGame.bind(this.scene));
-        this.settingsButton = this.createControlButton(startX - (buttonSpacing * 4), buttonY, 'settings-icon', this.scene.openSettings.bind(this.scene));
-        this.languageButton = this.createControlButton(startX - (buttonSpacing * 5), buttonY, 'language-icon', this.scene.toggleLanguage.bind(this.scene));
-        this.helpButton = this.createControlButton(startX - (buttonSpacing * 6), buttonY, 'help-icon', () => this.scene.scene.start('LanguageHelp'));
+        // Create UI control buttons using EventBus for communication
+        this.autoButton = this.createControlButton(startX - (buttonSpacing * 0), buttonY, 'auto-icon', 
+            () => this.eventBus.emit('ui:toggle-auto-mode'));
+            
+        this.skipButton = this.createControlButton(startX - (buttonSpacing * 1), buttonY, 'skip-icon', 
+            () => this.eventBus.emit('ui:toggle-skip-mode'));
+            
+        this.saveButton = this.createControlButton(startX - (buttonSpacing * 2), buttonY, 'save-icon', 
+            () => this.eventBus.emit('ui:save-game'));
+            
+        this.loadButton = this.createControlButton(startX - (buttonSpacing * 3), buttonY, 'load-icon', 
+            () => this.eventBus.emit('ui:load-game'));
+            
+        this.settingsButton = this.createControlButton(startX - (buttonSpacing * 4), buttonY, 'settings-icon', 
+            () => this.eventBus.emit('ui:open-settings'));
+            
+        this.languageButton = this.createControlButton(startX - (buttonSpacing * 5), buttonY, 'language-icon', 
+            () => this.eventBus.emit('ui:toggle-language'));
+            
+        this.helpButton = this.createControlButton(startX - (buttonSpacing * 6), buttonY, 'help-icon', 
+            () => this.eventBus.emit('ui:open-help'));
     }
     
     createControlButton(x, y, texture, callback) {

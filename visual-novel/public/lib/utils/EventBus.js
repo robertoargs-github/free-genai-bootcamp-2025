@@ -50,6 +50,7 @@ class EventBus {
      * @param {any} data - Event data
      */
     emit(event, data = null) {
+        console.log('emit', arguments)
         if (!this.listeners[event]) {
             return this;
         }

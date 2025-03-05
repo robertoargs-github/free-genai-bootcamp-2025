@@ -8,7 +8,6 @@ window.onload = function() {
     game.scene.add('Preload', PreloadScene);
     game.scene.add('Menu', MenuScene);
     game.scene.add('Game', GameScene);
-    game.scene.add('LanguageHelp', LanguageHelpScene);
     
     // Start with the Boot scene
     game.scene.start('Boot');

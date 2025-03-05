@@ -3,37 +3,43 @@
  * Handles background music and sound effects
  */
 class AudioManager {
-    constructor(scene) {
-        this.scene = scene;
+    constructor(globalManagers) {
+        this.g = globalManagers;
+        this.scene = null; // Initialize scene to null
         this.bgMusic = null;
         this.soundEffects = {
             click: null,
             transition: null
         };
-        
-        // Get volume settings from game config
-        this.bgmVolume = scene.gameSettings.bgmVolume || 0.05;
-        this.sfxVolume = scene.gameSettings.sfxVolume || 0.2;
     }
-    
-    setupAnyPlayBackgroundMusic() {
+
+    createBgm () {
         try {
-            // Start background music and loop it
+            const volume = this.g.settings.get('bgmVolume');
+            console.log(volume);
             this.bgMusic = this.scene.sound.add('bg-music', {
-                volume: this.bgmVolume,
+                volume,
                 loop: true
             });
-            
-            this.bgMusic.play();
         } catch (error) {
             console.error('Error setting up background music:', error);
         }
     }
     
+    
+    /**
+     * Update the scene reference
+     * @param {Phaser.Scene} scene - The new scene
+     */
+    updateScene(scene) {
+        this.scene = scene;
+    }
+    
+    
     playSoundEffect(key, config = {}) {
         try {
             // Default volume is the global SFX volume
-            const volume = config.volume || this.sfxVolume;
+            const volume = this.scene.gameSettings.sfxVolume
             
             // Play the sound effect
             this.scene.sound.play(key, {
@@ -45,40 +51,39 @@ class AudioManager {
         }
     }
     
-    stopBackgroundMusic() {
+    playBgm () {
+        if (this.bgMusic && !this.bgMusic.isPlaying) {
+            this.bgMusic.play();
+        }
+    }
+
+    stopBgm() {
         if (this.bgMusic && this.bgMusic.isPlaying) {
             this.bgMusic.stop();
         }
     }
     
-    pauseBackgroundMusic() {
+    pauseBgm() {
         if (this.bgMusic && this.bgMusic.isPlaying) {
             this.bgMusic.pause();
         }
     }
     
-    resumeBackgroundMusic() {
+    resumeBgm() {
         if (this.bgMusic && this.bgMusic.isPaused) {
             this.bgMusic.resume();
         }
     }
     
     setBgmVolume(volume) {
-        this.bgmVolume = Math.max(0, Math.min(1, volume));
-        
-        if (this.bgMusic) {
-            this.bgMusic.setVolume(this.bgmVolume);
-        }
-        
-        // Update game settings
-        this.scene.gameSettings.bgmVolume = this.bgmVolume;
+        const adjustedVolume = Math.max(0, Math.min(1, volume));
+        this.bgMusic.setVolume(adjustedVolume);
+        this.scene.gameSettings.bgmVolume = adjustedVolume;
     }
     
     setSfxVolume(volume) {
-        this.sfxVolume = Math.max(0, Math.min(1, volume));
-        
-        // Update game settings
-        this.scene.gameSettings.sfxVolume = this.sfxVolume;
+        const adjustedVolume = Math.max(0, Math.min(1, volume));
+        this.scene.gameSettings.sfxVolume = adjustedVolume;
     }
     
     // Method to play a click sound with error handling
