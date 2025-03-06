@@ -9,7 +9,6 @@ class UIToggle {
      * @param {Array<number>} options.position - [x,y] position of the leftmost part of the toggle group
      * @param {string} options.eventHandle - the string that is emitted in the eventbus
      * @param {object} options.style - Optional custom text style
-     * @param {string} options.label - Optional label for the toggle
      * @param {number} options.spacing - Optional spacing between pills (default: 10)
      */
     constructor(scene, options) {
@@ -20,7 +19,6 @@ class UIToggle {
         this.values = options.values;
         this.currentIndex = options.initialIndex || 0;
         this.eventHandle = options.eventHandle;
-        this.label = options.label || null;
         this.spacing = options.spacing || 10;
 
         // Calculate dimensions
@@ -37,18 +35,9 @@ class UIToggle {
             color: '#ffffff'
         };
         
-        this.labelStyle = {
-            fontFamily: 'Arial',
-            fontSize: '24px',
-            color: '#ffffff'
-        };
-
         // Arrays to store graphical objects
         this.backgrounds = [];
         this.texts = [];
-        
-        // Create the label if provided
-        this.createLabel();
         
         // Create toggle pills for each option
         this.createTogglePills();
@@ -57,20 +46,7 @@ class UIToggle {
         this.updatePillAppearance();
     }
 
-    /**
-     * Create the label if provided
-     */
-    createLabel() {
-        if (this.label) {
-            this.labelText = this.scene.add.text(
-                this.x,
-                this.y - this.pillHeight - 10, // Position above the pills
-                this.label,
-                this.labelStyle
-            );
-            this.labelText.setOrigin(0, 0.5);
-        }
-    }
+
 
     /**
      * Create pills for each toggle option
@@ -219,6 +195,78 @@ class UIToggle {
     getIndex() {
         return this.currentIndex;
     }
+    
+    /**
+     * Set a new position for the entire toggle group
+     * @param {number} x - X coordinate
+     * @param {number} y - Y coordinate
+     */
+    setPosition(x, y) {
+        // Calculate position change
+        const deltaX = x - this.x;
+        const deltaY = y - this.y;
+        
+        // Update base position
+        this.x = x;
+        this.y = y;
+        
+        // Update all pill positions
+        for (let i = 0; i < this.backgrounds.length; i++) {
+            const background = this.backgrounds[i];
+            const text = this.texts[i];
+            
+            // Calculate the position for this pill
+            const pillX = this.x + (i * (this.pillWidth + this.spacing));
+            const pillY = this.y;
+            const cornerRadius = this.pillHeight / 2;
+            
+            // Clear and redraw the pill at the new position
+            background.clear();
+            
+            if (i === this.currentIndex) {
+                // Selected pill
+                background.fillStyle(0x6666EE, 1);
+            } else {
+                // Normal pill
+                background.fillStyle(0x4444AA, 1);
+            }
+            
+            // Draw the pill at its new position
+            background.fillRoundedRect(pillX, pillY, this.pillWidth, this.pillHeight, cornerRadius);
+            
+            // Update the hit area for interaction
+            background.input.hitArea.x = pillX;
+            background.input.hitArea.y = pillY;
+            
+            // Update the text position
+            text.setPosition(pillX + (this.pillWidth / 2), pillY + (this.pillHeight / 2));
+            
+            // Update the pointerover/pointerout event handlers to use the new position
+            // We need to remove old listeners and add new ones to ensure the hover effect works correctly
+            const oldListeners = background.listeners('pointerover');
+            if (oldListeners.length > 0) {
+                background.off('pointerover');
+                background.off('pointerout');
+                
+                // Create new handlers with the updated position
+                background.on('pointerover', () => {
+                    if (i !== this.currentIndex) {
+                        background.clear();
+                        background.fillStyle(0x5555CC, 1); // Lighter color on hover
+                        background.fillRoundedRect(pillX, pillY, this.pillWidth, this.pillHeight, cornerRadius);
+                    }
+                });
+                
+                background.on('pointerout', () => {
+                    if (i !== this.currentIndex) {
+                        background.clear();
+                        background.fillStyle(0x4444AA, 1);
+                        background.fillRoundedRect(pillX, pillY, this.pillWidth, this.pillHeight, cornerRadius);
+                    }
+                });
+            }
+        }
+    }
 
     /**
      * Validate the options passed to the constructor
@@ -267,11 +315,6 @@ class UIToggle {
         }
         if (typeof options.eventHandle !== 'string') {
             throw new Error('Event handle must be a string');
-        }
-
-        // Validate label if provided
-        if (options.label !== undefined && typeof options.label !== 'string') {
-            throw new Error('Label must be a string');
         }
 
         // Validate spacing if provided

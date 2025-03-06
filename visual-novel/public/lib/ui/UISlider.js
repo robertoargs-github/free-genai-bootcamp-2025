@@ -1,13 +1,13 @@
 class UISlider {
     /**
-     * 
-     * @param {Phaser.Scene} scene 
+     * Create a slider component with draggable handle
+     * @param {Phaser.Scene} scene - The Phaser scene
      * @param {object} options - Options for the slider
      * @param {number} options.min - Minimum value of the slider
      * @param {number} options.max - Maximum value of the slider
      * @param {number} options.value - Initial value of the slider
-     * @param {string} options.size - [width,height] size of the slider
-     * @param {string} options.position - [x,y] position of the slider
+     * @param {Array<number>} options.size - [width,height] size of the slider
+     * @param {Array<number>} options.position - [x,y] position of the slider
      * @param {string} options.eventHandle - the string that is emitted in the eventbus
      * @param {boolean} options.showValue - whether to show the current value text
      */
@@ -237,5 +237,35 @@ class UISlider {
      */
     getValue() {
         return this.value;
+    }
+
+    /**
+     * Set a new position for the entire slider
+     * @param {number} x - X coordinate 
+     * @param {number} y - Y coordinate
+     */
+    setPosition(x, y) {
+        // Calculate the change in position
+        const deltaX = x - this.x;
+        const deltaY = y - this.y;
+        
+        // Update base position
+        this.x = x;
+        this.y = y;
+        
+        // Update track center position
+        this.trackX = this.x + (this.width / 2);
+        this.trackY = this.y + (this.height / 2);
+        
+        // Move the track
+        this.track.setPosition(this.trackX, this.trackY);
+        
+        // Move the handle (maintaining its position relative to the track)
+        this.handle.setPosition(this.handle.x + deltaX, this.trackY);
+        
+        // Move the value text if it exists
+        if (this.valueText) {
+            this.valueText.setPosition(this.x + this.width + 20, this.trackY);
+        }
     }
 }
