@@ -14,7 +14,7 @@ class UIField {
         this.scene = scene;
         this.validateOptions(options);
         
-        this.labelText = options.label;
+        this.labelText = options.label || ''; // Default to empty string if no label provided
         this.x = options.position[0];
         this.y = options.position[1];
         this.inputType = options.inputType;
@@ -33,12 +33,15 @@ class UIField {
      * @param {object} style - Optional custom style for the label
      */
     createLabel(style) {
-        // Use the UILabel class
+        // Always create a UILabel instance, even if labelText is empty
         this.label = new UILabel(this.scene, {
             text: this.labelText,
             position: [this.x, this.y],
             style: style
         });
+        
+        // If no label text was provided, we'll still position the input at the label's Y + spacing
+        // This ensures consistent positioning whether a label is visible or not
     }
     
     /**
@@ -62,6 +65,9 @@ class UIField {
                 break;
             case 'textinput':
                 this.input = new UITextInput(this.scene, this.inputOptions);
+                break;
+            case 'button':
+                this.input = new UIButton(this.scene, this.inputOptions);
                 break;
             default:
                 console.warn(`Input type '${this.inputType}' not supported`);
@@ -135,11 +141,8 @@ class UIField {
      * @param {object} options - The options object
      */
     validateOptions(options) {
-        // Validate label
-        if (!options.label) {
-            throw new Error('Label text is required');
-        }
-        if (typeof options.label !== 'string') {
+        // Validate label if provided
+        if (options.label !== undefined && typeof options.label !== 'string') {
             throw new Error('Label text must be a string');
         }
         

@@ -8,7 +8,7 @@ class SettingsUI extends BaseUI {
     create() {
         this.createBg();
         this.createSettingsFields();
-        //this.createActions();
+        this.createActions();
     }
     
     createSettingsFields() {
@@ -66,7 +66,6 @@ class SettingsUI extends BaseUI {
         
         // Register these elements with BaseUI so they respond to show/hide
         this.registerElement(this.panel);
-        this.registerElement(this.title);
     }
 
     createNameTextInput(){
@@ -177,34 +176,47 @@ class SettingsUI extends BaseUI {
     }
 
     createActions(){
+        // Create our actions withint horizontal fields container
+        // position in the bottom left of the screen.
+        const { width, height } = this.scene.game.canvas;
+        this.actionsContainer = this.uim.createFields({
+            position: [width * 0.1, height * 0.9],
+            layout: 'horizontal',
+            spacing: 20
+        });
+        this.registerElement(this.actionsContainer);
         this.createButtonApply();
         this.createButtonCancel();
     }
 
     createButtonApply(){
-        const x = 100
-        const y = 100
         const buttonWidth = 300;
         const buttonHeight = 80;
-        this.uim.createButton({
-            text: "Apply",
-            size: [buttonWidth,buttonHeight],
-            position: [x, y],
-            eventHandle: "settings-apply"
+        const buttonField = this.uim.createField({
+            inputType: 'button',
+            position: [0, 0],
+            inputOptions: {
+                text: "Apply",
+                size: [buttonWidth,buttonHeight],
+                eventHandle: "settings-apply"
+            }
         })
+        this.actionsContainer.addField(buttonField);
     }
 
     createButtonCancel(){
-        const x = 100
-        const y = 100
         const buttonWidth = 300;
         const buttonHeight = 80;
-        this.uim.createButton({
-            text: "Cancel",
-            size: [buttonWidth,buttonHeight],
-            position: [x, y],
-            eventHandle: "settings-cancel"
+        const buttonField = this.uim.createField({
+            inputType: 'button',
+            position: [0, 0],
+            inputOptions: {
+                text: "Cancel",
+                size: [buttonWidth,buttonHeight],
+                eventHandle: "settings-cancel"
+            }
         })
+        this.actionsContainer.addField(buttonField);
     }
 
 }

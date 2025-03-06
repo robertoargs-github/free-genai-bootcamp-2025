@@ -11,7 +11,7 @@ class UILabel {
         this.scene = scene;
         this.validateOptions(options);
         
-        this.text = options.text;
+        this.text = options.text || ''; // Default to empty string if no text provided
         this.x = options.position[0];
         this.y = options.position[1];
         
@@ -116,11 +116,8 @@ class UILabel {
      * @param {object} options - The options object
      */
     validateOptions(options) {
-        // Validate text
-        if (!options.text) {
-            throw new Error('Label text is required');
-        }
-        if (typeof options.text !== 'string') {
+        // Validate text if provided
+        if (options.text !== undefined && typeof options.text !== 'string') {
             throw new Error('Label text must be a string');
         }
         

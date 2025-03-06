@@ -101,21 +101,46 @@ class UITextInput {
         this.cursor.setOrigin(0, 0.5);
         this.cursor.visible = false;
         
-        // Make the input field interactive
+        // Make all components of the input field interactive
         this.background.setInteractive({ useHandCursor: true });
-        this.background.on('pointerdown', (pointer) => {
-            // Position cursor at the beginning of the text when first clicking
-            this.cursor.x = this.text.x;
-            this.focus();
-        });
+        this.border.setInteractive({ useHandCursor: true });
+        this.text.setInteractive({ useHandCursor: true });
         
-        // Handle clicking outside the input
+        // Handle clicks on any part of the input field
+        const focusHandler = (pointer) => {
+            // Update cursor position based on click location relative to text
+            if (this.value) {
+                // Place cursor at end of text by default
+                this.cursor.x = this.text.x + this.text.width + 2;
+            } else {
+                // Place cursor at beginning for empty input
+                this.cursor.x = this.text.x;
+            }
+            this.focus();
+        };
+        
+        // Add the focus handler to all components
+        this.background.on('pointerdown', focusHandler);
+        this.border.on('pointerdown', focusHandler);
+        this.text.on('pointerdown', focusHandler);
+        
+        // Handle clicking outside the input with improved hit testing
         this.scene.input.on('pointerdown', (pointer) => {
-            if (this.focused && 
-                (pointer.x < this.x || 
-                 pointer.x > this.x + this.width || 
-                 pointer.y < this.y - this.height/2 || 
-                 pointer.y > this.y + this.height/2)) {
+            if (!this.focused) return; // Skip if not focused
+            
+            // Create a proper hit area rectangle for more accurate testing
+            const inputBounds = {
+                x: this.x,
+                y: this.y,
+                width: this.width,
+                height: this.height
+            };
+            
+            // Check if click is outside the bounds
+            if (pointer.x < inputBounds.x || 
+                pointer.x > inputBounds.x + inputBounds.width || 
+                pointer.y < inputBounds.y || 
+                pointer.y > inputBounds.y + inputBounds.height) {
                 this.blur();
             }
         });
@@ -224,48 +249,70 @@ class UITextInput {
      * Give focus to this input field
      */
     focus() {
-        if (!this.focused) {
-            this.focused = true;
-            
+        // Prevent double focus
+        if (this.focused) return this;
+        
+        // Set focus state
+        this.focused = true;
+        
+        // Ensure cursor is properly positioned (if not set during click)
+        if (this.value && this.value.length > 0) {
+            // Move cursor to the end of the text
+            this.cursor.x = this.text.x + this.text.width + 2;
+        } else {
             // Move cursor to the start of the text input area
             this.cursor.x = this.text.x;
-            
-            // Show cursor and start blinking
-            this.cursor.visible = true;
-            this.cursorTween.resume();
-            
-            // Highlight border
-            this.border.setStrokeStyle(2, 0x3366ff);
-            
-            // Add keyboard event listener
-            this.scene.input.keyboard.on('keydown', this.keyboardInput);
         }
+        
+        // Show cursor and start blinking
+        this.cursor.visible = true;
+        this.cursorTween.restart();
+        
+        // Highlight border
+        this.border.setStrokeStyle(2, 0x3366ff);
+        
+        // Add keyboard event listener
+        this.scene.input.keyboard.off('keydown', this.keyboardInput); // Remove any existing listeners
+        this.scene.input.keyboard.on('keydown', this.keyboardInput);
+        
+        // Emit focus event
+        this.scene.g.eventBus.emit(`ui:textinput:${this.eventHandle}:focus`, {
+            input: this,
+            value: this.value,
+            scene: this.scene
+        });
+        
+        return this;
     }
     
     /**
      * Remove focus from this input field
      */
     blur() {
-        if (this.focused) {
-            this.focused = false;
-            
-            // Hide cursor and stop blinking
-            this.cursor.visible = false;
-            this.cursorTween.pause();
-            
-            // Reset border
-            this.border.setStrokeStyle(2, 0x000000);
-            
-            // Remove keyboard event listener
-            this.scene.input.keyboard.off('keydown', this.keyboardInput);
-            
-            // Emit blur event
-            this.scene.g.eventBus.emit(`ui:textinput:${this.eventHandle}:blur`, {
-                input: this,
-                value: this.value,
-                scene: this.scene
-            });
-        }
+        // Prevent unnecessary blur
+        if (!this.focused) return this;
+        
+        // Set unfocused state
+        this.focused = false;
+        
+        // Hide cursor and stop blinking
+        this.cursor.visible = false;
+        this.cursorTween.pause();
+        
+        // Reset border
+        this.border.setStrokeStyle(2, 0x000000);
+        
+        // Remove keyboard event listener
+        this.scene.input.keyboard.off('keydown', this.keyboardInput);
+        
+        // Emit blur event
+        this.scene.g.eventBus.emit(`ui:textinput:${this.eventHandle}:blur`, {
+            input: this,
+            value: this.value,
+            scene: this.scene
+        });
+        
+        return this;
     }
     
     /**
