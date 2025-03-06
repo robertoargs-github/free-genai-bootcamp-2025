@@ -17,4 +17,9 @@ class UIManager {
         const slider = new UISlider(this.scene,options)
         return slider;
     }
+
+    createToggle(options) {
+        const toggle = new UIToggle(this.scene,options)
+        return toggle;
+    }
 }

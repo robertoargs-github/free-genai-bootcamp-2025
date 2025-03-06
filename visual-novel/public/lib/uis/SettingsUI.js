@@ -6,6 +6,7 @@ class SettingsUI {
 
     create() {
         this.createBg();
+        this.createLanguageToggle();
         this.createBgmVolumeSlider();
         //this.createSfxVolumeSlider();
         //this.createFontSlider();
@@ -68,6 +69,24 @@ class SettingsUI {
                 const value = (data.value / 100) * 0.2
                 this.scene.g.audio.setBgmVolume(value);
             }
+        });
+    }
+
+    createLanguageToggle(){
+        // Create a language toggle using the generic UIToggle
+        const languageToggle = this.uim.createToggle({
+            values: ['English', 'Dual', 'Japanese'],  // The options to cycle through
+            initialIndex: 0,                         // Start with English selected
+            position: [100, 200],                    // X, Y position
+            size: [200, 40],                         // Width, Height
+            eventHandle: 'language-setting'          // Event handle for identifying this toggle
+        });
+
+        // Listen for changes
+        this.scene.g.eventBus.on('ui:toggle:language-setting:change', (data) => {
+            console.log(`Language changed to: ${data.value}`);
+            // Update game language based on selection
+            //updateGameLanguage(data.value);
         });
     }
 
