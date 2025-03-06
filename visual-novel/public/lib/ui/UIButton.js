@@ -17,8 +17,10 @@ class UIButton {
             fontSize: '28px',
             color: '#ffffff'
         };
+        // Create the button image with top-left positioning
         this.image = this.scene.add.image(options.position[0], options.position[1], 'button')
         this.image.setDisplaySize(options.size[0], options.size[1])
+        this.image.setOrigin(0, 0) // Set origin to top-left
         this.image.setInteractive({ useHandCursor: true })
         this.image.on('pointerover', () => {
             this.image.setTexture('button-hover');
@@ -32,13 +34,15 @@ class UIButton {
             this.scene.g.eventBus.emit(`ui:button:${options.eventHandle}:pointdown`, { button: this, scene: this.scene });
         });
             
+        // Create the text with proper positioning
+        // Position text to be centered within the button
         this.text = this.scene.add.text(
-            options.position[0], 
-            options.position[1], 
+            options.position[0] + (options.size[0] / 2), 
+            options.position[1] + (options.size[1] / 2), 
             options.text,
             this.buttonStyle
         )
-        this.text.setOrigin(0.5);
+        this.text.setOrigin(0.5); // Keep text centered within the button
     }
 
     validateOptions(options) {
@@ -94,6 +98,33 @@ class UIButton {
         // Set visibility for button text
         if (this.text && typeof this.text.setVisible === 'function') {
             this.text.setVisible(visible);
+        }
+        
+        return this;
+    }
+    
+    /**
+     * Set the position of the button (using top-left corner as origin)
+     * @param {number} x - The x coordinate (left edge)
+     * @param {number} y - The y coordinate (top edge)
+     * @returns {UIButton} - This button instance for chaining
+     */
+    setPosition(x, y) {
+        // Store the new position
+        this.x = x;
+        this.y = y;
+        
+        // Update button background position (top-left origin)
+        if (this.image) {
+            this.image.setPosition(x, y);
+        }
+        
+        // Update text position (centered within button)
+        if (this.text && this.image) {
+            // Calculate center of button for text positioning
+            const centerX = x + (this.image.displayWidth / 2);
+            const centerY = y + (this.image.displayHeight / 2);
+            this.text.setPosition(centerX, centerY);
         }
         
         return this;
