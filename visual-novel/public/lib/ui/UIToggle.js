@@ -1,14 +1,16 @@
 class UIToggle {
     /**
-     * Create a toggle component that cycles through multiple options
+     * Create a toggle component with multiple options displayed horizontally
      * @param {Phaser.Scene} scene - The Phaser scene
      * @param {object} options - Options for the toggle
-     * @param {Array<string>} options.values - Array of values/text to toggle through
+     * @param {Array<string>} options.values - Array of values/text to toggle between
      * @param {number} options.initialIndex - Initial selected index (default: 0)
-     * @param {Array<number>} options.size - [width,height] size of the toggle
-     * @param {Array<number>} options.position - [x,y] position of the toggle
+     * @param {Array<number>} options.size - [width,height] size of each individual option pill
+     * @param {Array<number>} options.position - [x,y] position of the leftmost part of the toggle group
      * @param {string} options.eventHandle - the string that is emitted in the eventbus
      * @param {object} options.style - Optional custom text style
+     * @param {string} options.label - Optional label for the toggle
+     * @param {number} options.spacing - Optional spacing between pills (default: 10)
      */
     constructor(scene, options) {
         this.scene = scene;
@@ -18,118 +20,149 @@ class UIToggle {
         this.values = options.values;
         this.currentIndex = options.initialIndex || 0;
         this.eventHandle = options.eventHandle;
+        this.label = options.label || null;
+        this.spacing = options.spacing || 10;
 
         // Calculate dimensions
-        this.width = options.size[0];
-        this.height = options.size[1];
+        this.pillWidth = options.size[0];
+        this.pillHeight = options.size[1];
+        this.totalWidth = (this.pillWidth * this.values.length) + (this.spacing * (this.values.length - 1));
         this.x = options.position[0];
         this.y = options.position[1];
-
+        
         // Define styles
         this.textStyle = options.style || {
+            fontFamily: 'Arial',
+            fontSize: '20px',
+            color: '#ffffff'
+        };
+        
+        this.labelStyle = {
             fontFamily: 'Arial',
             fontSize: '24px',
             color: '#ffffff'
         };
 
-        // Create the pill background
-        this.createToggleBackground();
-
-        // Create the text
-        this.createToggleText();
-
-        // Set up interactivity
-        this.setupInteractivity();
-    }
-
-    /**
-     * Create the toggle background (pill shape)
-     */
-    createToggleBackground() {
-        // Create a rounded rectangle as the background
-        this.background = this.scene.add.graphics();
-        this.updateBackgroundDisplay();
-
-        // Make the background interactive
-        this.hitArea = new Phaser.Geom.Rectangle(this.x, this.y, this.width, this.height);
-        this.background.setInteractive(this.hitArea, Phaser.Geom.Rectangle.Contains);
-    }
-
-    /**
-     * Create the toggle text display
-     */
-    createToggleText() {
-        this.text = this.scene.add.text(
-            this.x + (this.width / 2),
-            this.y + (this.height / 2),
-            this.values[this.currentIndex],
-            this.textStyle
-        );
-        this.text.setOrigin(0.5);
-    }
-
-    /**
-     * Update the background display based on current state
-     */
-    updateBackgroundDisplay() {
-        this.background.clear();
-        this.background.fillStyle(0x4444AA, 1);
+        // Arrays to store graphical objects
+        this.backgrounds = [];
+        this.texts = [];
         
-        // Draw a rounded rectangle (pill shape)
-        const cornerRadius = this.height / 2; // Makes it a proper pill shape
-        this.background.fillRoundedRect(
-            this.x, 
-            this.y, 
-            this.width, 
-            this.height, 
-            cornerRadius
-        );
+        // Create the label if provided
+        this.createLabel();
+        
+        // Create toggle pills for each option
+        this.createTogglePills();
+        
+        // Highlight the initially selected pill
+        this.updatePillAppearance();
     }
 
     /**
-     * Set up interactive events
+     * Create the label if provided
      */
-    setupInteractivity() {
-        // Add pointer events
-        this.background.on('pointerover', () => {
-            this.background.clear();
-            this.background.fillStyle(0x5555CC, 1); // Lighter color on hover
-            const cornerRadius = this.height / 2;
-            this.background.fillRoundedRect(
-                this.x, 
-                this.y, 
-                this.width, 
-                this.height, 
+    createLabel() {
+        if (this.label) {
+            this.labelText = this.scene.add.text(
+                this.x,
+                this.y - this.pillHeight - 10, // Position above the pills
+                this.label,
+                this.labelStyle
+            );
+            this.labelText.setOrigin(0, 0.5);
+        }
+    }
+
+    /**
+     * Create pills for each toggle option
+     */
+    createTogglePills() {
+        let xOffset = this.x;
+        
+        // Create a pill for each value
+        for (let i = 0; i < this.values.length; i++) {
+            // Create pill background
+            const background = this.scene.add.graphics();
+            background.fillStyle(0x4444AA, 1);
+            
+            // Draw the pill shape
+            const cornerRadius = this.pillHeight / 2;
+            background.fillRoundedRect(
+                xOffset,
+                this.y,
+                this.pillWidth,
+                this.pillHeight,
                 cornerRadius
             );
-        });
-
-        this.background.on('pointerout', () => {
-            this.updateBackgroundDisplay(); // Reset to normal color
-        });
-
-        this.background.on('pointerdown', () => {
-            this.nextValue(); // Cycle to the next value
-        });
+            
+            // Make the pill interactive
+            const hitArea = new Phaser.Geom.Rectangle(xOffset, this.y, this.pillWidth, this.pillHeight);
+            background.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
+            
+            // Create pill text
+            const text = this.scene.add.text(
+                xOffset + (this.pillWidth / 2),
+                this.y + (this.pillHeight / 2),
+                this.values[i],
+                this.textStyle
+            );
+            text.setOrigin(0.5);
+            
+            // Store references to graphics objects
+            this.backgrounds.push(background);
+            this.texts.push(text);
+            
+            // Set up click event for this pill
+            background.on('pointerdown', () => {
+                this.setValue(i);
+            });
+            
+            // Store the pill position for this index for later reference
+            const pillPosition = xOffset;
+            
+            // Set up hover effects
+            background.on('pointerover', () => {
+                if (i !== this.currentIndex) {
+                    background.clear();
+                    background.fillStyle(0x5555CC, 1); // Lighter color on hover
+                    background.fillRoundedRect(pillPosition, this.y, this.pillWidth, this.pillHeight, cornerRadius);
+                }
+            });
+            
+            background.on('pointerout', () => {
+                if (i !== this.currentIndex) {
+                    background.clear();
+                    background.fillStyle(0x4444AA, 1);
+                    background.fillRoundedRect(pillPosition, this.y, this.pillWidth, this.pillHeight, cornerRadius);
+                }
+            });
+            
+            // Move to next pill position
+            xOffset += this.pillWidth + this.spacing;
+        }
     }
 
     /**
-     * Cycle to the next available value
+     * Update pill appearance based on current selection
      */
-    nextValue() {
-        // Move to the next index, with wraparound
-        this.currentIndex = (this.currentIndex + 1) % this.values.length;
-        
-        // Update the displayed text
-        this.text.setText(this.values[this.currentIndex]);
-        
-        // Emit an event about the change
-        this.scene.g.eventBus.emit(`ui:toggle:${this.eventHandle}:change`, { 
-            toggle: this, 
-            value: this.values[this.currentIndex],
-            index: this.currentIndex,
-            scene: this.scene 
-        });
+    updatePillAppearance() {
+        // Update all pills
+        for (let i = 0; i < this.backgrounds.length; i++) {
+            const background = this.backgrounds[i];
+            const xPos = this.x + (i * (this.pillWidth + this.spacing));
+            const cornerRadius = this.pillHeight / 2;
+            
+            background.clear();
+            
+            if (i === this.currentIndex) {
+                // Selected pill gets a highlight color
+                background.fillStyle(0x6666EE, 1);
+            } else {
+                // Unselected pills get the default color
+                background.fillStyle(0x4444AA, 1);
+            }
+            
+            background.fillRoundedRect(xPos, this.y, this.pillWidth, this.pillHeight, cornerRadius);
+        }
     }
 
     /**
@@ -138,16 +171,21 @@ class UIToggle {
      */
     setValue(index) {
         if (index >= 0 && index < this.values.length) {
-            this.currentIndex = index;
-            this.text.setText(this.values[this.currentIndex]);
-            
-            // Emit an event about the change
-            this.scene.g.eventBus.emit(`ui:toggle:${this.eventHandle}:change`, { 
-                toggle: this, 
-                value: this.values[this.currentIndex],
-                index: this.currentIndex,
-                scene: this.scene 
-            });
+            // Only update if the selection has changed
+            if (this.currentIndex !== index) {
+                this.currentIndex = index;
+                
+                // Update visual appearance
+                this.updatePillAppearance();
+                
+                // Emit an event about the change
+                this.scene.g.eventBus.emit(`ui:toggle:${this.eventHandle}:change`, { 
+                    toggle: this, 
+                    value: this.values[this.currentIndex],
+                    index: this.currentIndex,
+                    scene: this.scene 
+                });
+            }
         } else {
             console.warn(`Invalid index: ${index}. Must be between 0 and ${this.values.length - 1}`);
         }
@@ -229,6 +267,16 @@ class UIToggle {
         }
         if (typeof options.eventHandle !== 'string') {
             throw new Error('Event handle must be a string');
+        }
+
+        // Validate label if provided
+        if (options.label !== undefined && typeof options.label !== 'string') {
+            throw new Error('Label must be a string');
+        }
+
+        // Validate spacing if provided
+        if (options.spacing !== undefined && typeof options.spacing !== 'number') {
+            throw new Error('Spacing must be a number');
         }
     }
 }

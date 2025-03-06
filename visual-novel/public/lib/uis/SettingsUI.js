@@ -78,7 +78,9 @@ class SettingsUI {
             values: ['English', 'Dual', 'Japanese'],  // The options to cycle through
             initialIndex: 0,                         // Start with English selected
             position: [100, 200],                    // X, Y position
-            size: [200, 40],                         // Width, Height
+            size: [90, 40],                          // Width, Height of each pill
+            spacing: 5,                              // Space between pills
+            label: 'Language',                       // Add label above the toggle
             eventHandle: 'language-setting'          // Event handle for identifying this toggle
         });
 
