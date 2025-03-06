@@ -322,4 +322,26 @@ class UIToggle {
             throw new Error('Spacing must be a number');
         }
     }
+    
+    /**
+     * Set visibility of this toggle and all its components
+     * @param {boolean} visible - Whether the toggle should be visible
+     * @returns {UIToggle} - This toggle instance for chaining
+     */
+    setVisible(visible) {
+        // Set visibility for all backgrounds and texts
+        this.backgrounds.forEach(bg => {
+            if (bg && typeof bg.setVisible === 'function') {
+                bg.setVisible(visible);
+            }
+        });
+        
+        this.texts.forEach(text => {
+            if (text && typeof text.setVisible === 'function') {
+                text.setVisible(visible);
+            }
+        });
+        
+        return this;
+    }
 }

@@ -346,4 +346,32 @@ class UITextInput {
             throw new Error('Event handle must be a string');
         }
     }
+    
+    /**
+     * Set visibility of this text input and all its components
+     * @param {boolean} visible - Whether the text input should be visible
+     * @returns {UITextInput} - This text input instance for chaining
+     */
+    setVisible(visible) {
+        // Set visibility for background and border
+        if (this.background && typeof this.background.setVisible === 'function') {
+            this.background.setVisible(visible);
+        }
+        
+        if (this.border && typeof this.border.setVisible === 'function') {
+            this.border.setVisible(visible);
+        }
+        
+        // Set visibility for text
+        if (this.text && typeof this.text.setVisible === 'function') {
+            this.text.setVisible(visible);
+        }
+        
+        // Set visibility for cursor (only if focused and input should be visible)
+        if (this.cursor && typeof this.cursor.setVisible === 'function') {
+            this.cursor.setVisible(visible && this.focused);
+        }
+        
+        return this;
+    }
 }

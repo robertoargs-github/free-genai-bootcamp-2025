@@ -88,6 +88,22 @@ class UIFields {
     }
     
     /**
+     * Set visibility of this container and all its fields
+     * @param {boolean} visible - Whether the container and fields should be visible
+     * @returns {UIFields} - This container instance for chaining
+     */
+    setVisible(visible) {
+        // Set visibility for all fields
+        this.fields.forEach(field => {
+            if (field && typeof field.setVisible === 'function') {
+                field.setVisible(visible);
+            }
+        });
+        
+        return this;
+    }
+    
+    /**
      * Update the positions of all fields based on container position and layout
      * @private
      */

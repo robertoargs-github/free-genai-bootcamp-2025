@@ -112,6 +112,25 @@ class UIField {
     }
     
     /**
+     * Set visibility of this field and its components
+     * @param {boolean} visible - Whether the field should be visible
+     * @returns {UIField} - This field instance for chaining
+     */
+    setVisible(visible) {
+        // Set visibility for label
+        if (this.label && typeof this.label.setVisible === 'function') {
+            this.label.setVisible(visible);
+        }
+        
+        // Set visibility for input component
+        if (this.input && typeof this.input.setVisible === 'function') {
+            this.input.setVisible(visible);
+        }
+        
+        return this;
+    }
+    
+    /**
      * Validate the options passed to the constructor
      * @param {object} options - The options object
      */

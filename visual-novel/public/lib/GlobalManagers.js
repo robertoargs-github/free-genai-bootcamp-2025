@@ -57,8 +57,10 @@ class GlobalManagers {
         console.log('ev',ev);
     }
 
-    settingsGame(ev) {
+    openSettings(ev) {
         console.log('settings ui')
+        ev.scene.ui.hide();
+        ev.scene.uiSettings.show();
     }
 
 

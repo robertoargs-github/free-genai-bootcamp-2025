@@ -1,7 +1,8 @@
-class SettingsUI {
+
+class SettingsUI extends BaseUI {
     constructor(UIManager, scene) {
+        super(scene); // Call BaseUI constructor
         this.uim = UIManager;
-        this.scene = scene;
     }
 
     create() {
@@ -15,10 +16,13 @@ class SettingsUI {
         
         // Create a fields container for all settings
         this.settingsFields = this.uim.createFields({
-            position: [width * 0.3, height * 0.3],
+            position: [width * 0.5, height * 0.3], // Centered horizontally
             layout: 'vertical',
             spacing: 30  // Reduced spacing between fields
         });
+        
+        // Register the fields container with BaseUI
+        this.registerElement(this.settingsFields);
         
         // Add BGM volume field
         this.createBgmVolumeSlider();
@@ -34,27 +38,35 @@ class SettingsUI {
         //this.createFontSlider();
     }
 
-    show(){
-
+    // Override show method to add any specific behavior
+    show() {
+        super.show(); // Call BaseUI's show method
     }
 
-    hide(){
-
+    // Override hide method to add any specific behavior
+    hide() {
+        super.hide(); // Call BaseUI's hide method
     }
 
     createBg(){
         const width = this.scene.cameras.main.width;
         const height = this.scene.cameras.main.height;
-        const x = 0;
-        const y = 0;
+        const x = width / 2;
+        const y = height / 2;
 
-        const panel = this.scene.add.rectangle(x, y, width, height, 0x222222, 1).setOrigin(0, 0);
-        // Title
-        const title = this.scene.add.text(x, y - height / 2 + 30, 'Settings', {
+        // Create panel background with semi-transparency
+        this.panel = this.scene.add.rectangle(x, y, width, height, 0x222222, 0.9);
+        
+        // Create title text
+        this.title = this.scene.add.text(x, y - height / 2 + 30, 'Settings', {
             fontFamily: 'Arial',
             fontSize: '28px',
             color: '#ffffff'
         }).setOrigin(0.5, 0.5);
+        
+        // Register these elements with BaseUI so they respond to show/hide
+        this.registerElement(this.panel);
+        this.registerElement(this.title);
     }
 
     createNameTextInput(){
@@ -195,5 +207,10 @@ class SettingsUI {
         })
     }
 
-
 }
+
+// Export for use in other files
+if (typeof module !== 'undefined') {
+    module.exports = SettingsUI;
+}
+

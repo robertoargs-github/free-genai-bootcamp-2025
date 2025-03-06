@@ -1,8 +1,9 @@
-class MenuUI {
-    constructor(UIManager,scene) {
+
+class MenuUI extends BaseUI {
+    constructor(UIManager, scene) {
+        super(scene); // Call BaseUI constructor
         this.uim = UIManager;
-        this.scene = scene;
-        this.spacing = 20
+        this.spacing = 20;
         this.buttonWidth = 500;
         this.buttonHeight = 80;
         this.buttons = {
@@ -22,8 +23,7 @@ class MenuUI {
             {text: 'Continue',eventHandle: 'continue'},
             {text: 'Settings',eventHandle: 'settings'},
             {text: 'Load',eventHandle: 'load'}
-        ])
-
+        ]);
     }
 
     createButtons(buttonData) {
@@ -44,5 +44,23 @@ class MenuUI {
             position: [this.x,this.y + yOffset],
             eventHandle: eventHandle
         });
+        
+        // Register the button with BaseUI as an interactive element
+        this.registerElement(this.buttons[eventHandle], true);
     }
+    
+    // Override show method to add any specific behavior
+    show() {
+        super.show(); // Call BaseUI's show method
+    }
+
+    // Override hide method to add any specific behavior
+    hide() {
+        super.hide(); // Call BaseUI's hide method
+    }
+}
+
+// Export for use in other files
+if (typeof module !== 'undefined') {
+    module.exports = MenuUI;
 }

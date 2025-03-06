@@ -79,4 +79,23 @@ class UIButton {
             }
         }
     }
+    
+    /**
+     * Set visibility of this button and all its components
+     * @param {boolean} visible - Whether the button should be visible
+     * @returns {UIButton} - This button instance for chaining
+     */
+    setVisible(visible) {
+        // Set visibility for button image
+        if (this.image && typeof this.image.setVisible === 'function') {
+            this.image.setVisible(visible);
+        }
+        
+        // Set visibility for button text
+        if (this.text && typeof this.text.setVisible === 'function') {
+            this.text.setVisible(visible);
+        }
+        
+        return this;
+    }
 }

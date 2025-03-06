@@ -268,4 +268,27 @@ class UISlider {
             this.valueText.setPosition(this.x + this.width + 20, this.trackY);
         }
     }
+    
+    /**
+     * Set visibility of this slider and all its components
+     * @param {boolean} visible - Whether the slider should be visible
+     * @returns {UISlider} - This slider instance for chaining
+     */
+    setVisible(visible) {
+        // Set visibility for track and handle
+        if (this.track && typeof this.track.setVisible === 'function') {
+            this.track.setVisible(visible);
+        }
+        
+        if (this.handle && typeof this.handle.setVisible === 'function') {
+            this.handle.setVisible(visible);
+        }
+        
+        // Set visibility for value text if it exists
+        if (this.valueText && typeof this.valueText.setVisible === 'function') {
+            this.valueText.setVisible(visible);
+        }
+        
+        return this;
+    }
 }

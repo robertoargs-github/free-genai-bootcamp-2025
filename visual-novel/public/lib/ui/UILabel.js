@@ -77,17 +77,31 @@ class UILabel {
     }
     
     /**
-     * Hide the label
+     * Set visibility of this label
+     * @param {boolean} visible - Whether the label should be visible
+     * @returns {UILabel} - This label instance for chaining
      */
-    hide() {
-        this.labelText.setVisible(false);
+    setVisible(visible) {
+        if (this.labelText && typeof this.labelText.setVisible === 'function') {
+            this.labelText.setVisible(visible);
+        }
+        return this;
     }
     
     /**
-     * Show the label
+     * Hide the label (for backwards compatibility)
+     * @returns {UILabel} - This label instance for chaining
+     */
+    hide() {
+        return this.setVisible(false);
+    }
+    
+    /**
+     * Show the label (for backwards compatibility)
+     * @returns {UILabel} - This label instance for chaining
      */
     show() {
-        this.labelText.setVisible(true);
+        return this.setVisible(true);
     }
     
     /**
