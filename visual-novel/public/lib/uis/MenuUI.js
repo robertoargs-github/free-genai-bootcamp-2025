@@ -27,26 +27,31 @@ class MenuUI extends BaseUI {
     }
 
     createButtons(buttonData) {
-        // for loop and increment position of button data
-        let pos = 0
+        // contain the buttons within a UIFields that is vertical       
+        this.menuContainer = this.uim.createFields({
+            layout: 'vertical',
+            position: [this.x,this.y],
+            spacing: this.spacing,
+            origin: [0.5,0.5]
+        });
+        // iterate over the buttonData and create button
         for (let t of buttonData) {
-            this.createButton(pos,t.text,t.eventHandle)
-            pos++
+            this.createButton(t.text, t.eventHandle)
         }
     }
         
 
-    createButton(position,text,eventHandle){
-        const yOffset = (position*this.buttonHeight) + (position*this.spacing)
-        this.buttons[eventHandle] = this.uim.createButton({
-            text: text,
-            size: [this.buttonWidth,this.buttonHeight],
-            position: [this.x,this.y + yOffset],
-            eventHandle: eventHandle
+    createButton(text, eventHandle){
+        this.buttons[eventHandle] = this.uim.createField({
+            inputType: 'button',
+            position: [0,0],
+            inputOptions: {
+                text: text,
+                size: [this.buttonWidth,this.buttonHeight],
+                eventHandle: eventHandle
+            }
         });
-        
-        // Register the button with BaseUI as an interactive element
-        this.registerElement(this.buttons[eventHandle], true);
+        this.menuContainer.addField(this.buttons[eventHandle]);
     }
     
     // Override show method to add any specific behavior

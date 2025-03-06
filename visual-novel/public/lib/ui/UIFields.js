@@ -7,6 +7,7 @@ class UIFields {
      * @param {string} options.layout - Layout direction ('vertical' or 'horizontal')
      * @param {number} options.spacing - Spacing between fields
      * @param {Array<UIField>} options.fields - Initial fields to add (optional)
+     * @param {Array<number>} options.origin - [x,y] origin point (0-1) for the container (default: [0,0])
      */
     constructor(scene, options) {
         this.scene = scene;
@@ -17,6 +18,10 @@ class UIFields {
         this.layout = options.layout || 'vertical';
         this.spacing = options.spacing !== undefined ? options.spacing : 20;
         this.fields = [];
+        
+        // Set origin (default to top-left [0,0])
+        this.originX = options.origin ? options.origin[0] : 0;
+        this.originY = options.origin ? options.origin[1] : 0;
         
         // Add initial fields if provided
         if (options.fields && Array.isArray(options.fields)) {
@@ -104,12 +109,20 @@ class UIFields {
     }
     
     /**
-     * Update the positions of all fields based on container position and layout
+     * Update the positions of all fields based on container position, origin, and layout
      * @private
      */
     updateFieldPositions() {
-        let currentX = this.x;
-        let currentY = this.y;
+        // Calculate the effective position based on origin
+        // We need to determine total width/height to apply origin offset
+        const containerDimensions = this.calculateContainerDimensions();
+        
+        // Apply origin offset to starting position
+        let startX = this.x - (containerDimensions.width * this.originX);
+        let startY = this.y - (containerDimensions.height * this.originY);
+        
+        let currentX = startX;
+        let currentY = startY;
         
         this.fields.forEach((field, index) => {
             // Position the field
@@ -159,6 +172,72 @@ class UIFields {
     }
     
     /**
+     * Calculate the total dimensions of the container based on fields and layout
+     * @private
+     * @returns {object} - {width, height} of the container
+     */
+    calculateContainerDimensions() {
+        // Use base dimensions if no fields
+        if (this.fields.length === 0) {
+            return { width: 0, height: 0 };
+        }
+        
+        // Attempt to get actual dimensions from fields
+        let maxFieldWidth = 0;
+        let maxFieldHeight = 0;
+        let totalWidth = 0;
+        let totalHeight = 0;
+        
+        // Examine each field to get dimensions where possible
+        this.fields.forEach(field => {
+            let fieldWidth = 0;
+            let fieldHeight = 0;
+            
+            // Try to get dimensions from the field or its components
+            if (field.inputComponent && field.inputComponent.image) {
+                // For buttons with images
+                fieldWidth = Math.max(fieldWidth, field.inputComponent.image.displayWidth || 0);
+                fieldHeight = Math.max(fieldHeight, field.inputComponent.image.displayHeight || 0);
+            } else if (field.inputOptions && field.inputOptions.size) {
+                // For fields with explicit size in options
+                fieldWidth = Math.max(fieldWidth, field.inputOptions.size[0] || 0);
+                fieldHeight = Math.max(fieldHeight, field.inputOptions.size[1] || 0);
+            } else if (field.options && field.options.inputOptions && field.options.inputOptions.size) {
+                // For fields with size defined in inputOptions
+                fieldWidth = Math.max(fieldWidth, field.options.inputOptions.size[0] || 0);
+                fieldHeight = Math.max(fieldHeight, field.options.inputOptions.size[1] || 0);
+            }
+            
+            // Update maximums
+            maxFieldWidth = Math.max(maxFieldWidth, fieldWidth);
+            maxFieldHeight = Math.max(maxFieldHeight, fieldHeight);
+        });
+        
+        // If we couldn't determine dimensions from fields, use reasonable defaults
+        if (maxFieldWidth === 0) maxFieldWidth = 500; // Default to a reasonable button width
+        if (maxFieldHeight === 0) maxFieldHeight = 80; // Default height
+        
+        // Calculate total dimensions based on layout
+        if (this.layout === 'vertical') {
+            // For vertical layout, width is the maximum field width,
+            // height is sum of all field heights plus spacing
+            return {
+                width: maxFieldWidth,
+                height: (maxFieldHeight * this.fields.length) + 
+                        (this.spacing * (this.fields.length - 1))
+            };
+        } else {
+            // For horizontal layout, width is sum of all field widths plus spacing,
+            // height is the maximum field height
+            return {
+                width: (maxFieldWidth * this.fields.length) + 
+                       (this.spacing * (this.fields.length - 1)),
+                height: maxFieldHeight
+            };
+        }
+    }
+    
+    /**
      * Destroy all fields and clean up resources
      */
     destroy() {
@@ -170,6 +249,28 @@ class UIFields {
         });
         
         this.fields = [];
+    }
+    
+    /**
+     * Set the origin point of the container
+     * @param {number} x - X origin (0-1)
+     * @param {number} y - Y origin (0-1)
+     * @returns {UIFields} - This container instance for chaining
+     */
+    setOrigin(x, y) {
+        // Validate origin values
+        if (typeof x !== 'number' || typeof y !== 'number') {
+            throw new Error('Origin values must be numbers');
+        }
+        
+        // Update origin values
+        this.originX = x;
+        this.originY = y;
+        
+        // Update field positions based on new origin
+        this.updateFieldPositions();
+        
+        return this;
     }
     
     /**
@@ -200,9 +301,15 @@ class UIFields {
         }
         
         // Validate fields if provided
-        if (options.fields !== undefined) {
-            if (!Array.isArray(options.fields)) {
-                throw new Error('Fields must be an array');
+        if (options.fields !== undefined && !Array.isArray(options.fields)) {
+            throw new Error('Fields must be an array');
+        }
+        
+        // Validate origin if provided
+        if (options.origin !== undefined) {
+            if (!Array.isArray(options.origin) || options.origin.length !== 2 ||
+                typeof options.origin[0] !== 'number' || typeof options.origin[1] !== 'number') {
+                throw new Error('Origin must be an array of two numbers');
             }
         }
     }

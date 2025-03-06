@@ -17,6 +17,10 @@ class UIButton {
             fontSize: '28px',
             color: '#ffffff'
         };
+        
+        // Store text (which may be empty string if not provided)
+        this.buttonText = options.text || '';
+        
         // Create the button image with top-left positioning
         this.image = this.scene.add.image(options.position[0], options.position[1], 'button')
         this.image.setDisplaySize(options.size[0], options.size[1])
@@ -34,25 +38,21 @@ class UIButton {
             this.scene.g.eventBus.emit(`ui:button:${options.eventHandle}:pointdown`, { button: this, scene: this.scene });
         });
             
-        // Create the text with proper positioning
+        // Create the text with proper positioning (if text was provided)
         // Position text to be centered within the button
         this.text = this.scene.add.text(
             options.position[0] + (options.size[0] / 2), 
             options.position[1] + (options.size[1] / 2), 
-            options.text,
+            this.buttonText,
             this.buttonStyle
         )
         this.text.setOrigin(0.5); // Keep text centered within the button
     }
 
     validateOptions(options) {
-        // validate text
-        if (!options.text) {
-            throw new Error('Text is required');
-            // validate is string
-            if (typeof options.text !== 'string') {
-                throw new Error('Text must be a string');
-            }
+        // validate text if provided
+        if (options.text !== undefined && typeof options.text !== 'string') {
+            throw new Error('Text must be a string');
         }
 
         // validate size

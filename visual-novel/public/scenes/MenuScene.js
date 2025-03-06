@@ -54,7 +54,7 @@ class MenuScene extends Phaser.Scene {
         
         // Create menu UI with buttons
         this.ui = new MenuUI(this.g.ui, this);
-        this.ui.create(width/2, height/2);
+        this.ui.create(width/2, height/2); // Center the menu in the scene
         this.ui.show();
 
         this.uiSettings = new SettingsUI(this.g.ui, this);
