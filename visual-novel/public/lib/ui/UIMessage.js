@@ -1,8 +1,8 @@
 // The UIMessage is the following:
 // its message bubble that can have its colour set.
 // it has text label who the speaker is.
-// it has text for japanese dialogue.
-// it has text for english dialogue
+// it has text for japanese dialog.
+// it has text for english dialog
 class UIMessage {
     constructor(scene,options) {
         this.scene = scene;

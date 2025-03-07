@@ -4,7 +4,7 @@
   "location": "apartment",
   "character": "alex",
   "backgroundImage": "apartment-interior.jpg",
-  "dialogue": [
+  "dialog": [
     {
       "speaker": "narrator",
       "text": "You wake up in your new apartment in Japan. The morning sunlight streams through the blinds.",

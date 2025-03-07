@@ -7,7 +7,7 @@ This document outlines a step-by-step plan for migrating the current monolithic 
 ```
 /public/lib/
   /ui/           - UI-related components
-  /dialogue/     - Dialogue system
+  /dialog/     - Dialog system
   /characters/   - Character management
   /save/         - Save/load functionality
   /input/        - Input handling
@@ -21,16 +21,16 @@ This document outlines a step-by-step plan for migrating the current monolithic 
 ### Core Systems
 
 1. **UIManager** (`/lib/ui/UIManager.js`)
-   - Manages all UI components including dialogue box, choice buttons, and control panels
+   - Manages all UI components including dialog box, choice buttons, and control panels
    - Handles UI layout and positioning
 
 2. **NotificationManager** (`/lib/ui/NotificationManager.js`)
    - Handles in-game notifications and messages
    - Manages notification display, positioning, and animations
 
-3. **DialogueManager** (`/lib/dialogue/DialogueManager.js`)
-   - Handles dialogue display, progression, and choices
-   - Manages typing effects and dialogue state
+3. **DialogManager** (`/lib/dialog/DialogManager.js`)
+   - Handles dialog display, progression, and choices
+   - Manages typing effects and dialog state
 
 4. **CharacterManager** (`/lib/characters/CharacterManager.js`)
    - Handles character and background display
@@ -93,7 +93,7 @@ Remove any duplicate code and ensure all functionality is properly migrated.
 2. **Integration Testing**: Test modules working together in various combinations
 3. **System Testing**: Test the complete game with all modules integrated
 4. **Functional Testing**: Verify all game functionality works as expected:
-   - Dialogue progression and choices
+   - Dialog progression and choices
    - Character display and transitions
    - Game controls (auto, skip, save, load)
    - Audio playback and control
@@ -102,7 +102,7 @@ Remove any duplicate code and ensure all functionality is properly migrated.
 ## Long-term Improvements
 
 1. Add additional character features like expressions and animations
-2. Enhance dialogue system with more text effects
+2. Enhance dialog system with more text effects
 3. Improve settings menu with more options
 4. Implement a chapter selection screen
 5. Add localization support for multiple languages

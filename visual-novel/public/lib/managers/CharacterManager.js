@@ -3,8 +3,8 @@
  * Handles character and background display and updates
  */
 class CharacterManager {
-    constructor(globalManagers,dialogueManager,scene) {
-        this.d = dialogueManager;
+    constructor(globalManagers,dialogManager,scene) {
+        this.d = dialogManager;
         this.g = globalManagers;
         this.scene = scene;
         

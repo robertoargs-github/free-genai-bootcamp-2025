@@ -13,7 +13,7 @@
     "defaultImage": "alex-neutral.png"
   },
   "languageDifficulty": "beginner",
-  "dialogue": [
+  "dialog": [
     {
       "speaker": "narrator",
       "text": "You wake up in your new apartment in Japan. The morning sunlight streams through the blinds as you hear someone in the kitchen.",
@@ -192,9 +192,9 @@
         ]
       },
       {
-        "type": "dialogue-completion",
+        "type": "dialog-completion",
         "instructions": "Fill in the blanks with appropriate responses",
-        "dialogue": [
+        "dialog": [
           {"speaker": "Alex", "text": "おはよう！"},
           {"speaker": "You", "text": "[        ]"},
           {"speaker": "Alex", "text": "コーヒーを飲みますか？"},

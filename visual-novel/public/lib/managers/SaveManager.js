@@ -11,7 +11,7 @@ class SaveManager {
         this.defaultSave = {
             sceneId: 'scene001',
             chapterId: 1,
-            dialogueId: '000',
+            dialogId: '000',
             timestamp: null
         };
     }

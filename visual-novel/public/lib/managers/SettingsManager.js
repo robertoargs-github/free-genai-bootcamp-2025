@@ -11,7 +11,7 @@ class SettingsManager {
         this.defaultSettings = {
             language: 'dual',   // english, japanese, dual
             textSpeed: 30,         // ms per character
-            autoAdvanced: false,   // auto-advance dialogue
+            autoAdvanced: false,   // auto-advance dialog
             autoSpeed: 2000,       // ms to wait before advancing in auto mode
             bgmVolume: 0.01,       // 0-1
             sfxVolume: 0.1,        // 0-1

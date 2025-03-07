@@ -7,7 +7,7 @@
 - All interactions flow naturally from one to the next
 ## NodeState
 
-When a current dialogue node is set it a state.
+When a current dialog node is set it a state.
 - speaker
 - response
 
@@ -20,7 +20,7 @@ This is an example of a story scene in JSON format that is stored in the outputs
     title: "Welcome to Japan",
     location_id: "apartment",
     character_id: "alex",
-    dialogue: {
+    dialog: {
         "000": {
             speaker: "player",
             japanese: "あなたは新しいアパートにおり、朝日の光が窓の中を流すように、あなたは起きた。",
@@ -60,7 +60,7 @@ Sometimes you want to have a response for a specific choice but the choice alway
 ```json
 {
     "id": "scene002",
-    "dialogue": {
+    "dialog": {
         "000": {
             "speaker": "alex",
             "japanese": "おはよう！起きた？",
@@ -165,7 +165,7 @@ Each path concludes with a final assessment at the language school with Yamamoto
 
 Each scene includes:
 - **Relevant Vocabulary**: Words specific to the location and situation
-- **Grammar Points**: New structures introduced through character dialogue
+- **Grammar Points**: New structures introduced through character dialog
 - **Cultural Notes**: Insights into Japanese customs and practices
 - **Practice Exercises**: Interactive language challenges with feedback
 

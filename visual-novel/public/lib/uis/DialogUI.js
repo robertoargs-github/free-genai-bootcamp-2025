@@ -3,10 +3,10 @@
  * Manages all UI components in the game
  */
 class DialogUI  extends BaseUI {
-    constructor(UIManager,dialogueManager,scene) {
+    constructor(UIManager,dialogManager,scene) {
         super(scene);
         this.uim = UIManager;
-        this.d = dialogueManager;
+        this.d = dialogManager;
         this.scene = scene;
         this.width = scene.cameras.main.width;
         this.height = scene.cameras.main.height;
@@ -25,7 +25,7 @@ class DialogUI  extends BaseUI {
         this.x = 0//x;
         this.y = 0//y;
         
-        // create fields container to contain the dialogue.
+        // create fields container to contain the dialog.
         this.messagesContainer = this.uim.createContainer({
             layout: 'vertical',
             position: [this.x,this.y],
@@ -82,7 +82,7 @@ class DialogUI  extends BaseUI {
             inputOptions: {
                 text: 'Next',
                 size: [80,50],
-                eventHandle: 'dialogue-next'
+                eventHandle: 'dialog-next'
             }
         })       
         this.messagesContainer.addField(this.nextButton);

@@ -1,20 +1,20 @@
 /**
- * DialogueManager.js
- * Handles dialogue display, progression, and choices
+ * DialogManager.js
+ * Handles dialog display, progression, and choices
  */
-class DialogueManager {
+class DialogManager {
     constructor(globalManagers,scene) {
         this.g = globalManagers;
         this.scene = scene;
         
         this.sceneId = null; // this is the current scene
         
-        // dialogueData[dialogueId] = dialogueNode
-        this.dialogueData = null; // contains all dialogue data for the current scene.
-        this.dialogueId = null; // this is the current dialogue
-        this.dialogueNode = null; // this is the current dialogue node
+        // dialogData[dialogId] = dialogNode
+        this.dialogData = null; // contains all dialog data for the current scene.
+        this.dialogId = null; // this is the current dialog
+        this.dialogNode = null; // this is the current dialog node
 
-        this.dialogueState = null; // contains the current dialogue state
+        this.dialogState = null; // contains the current dialog state
 
         this.mappings = null; // contains character names and IDs
     }
@@ -28,12 +28,12 @@ class DialogueManager {
         //const typewriterEffect = this.g.settings.get('typewriterEffect');
         this.loadMappings();
         this.loadSceneData();
-        this.loadDialogueNode();
+        this.loadDialogNode();
     }
     
-    // checks if the dialogue is loaded for rendering.
+    // checks if the dialog is loaded for rendering.
     isLoaded(){
-        return this.dialogueData && this.dialogueNode && this.mappings;
+        return this.dialogData && this.dialogNode && this.mappings;
     }
 
     loadMappings(){
@@ -45,30 +45,30 @@ class DialogueManager {
         
         try {
             const cacheKey = `scene-${sceneId}`;
-            this.dialogueData = this.scene.cache.json.get(cacheKey);
-            if (!this.dialogueData) {
-                console.error(`No dialogue data found for scene: ${cacheKey}`);
+            this.dialogData = this.scene.cache.json.get(cacheKey);
+            if (!this.dialogData) {
+                console.error(`No dialog data found for scene: ${cacheKey}`);
                 return;
             }
             
             // Start from the beginning or from the saved position
-            this.dialogueId = this.g.saves.get('dialogueId') || this.dialogueData.startAt;
+            this.dialogId = this.g.saves.get('dialogId') || this.dialogData.startAt;
         } catch (error) {
             console.error(`Error loading scene data for ${sceneId}:`, error);
         }
     }
     
-    loadDialogueNode() {
-        this.dialogueNode = this.dialogueData.dialogue[this.dialogueId];
-        this.dialogueState = 'speaker'
-        if (!this.dialogueNode) {
-            console.error(`Dialogue node not found for ID: ${this.dialogueId}`);
+    loadDialogNode() {
+        this.dialogNode = this.dialogData.dialog[this.dialogId];
+        this.dialogState = 'speaker'
+        if (!this.dialogNode) {
+            console.error(`Dialog node not found for ID: ${this.dialogId}`);
             return;
         }
     }
    
     isChoices(){
-        return this.dialogueNode.choices && this.dialogueNode.choices.length > 0;
+        return this.dialogNode.choices && this.dialogNode.choices.length > 0;
     }    
 
     // next
@@ -80,16 +80,16 @@ class DialogueManager {
             // advance based on default_next_id
             
             // check if default_next_id exists if not throw an error.
-            if (!this.dialogueNode.default_next_id){
-                console.error('No default_next_id found for dialogue node:', this.dialogueNode);
+            if (!this.dialogNode.default_next_id){
+                console.error('No default_next_id found for dialog node:', this.dialogNode);
                 return;
             }
 
-            this.dialogueId = this.dialogueNode.default_next_id;
-            this.dialogueNode = this.dialogueData.dialogue[this.dialogueId];
+            this.dialogId = this.dialogNode.default_next_id;
+            this.dialogNode = this.dialogData.dialog[this.dialogId];
         } else if (action == 'choice') {
             // we are assuming the choice is an integer
-            const choice = this.dialogueData.dialogue[this.dialogueId].choices[value];
+            const choice = this.dialogData.dialog[this.dialogId].choices[value];
             // if there is a response we need to show it.
             // if we are advancing from response lets check for next_id otherwise fallback to default_next_id
         }
@@ -101,19 +101,19 @@ class DialogueManager {
         this.scene.uiManager.clearChoices();
         
         if (choice.next) {
-            this.currentDialogueId = choice.next;
-            this.startDialogue();
+            this.currentDialogId = choice.next;
+            this.startDialog();
         } else if (choice.nextScene) {
             this.goToNextScene(choice.nextScene);
         } else {
-            console.error('Choice has no next dialogue or scene', choice);
+            console.error('Choice has no next dialog or scene', choice);
         }
     }
     
     goToNextScene(sceneId) {
         // Update game settings
         this.scene.gameSettings.currentScene = sceneId;
-        this.scene.gameSettings.currentDialogueId = null; // Reset dialogue ID for new scene
+        this.scene.gameSettings.currentDialogId = null; // Reset dialog ID for new scene
         
         // Save the game state before changing scenes
         this.scene.saveManager.saveGameState();
@@ -137,16 +137,16 @@ class DialogueManager {
     }
 
     getJapaneseText(){
-        return this.dialogueNode.japanese;
+        return this.dialogNode.japanese;
     }
 
     getEnglishText(){
-        return this.dialogueNode.english;
+        return this.dialogNode.english;
     }
 
     getSpeakerName() {
-        // get speakerId from dialogue node
-        const speakerId = this.dialogueNode.speakerId;       
+        // get speakerId from dialog node
+        const speakerId = this.dialogNode.speakerId;       
 
         if (speakerId == 'player') {
             return 'Player';
@@ -163,5 +163,5 @@ class DialogueManager {
 
 // Export for use in other files
 if (typeof module !== 'undefined') {
-    module.exports = DialogueManager;
+    module.exports = DialogManager;
 }

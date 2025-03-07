@@ -4,7 +4,7 @@
     "location_id": "apartment",
     "character_id": "alex",
     "startsAt": "000",
-    "dialogue": {
+    "dialog": {
         "000": {
             "speakerId": "player",
             "japanese": "あなたは新しいアパートにおり、朝日の光が窓の中を流すように、あなたは起きた。",

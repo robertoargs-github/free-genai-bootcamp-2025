@@ -194,7 +194,7 @@ class StoryManager {
      * Load content for the current scene
      */
     loadSceneContent() {
-        // In a production game, this would load dialogue from external files
+        // In a production game, this would load dialog from external files
         // For now, we'll simulate with event emissions
         
         console.log(`Loading content for scene: ${this.currentScene} in chapter: ${this.currentChapter}`);
@@ -277,17 +277,17 @@ class StoryManager {
     }
     
     /**
-     * Handle dialogue completion
-     * @param {object} data - Dialogue completion data
+     * Handle dialog completion
+     * @param {object} data - Dialog completion data
      */
-    onDialogueComplete(data) {
-        // In a real game, this would determine what happens after dialogue ends
-        console.log('Dialogue completed:', data);
+    onDialogComplete(data) {
+        // In a real game, this would determine what happens after dialog ends
+        console.log('Dialog completed:', data);
         
         // Add to history
         this.addToHistory({
-            type: 'dialogue_complete',
-            dialogueId: data.dialogueId,
+            type: 'dialog_complete',
+            dialogId: data.dialogId,
             timestamp: new Date().toISOString()
         });
     }

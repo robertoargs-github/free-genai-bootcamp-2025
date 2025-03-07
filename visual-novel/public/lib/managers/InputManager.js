@@ -15,22 +15,22 @@ class InputManager {
     setupInputHandlers() {
         // Add click/tap handler
         this.scene.input.on('pointerdown', (pointer) => {
-            // All dialogue advancement is now handled by the next button
+            // All dialog advancement is now handled by the next button
             // This handler remains only for other UI interactions
             if (this.scene.uiManager.isClickingUIElement(pointer)) {
                 return;
             }
             
-            // No longer advance dialogue by clicking anywhere
+            // No longer advance dialog by clicking anywhere
         });
         
         // Add keyboard handlers
         this.scene.input.keyboard.on('keydown-SPACE', () => {
-            // Space advances dialogue just like clicking the next button
-            if (this.scene.dialogueManager.isTyping) {
-                this.scene.dialogueManager.completeTypingImmediately();
-            } else if (this.scene.dialogueManager.dialogueComplete && !this.scene.dialogueManager.choosingOption) {
-                this.scene.dialogueManager.advanceDialogue();
+            // Space advances dialog just like clicking the next button
+            if (this.scene.dialogManager.isTyping) {
+                this.scene.dialogManager.completeTypingImmediately();
+            } else if (this.scene.dialogManager.dialogComplete && !this.scene.dialogManager.choosingOption) {
+                this.scene.dialogManager.advanceDialog();
             }
         });
         
