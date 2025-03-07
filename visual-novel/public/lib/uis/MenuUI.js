@@ -21,7 +21,7 @@ class MenuUI extends BaseUI {
     }
 
     createButtons(buttonData) {
-        // contain the buttons within a UIFields that is vertical       
+        // contain the buttons within a UIContainer that is vertical       
         this.menuContainer = this.uim.createFields({
             layout: 'vertical',
             position: [this.x,this.y],

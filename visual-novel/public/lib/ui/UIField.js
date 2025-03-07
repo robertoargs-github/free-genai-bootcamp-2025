@@ -88,6 +88,9 @@ class UIField {
             case 'button':
                 this.input = new UIButton(this.scene, this.inputOptions);
                 break;
+            case 'message':
+                this.input = new UIMessage(this.scene, this.inputOptions);
+                break;
             default:
                 console.warn(`Input type '${this.inputType}' not supported`);
                 break;

@@ -33,7 +33,7 @@ class UIManager {
     }
     
     createFields(options) {
-        const fields = new UIFields(this.scene, options);
+        const fields = new UIContainer(this.scene, options);
         return fields;
     }
     

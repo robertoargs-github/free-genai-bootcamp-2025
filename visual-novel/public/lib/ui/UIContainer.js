@@ -1,4 +1,4 @@
-class UIFields {
+class UIContainer {
     /**
      * Create a container for multiple UIField components with automatic spacing
      * @param {Phaser.Scene} scene - The Phaser scene
@@ -32,7 +32,7 @@ class UIFields {
     /**
      * Add a field to the container
      * @param {UIField} field - The field to add
-     * @returns {UIFields} - This container instance for chaining
+     * @returns {UIContainer} - This container instance for chaining
      */
     addField(field) {
         this.fields.push(field);
@@ -43,7 +43,7 @@ class UIFields {
     /**
      * Remove a field from the container
      * @param {UIField} field - The field to remove
-     * @returns {UIFields} - This container instance for chaining
+     * @returns {UIContainer} - This container instance for chaining
      */
     removeField(field) {
         const index = this.fields.indexOf(field);
@@ -66,7 +66,7 @@ class UIFields {
      * Set the position of the container and all its fields
      * @param {number} x - X position
      * @param {number} y - Y position
-     * @returns {UIFields} - This container instance for chaining
+     * @returns {UIContainer} - This container instance for chaining
      */
     setPosition(x, y) {
         const deltaX = x - this.x;
@@ -84,7 +84,7 @@ class UIFields {
     /**
      * Set the spacing between fields
      * @param {number} spacing - Spacing value
-     * @returns {UIFields} - This container instance for chaining
+     * @returns {UIContainer} - This container instance for chaining
      */
     setSpacing(spacing) {
         this.spacing = spacing;
@@ -95,7 +95,7 @@ class UIFields {
     /**
      * Set visibility of this container and all its fields
      * @param {boolean} visible - Whether the container and fields should be visible
-     * @returns {UIFields} - This container instance for chaining
+     * @returns {UIContainer} - This container instance for chaining
      */
     setVisible(visible) {
         // Set visibility for all fields
@@ -289,7 +289,7 @@ class UIFields {
     /**
      * Set the layout direction
      * @param {string} layout - 'vertical' or 'horizontal'
-     * @returns {UIFields} - This container instance for chaining
+     * @returns {UIContainer} - This container instance for chaining
      */
     setLayout(layout) {
         if (layout !== 'vertical' && layout !== 'horizontal') {
@@ -390,7 +390,7 @@ class UIFields {
      * Set the origin point of the container
      * @param {number} x - X origin (0-1)
      * @param {number} y - Y origin (0-1)
-     * @returns {UIFields} - This container instance for chaining
+     * @returns {UIContainer} - This container instance for chaining
      */
     setOrigin(x, y) {
         // Validate origin values
