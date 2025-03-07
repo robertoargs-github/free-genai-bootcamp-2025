@@ -6,12 +6,6 @@ class MenuUI extends BaseUI {
         this.spacing = 20;
         this.buttonWidth = 500;
         this.buttonHeight = 80;
-        this.buttons = {
-            newGame: null,
-            continue: null,
-            settings: null,
-            load: null
-        }
     }
 
     create(x,y) {
@@ -21,8 +15,8 @@ class MenuUI extends BaseUI {
         this.createButtons([
             {text: 'New Game',eventHandle: 'new-game'},
             {text: 'Continue',eventHandle: 'continue'},
-            {text: 'Settings',eventHandle: 'settings'},
-            {text: 'Load',eventHandle: 'load'}
+            {text: 'Load',eventHandle: 'load'},
+            {text: 'Settings',eventHandle: 'settings'}
         ]);
     }
 
@@ -34,15 +28,15 @@ class MenuUI extends BaseUI {
             spacing: this.spacing,
             origin: [0.5,0.5]
         });
+        this.registerElement(this.menuContainer);
         // iterate over the buttonData and create button
         for (let t of buttonData) {
             this.createButton(t.text, t.eventHandle)
         }
     }
-        
 
     createButton(text, eventHandle){
-        this.buttons[eventHandle] = this.uim.createField({
+        const button = this.uim.createField({
             inputType: 'button',
             position: [0,0],
             inputOptions: {
@@ -51,7 +45,7 @@ class MenuUI extends BaseUI {
                 eventHandle: eventHandle
             }
         });
-        this.menuContainer.addField(this.buttons[eventHandle]);
+        this.menuContainer.addField(button);
     }
     
     // Override show method to add any specific behavior

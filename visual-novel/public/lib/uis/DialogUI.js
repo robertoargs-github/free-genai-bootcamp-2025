@@ -2,252 +2,133 @@
  * UIManager.js
  * Manages all UI components in the game
  */
-class DialogUI {
-    constructor(scene) {
+class DialogUI  extends BaseUI {
+    constructor(UIManager,dialogueManager,scene) {
+        super(scene);
+        this.uim = UIManager;
+        this.d = dialogueManager;
         this.scene = scene;
         this.width = scene.cameras.main.width;
         this.height = scene.cameras.main.height;
         
         // Get reference to the event bus from the scene
         this.eventBus = window.eventBus;
+
+        this.margin = 32;
+        this.padding = 32;
         
         // UI components
         this.dialogueBox = null;
         this.nameBox = null;
         this.nextButton = null;
-        this.controls = null;
         this.choiceSystem = null;
+
+        this.nameText = null;
     }
     
-    create() {
+    create(x,y) {
+        this.x = x;
+        this.y = y;
         this.createDialogueBox();
         this.createNameBox();
         this.createNextButton();
-        this.createControls();
+        this.createDialogueText();
+    }
+
+    update() {
+        if (this.d.isLoaded()){
+            const name = this.d.getSpeakerName();
+            this.nameText.setText(name);
+        }
+        // update japanese text 
+        if (this.japaneseText && (this.scene.g.settings.get('language') == 'japanese' || this.scene.g.settings.get('language') == 'dual')) {
+            this.japaneseText.setText(this.d.getJapaneseText());
+        }
+        // update english text
+        if (this.englishText && (this.scene.g.settings.get('language') == 'english' || this.scene.g.settings.get('language') == 'dual')) {
+            this.englishText.setText(this.d.getEnglishText());
+        }
+
+        if (this.d.isChoices()){
+            this.nextButton.setVisible(false)
+        } else {
+            this.nextButton.setVisible(true)
+        }
     }
     
     createDialogueBox() {
-        this.dialogueBox = this.scene.add.image(this.width / 2, this.height - 120, 'dialog-box')
-            .setDisplaySize(1000, 200);
+        const width = this.width - (this.margin * 2);
+        const height = 300;
+        const y = this.y - this.margin;
+        const x = this.x + this.margin;
+        this.dialogueBox = this.scene.add.image(x, y, 'dialog-box')
+        this.dialogueBox.setDisplaySize(width, height);
+        this.dialogueBox.setOrigin(0,1)
     }
     
     createNameBox() {
-        this.nameBox = this.scene.add.image(this.width / 2 - 400, this.height - 200, 'name-box')
-            .setDisplaySize(200, 50);
+        const height = 50
+        const width = 400
+        const x = this.dialogueBox.x + 32;
+        const y = this.dialogueBox.y - this.dialogueBox.displayHeight - (height/2);
+        this.nameBox = this.scene.add.image(x, y, 'name-box')
+        this.nameBox.setDisplaySize(width, height);
+        this.nameBox.setOrigin(0,0);
+
+        this.nameText = this.scene.add.text(x + 16, y + 8, '', {
+            fontFamily: 'Arial',
+            fontSize: '32px',
+            color: '#ffffff'
+        }).setOrigin(0,0);
     }
     
     createNextButton() {
-        this.nextButton = this.scene.add.image(this.width / 2 + 400, this.height - 50, 'next-button')
-            .setDisplaySize(80, 50)
-            .setInteractive({ useHandCursor: true })
-            .on('pointerover', () => {
-                this.nextButton.setTexture('next-button-hover');
-            })
-            .on('pointerout', () => {
-                this.nextButton.setTexture('next-button');
-            })
-            .on('pointerdown', () => {
-                try {
-                    this.scene.sound.play('click', { volume: 0.5 });
-                } catch (e) {
-                    console.warn('Click sound not available');
-                }
-                
-                if (this.scene.dialogueManager.isTyping) {
-                    this.scene.dialogueManager.completeTypingImmediately();
-                    return;
-                }
-                
-                if (this.scene.dialogueManager.dialogueComplete && !this.scene.dialogueManager.choosingOption) {
-                    this.scene.dialogueManager.advanceDialogue();
-                }
-            });
-    }
-    
-    createControls() {
-        // Control panel at the bottom-right
-        const buttonSpacing = 60;
-        const buttonY = this.height - 40;
-        const startX = this.width - 40;
-        
-        // Create UI control buttons using EventBus for communication
-        this.autoButton = this.createControlButton(startX - (buttonSpacing * 0), buttonY, 'auto-icon', 
-            () => this.eventBus.emit('ui:toggle-auto-mode'));
-            
-        this.skipButton = this.createControlButton(startX - (buttonSpacing * 1), buttonY, 'skip-icon', 
-            () => this.eventBus.emit('ui:toggle-skip-mode'));
-            
-        this.saveButton = this.createControlButton(startX - (buttonSpacing * 2), buttonY, 'save-icon', 
-            () => this.eventBus.emit('ui:save-game'));
-            
-        this.loadButton = this.createControlButton(startX - (buttonSpacing * 3), buttonY, 'load-icon', 
-            () => this.eventBus.emit('ui:load-game'));
-            
-        this.settingsButton = this.createControlButton(startX - (buttonSpacing * 4), buttonY, 'settings-icon', 
-            () => this.eventBus.emit('ui:open-settings'));
-            
-        this.languageButton = this.createControlButton(startX - (buttonSpacing * 5), buttonY, 'language-icon', 
-            () => this.eventBus.emit('ui:toggle-language'));
-            
-        this.helpButton = this.createControlButton(startX - (buttonSpacing * 6), buttonY, 'help-icon', 
-            () => this.eventBus.emit('ui:open-help'));
-    }
-    
-    createControlButton(x, y, texture, callback) {
-        return this.scene.add.image(x, y, texture)
-            .setDisplaySize(40, 40)
-            .setInteractive({ useHandCursor: true })
-            .on('pointerover', function() {
-                this.setTint(0xdddddd);
-            })
-            .on('pointerout', function() {
-                this.clearTint();
-            })
-            .on('pointerdown', () => {
-                try {
-                    this.scene.sound.play('click');
-                } catch (e) {
-                    console.warn('Click sound not available');
-                }
-                callback();
-            });
-    }
-    
-    showNotification(message, duration = 2000) {
-        // Create notification text
-        const notification = this.scene.add.text(this.width / 2, 100, message, {
-            fontFamily: 'Arial',
-            fontSize: '24px',
-            color: '#ffffff',
-            backgroundColor: '#000000',
-            padding: { x: 20, y: 10 }
-        })
-        .setOrigin(0.5, 0.5)
-        .setAlpha(0);
-        
-        // Animation for notification
-        this.scene.tweens.add({
-            targets: notification,
-            alpha: 1,
-            duration: 300,
-            ease: 'Power2',
-            yoyo: true,
-            hold: duration - 600,
-            onComplete: () => {
-                notification.destroy();
+        const x = this.dialogueBox.x + this.dialogueBox.displayWidth - 80;
+        const y = this.dialogueBox.y - 100;
+        this.nextButton = this.uim.createField({
+            inputType: 'button',
+            position: [x,y],
+            inputOptions: {
+                text: 'Next',
+                size: [80,50],
+                eventHandle: 'dialogue-next'
             }
-        });
+        })       
+        this.registerElement(this.nextButton);
     }
     
     createDialogueText() {
         // Create text objects for dialogue
-        const textX = this.width / 2;
-        const textY = this.height - 120;
+        const x = this.dialogueBox.x + this.margin
+        const y = this.dialogueBox.y - this.dialogueBox.displayHeight + (this.padding * 2);
+
+        const width = this.dialogueBox.displayWidth - (this.margin * 2) - (this.padding * 2);
         
+        let offsetY = y;
         // Create text for Japanese (top) and English (bottom) if using dual mode
-        if (this.scene.gameSettings.language === 'dual' || this.scene.gameSettings.language === 'japanese') {
-            this.scene.japaneseText = this.scene.add.text(textX, textY - 30, '', {
+        if (this.scene.g.settings.get('language') === 'dual' || this.scene.g.settings.get('language') === 'japanese') {
+            this.japaneseText = this.scene.add.text(x, offsetY, '', {
                 fontFamily: 'Noto Sans JP',
                 fontSize: '28px',
                 color: '#ffffff',
                 align: 'left',
-                wordWrap: { width: 900 }
-            }).setOrigin(0.5, 0.5);
+                wordWrap: { width: width }
+            }).setOrigin(0,0);
         }
         
-        if (this.scene.gameSettings.language === 'dual' || this.scene.gameSettings.language === 'english') {
-            this.scene.englishText = this.scene.add.text(textX, textY + 30, '', {
+        if (this.scene.g.settings.get('language') === 'dual' || this.scene.g.settings.get('language') === 'english') {
+            offsetY += this.japaneseText.displayHeight + this.padding;
+            this.englishText = this.scene.add.text(x, offsetY, '', {
                 fontFamily: 'Arial',
                 fontSize: '24px',
                 color: '#ffffff',
                 align: 'left',
-                wordWrap: { width: 900 }
-            }).setOrigin(0.5, 0.5);
-        }
-        
-        // Create text for character name
-        this.scene.nameText = this.scene.add.text(this.width / 2 - 400, this.height - 200, '', {
-            fontFamily: 'Arial',
-            fontSize: '22px',
-            color: '#ffffff'
-        }).setOrigin(0.5, 0.5);
-    }
-    
-    clearChoices() {
-        if (this.scene.choiceButtons) {
-            this.scene.choiceButtons.forEach(button => {
-                button.destroy();
-            });
-            this.scene.choiceButtons = [];
+                wordWrap: { width: width }
+            }).setOrigin(0,0);
         }
     }
-    
-    showChoices(choices) {
-        this.clearChoices();
-        this.scene.dialogueManager.choosingOption = true;
-        
-        const startY = this.height / 2 - 100;
-        const spacing = 80;
-        
-        choices.forEach((choice, index) => {
-            const button = this.scene.add.image(this.width / 2, startY + (index * spacing), 'choice-box')
-                .setDisplaySize(600, 60)
-                .setInteractive({ useHandCursor: true })
-                .on('pointerover', () => {
-                    button.setTint(0xdddddd);
-                })
-                .on('pointerout', () => {
-                    button.clearTint();
-                })
-                .on('pointerdown', () => {
-                    try {
-                        this.scene.sound.play('click');
-                    } catch (e) {
-                        console.warn('Click sound not available');
-                    }
-                    this.scene.dialogueManager.handleChoice(choice);
-                });
-            
-            // Add choice text on top of the button
-            const text = this.scene.add.text(this.width / 2, startY + (index * spacing), choice.text, {
-                fontFamily: 'Arial',
-                fontSize: '20px',
-                color: '#ffffff',
-                align: 'center'
-            }).setOrigin(0.5, 0.5);
-            
-            // Group the button and text together
-            button.text = text;
-            this.scene.choiceButtons.push(button);
-        });
-    }
-    
-    isClickingUIElement(pointer) {
-        // Check if the pointer is over a UI button or choice button
-        const uiButtons = [
-            this.autoButton, this.skipButton, this.saveButton,
-            this.loadButton, this.settingsButton, this.languageButton,
-            this.helpButton, this.nextButton
-        ];
-        
-        // Check UI buttons
-        for (const button of uiButtons) {
-            if (button && button.getBounds().contains(pointer.x, pointer.y)) {
-                return true;
-            }
-        }
-        
-        // Check choice buttons
-        if (this.scene.choiceButtons) {
-            for (const button of this.scene.choiceButtons) {
-                if (button.getBounds().contains(pointer.x, pointer.y)) {
-                    return true;
-                }
-            }
-        }
-        
-        return false;
-    }
+
+
 }
 
 // Export for use in other files

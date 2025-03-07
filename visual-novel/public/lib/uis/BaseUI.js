@@ -44,7 +44,6 @@ class BaseUI {
         this.isVisible = visible;
         
         // Update visibility of all registered elements
-        console.log(this.uiElements)
         this.uiElements.forEach(element => {
             if (element && typeof element.setVisible === 'function') {
                 element.setVisible(visible);

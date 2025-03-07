@@ -3,13 +3,12 @@
  * Handles character and background display and updates
  */
 class CharacterManager {
-    constructor(scene) {
+    constructor(globalManagers,dialogueManager,scene) {
+        this.d = dialogueManager;
+        this.g = globalManagers;
         this.scene = scene;
-        this.width = scene.cameras.main.width;
-        this.height = scene.cameras.main.height;
         
         this.character = null;
-        this.background = null;
         
         this.characterData = {
             'alex': { name: 'Alex Thompson', expression: 'neutral' },
@@ -21,64 +20,17 @@ class CharacterManager {
             'kenji': { name: 'Suzuki Kenji', expression: 'neutral' },
             'akiko': { name: 'Watanabe Akiko', expression: 'neutral' }
         };
-        
-        this.backgroundData = {
-            'apartment': { name: 'Apartment Interior' },
-            'classroom': { name: 'Language School Classroom' },
-            'cafe': { name: 'Cafe Interior' },
-            'post-office': { name: 'Post Office Interior' },
-            'store': { name: 'Corner Store Interior' }
-        };
     }
     
     create() {
-        this.createBackground();
         this.createCharacter();
     }
     
-    createBackground() {
-        // Default background
-        this.background = this.scene.add.image(this.width / 2, this.height / 2, 'apartment')
-            .setDisplaySize(this.width, this.height);
-    }
-    
     createCharacter() {
-        // Position for character (center, slightly lower than middle)
-        const characterX = this.width / 2;
-        const characterY = this.height / 2 + 100;
-        
+        this.g.saves.get('characterId')
         // Add a default character sprite if needed
-        this.character = this.scene.add.image(characterX, characterY, 'alex')
-            .setVisible(false); // Start hidden until we know which character to show
-    }
-    
-    updateBackground(locationId) {
-        if (!locationId || !this.backgroundData[locationId]) {
-            console.warn(`Background not found for location: ${locationId}`);
-            return;
-        }
-        
-        try {
-            // Fade out current background
-            this.scene.tweens.add({
-                targets: this.background,
-                alpha: 0,
-                duration: 300,
-                onComplete: () => {
-                    // Change texture and fade in
-                    this.background.setTexture(locationId);
-                    this.scene.tweens.add({
-                        targets: this.background,
-                        alpha: 1,
-                        duration: 300
-                    });
-                }
-            });
-        } catch (error) {
-            console.error(`Error updating background to ${locationId}:`, error);
-            // Fallback: just change the texture
-            this.background.setTexture(locationId);
-        }
+        this.character = this.scene.add.image(0, 0, 'alex')
+        this.character.setOrigin(0, 0);
     }
     
     updateCharacter(characterId) {

@@ -131,7 +131,9 @@ class PreloadScene extends Phaser.Scene {
     loadStoryData() {
         // Define data files to load
         const dataFiles = [
-            { id: 'scene001', path: 'scenes/scene001.json' }
+            { id: 'mappings', path: 'mappings.json' },
+            { id: 'story-main', path: 'story/story.json' },
+            { id: 'scene-scene001', path: 'scenes/scene001.json' }
             // In a full game, you would load all scenes here
         ];
         

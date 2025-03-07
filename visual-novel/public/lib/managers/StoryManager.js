@@ -16,25 +16,8 @@ class StoryManager {
         // Story state storage key
         this.storyStateKey = 'visual-novel-story-state';
         
-        // Story structure (would be loaded from external files in production)
-        this.storyStructure = {
-            chapters: {
-                'chapter1': {
-                    title: 'First Steps in Japan',
-                    description: 'Your journey as an exchange student begins in Tokyo.',
-                    scenes: ['intro', 'arrival', 'meeting', 'dorm', 'university'],
-                    initialScene: 'intro',
-                    requiredFlags: {}
-                },
-                'chapter2': {
-                    title: 'New Friends, New Words',
-                    description: 'As you adjust to life in Japan, you begin to make friends and learn more Japanese.',
-                    scenes: ['classroom', 'cafeteria', 'study', 'shopping', 'evening'],
-                    initialScene: 'classroom',
-                    requiredFlags: { 'completedChapter1': true }
-                }
-            }
-        };
+        // Story structure (loaded from external file)
+        this.storyStructure = {} //
         
         // Load story state
         this.loadStoryState();

@@ -19,7 +19,26 @@ class UIField {
         this.y = options.position[1];
         this.inputType = options.inputType;
         this.inputOptions = options.inputOptions || {};
-        this.spacing = options.spacing || 25; // Increased default spacing between label and input
+        
+        // Use provided spacing or set defaults based on input type
+        if (options.spacing !== undefined) {
+            this.spacing = options.spacing;
+        } else {
+            // Set larger default spacing for components that need more space
+            switch(this.inputType) {
+                case 'slider':
+                    this.spacing = 35;
+                    break;
+                case 'toggle':
+                    this.spacing = 40;
+                    break;
+                case 'textinput':
+                    this.spacing = 35;
+                    break;
+                default:
+                    this.spacing = 25;
+            }
+        }
         
         // Create the label
         this.createLabel(options.labelStyle);

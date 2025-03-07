@@ -16,7 +16,6 @@ class AudioManager {
     createBgm () {
         try {
             const volume = this.g.settings.get('bgmVolume');
-            console.log(volume);
             this.bgMusic = this.scene.sound.add('bg-music', {
                 volume,
                 loop: true

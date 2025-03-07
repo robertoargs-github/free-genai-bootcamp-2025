@@ -18,7 +18,8 @@ class SettingsUI extends BaseUI {
         this.settingsFields = this.uim.createFields({
             position: [width * 0.5, height * 0.3], // Centered horizontally
             layout: 'vertical',
-            spacing: 30  // Reduced spacing between fields
+            spacing: 80,  // Further increased spacing to ensure no overlap
+            origin: [0.5, 0]  // Center horizontally, align to top
         });
         
         // Register the fields container with BaseUI
@@ -66,6 +67,7 @@ class SettingsUI extends BaseUI {
         
         // Register these elements with BaseUI so they respond to show/hide
         this.registerElement(this.panel);
+        this.registerElement(this.title);
     }
 
     createNameTextInput(){
@@ -217,6 +219,8 @@ class SettingsUI extends BaseUI {
             }
         })
         this.actionsContainer.addField(buttonField);
+
+
     }
 
 }

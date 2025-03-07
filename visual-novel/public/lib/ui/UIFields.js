@@ -121,27 +121,169 @@ class UIFields {
         let startX = this.x - (containerDimensions.width * this.originX);
         let startY = this.y - (containerDimensions.height * this.originY);
         
-        let currentX = startX;
-        let currentY = startY;
-        
-        this.fields.forEach((field, index) => {
-            // Position the field
-            field.setPosition(currentX, currentY);
+        // Define positions for each field based on calculated dimensions
+        if (this.layout === 'vertical') {
+            // For vertical layout, calculate field positions based on actual dimensions
+            let yOffset = 0;
             
-            // Calculate next position based on layout
-            if (this.layout === 'vertical') {
-                // For vertical layout, increment Y position
-                // We need to estimate total field height (label + spacing + input)
-                // For toggle and slider inputs, this is approximately 80-90px
-                const fieldHeight = 90; // Better height estimate for a field with label and input
-                currentY += fieldHeight + this.spacing;
+            this.fields.forEach((field, index) => {
+                // Position the field at the current offset
+                field.setPosition(startX, startY + yOffset);
+                
+                // Calculate actual dimensions for this field
+                const dimensions = this.getFieldDimensions(field);
+                
+                // Add this field's height plus spacing to the offset for the next field
+                yOffset += dimensions.height + this.spacing;
+            });
+        } else {
+            // For horizontal layout, use standard positioning logic
+            let currentX = startX;
+            
+            this.fields.forEach((field, index) => {
+                // Position the field
+                field.setPosition(currentX, startY);
+                
+                // Get field dimensions
+                const fieldDimensions = this.getFieldDimensions(field);
+                
+                // Increment X for next field
+                currentX += fieldDimensions.width + this.spacing;
+            });
+        }
+    }
+    
+    /**
+     * Get dimensions for a specific field based on its type and components
+     * @param {UIField} field - The field to measure
+     * @returns {object} - {width, height} of the field
+     * @private
+     */
+    getFieldDimensions(field) {
+        let width = 0;
+        let height = 0;
+        let labelOffset = 0;
+        let componentHeight = 0;
+        
+        // First check if the field has a non-empty label (adds to height)
+        if (field.label && field.label.text && field.label.text.text !== '') {
+            // Get the actual label height from the text component
+            labelOffset = field.label.text.displayHeight;
+            
+            // Add the configured spacing between label and component
+            if (field.spacing !== undefined) {
+                labelOffset += field.spacing;
             } else {
-                // For horizontal layout, increment X position
-                // Width depends on the specific input type, but we use a reasonable estimate
-                const fieldWidth = 200; // Base width estimate
-                currentX += fieldWidth + this.spacing;
+                // If no field spacing is defined, use a reasonable value based on component type
+                switch(field.inputType) {
+                    case 'toggle':
+                        labelOffset += 30; // Toggle needs more space
+                        break;
+                    case 'slider':
+                        labelOffset += 25; // Slider needs moderate space
+                        break;
+                    default:
+                        labelOffset += 20; // Default spacing
+                }
             }
-        });
+        }
+        
+        // Determine width and height based on input component type
+        if (field.inputComponent) {
+            // Handle button components
+            if (field.inputType === 'button' && field.inputComponent.image) {
+                width = field.inputComponent.image.displayWidth || 0;
+                componentHeight = field.inputComponent.image.displayHeight || 0;
+            } 
+            // Handle toggle components (support for multiple options beyond on/off)
+            else if (field.inputType === 'toggle') {
+                // For toggle components with pills
+                if (field.inputComponent.pills && field.inputComponent.pills.length > 0) {
+                    // Calculate total width across all pills plus spacing
+                    width = 0;
+                    
+                    // Get actual width by summing all pill widths plus spacing
+                    for (let i = 0; i < field.inputComponent.pills.length; i++) {
+                        const pill = field.inputComponent.pills[i];
+                        if (pill) {
+                            width += pill.displayWidth || 0;
+                            // Add spacing between pills (except after the last one)
+                            if (i < field.inputComponent.pills.length - 1) {
+                                width += field.inputComponent.spacing || 5;
+                            }
+                        }
+                    }
+                    
+                    // Get height from the first pill (they should all be same height)
+                    componentHeight = field.inputComponent.pills[0] ? 
+                        field.inputComponent.pills[0].displayHeight : 40;
+                    
+                    // Add some extra padding for hover effects
+                    componentHeight += 10;
+                } 
+                // Fallback to options-based calculation if no pills are created yet
+                else if (field.inputOptions && field.inputOptions.values) {
+                    // Calculate width based on number of values and spacing
+                    const numValues = field.inputOptions.values.length;
+                    const valueWidth = field.inputOptions.size ? field.inputOptions.size[0] : 80;
+                    const spacing = field.inputOptions.spacing || 5;
+                    
+                    width = (valueWidth * numValues) + (spacing * (numValues - 1));
+                    componentHeight = field.inputOptions.size ? field.inputOptions.size[1] : 40;
+                } 
+                // Last resort fallback
+                else {
+                    width = 300;
+                    componentHeight = 40;
+                }
+            } 
+            // Handle text input components
+            else if (field.inputType === 'textinput' && field.inputComponent.background) {
+                width = field.inputComponent.background.displayWidth || 0;
+                componentHeight = field.inputComponent.background.displayHeight || 0;
+            } 
+            // Handle slider components
+            else if (field.inputType === 'slider') {
+                if (field.inputComponent.track) {
+                    width = field.inputComponent.track.displayWidth || 0;
+                    // Add extra height for the handle and to prevent overlap with next element
+                    componentHeight = field.inputComponent.track.displayHeight + 20;
+                }
+                // If we have a slider value text, make sure we account for its height
+                if (field.inputComponent.valueText) {
+                    componentHeight += field.inputComponent.valueText.displayHeight || 0;
+                }
+            }
+        }
+        
+        // Fallback to options if we couldn't determine from component
+        if (width === 0 && field.inputOptions && field.inputOptions.size) {
+            width = field.inputOptions.size[0] || 0;
+            if (componentHeight === 0) {
+                componentHeight = field.inputOptions.size[1] || 0;
+            }
+        }
+        
+        // Fallback to nested inputOptions if still not found
+        if (width === 0 && field.options && field.options.inputOptions && field.options.inputOptions.size) {
+            width = field.options.inputOptions.size[0] || 0;
+            if (componentHeight === 0) {
+                componentHeight = field.options.inputOptions.size[1] || 0;
+            }
+        }
+        
+        // Set reasonable defaults if all else fails
+        if (width === 0) width = 300; // Default width
+        if (componentHeight === 0) componentHeight = 40; // Default component height
+        
+        // For vertical layouts, elements with labels need more space
+        if (labelOffset > 0) {
+            height = labelOffset + componentHeight + 10; // Add extra padding between label and component
+        } else {
+            height = componentHeight;
+        }
+        
+        return { width, height };
     }
     
     /**
@@ -184,55 +326,48 @@ class UIFields {
         
         // Attempt to get actual dimensions from fields
         let maxFieldWidth = 0;
-        let maxFieldHeight = 0;
-        let totalWidth = 0;
         let totalHeight = 0;
         
         // Examine each field to get dimensions where possible
         this.fields.forEach(field => {
-            let fieldWidth = 0;
-            let fieldHeight = 0;
+            // Get dimensions for this field using our helper method
+            const dimensions = this.getFieldDimensions(field);
             
-            // Try to get dimensions from the field or its components
-            if (field.inputComponent && field.inputComponent.image) {
-                // For buttons with images
-                fieldWidth = Math.max(fieldWidth, field.inputComponent.image.displayWidth || 0);
-                fieldHeight = Math.max(fieldHeight, field.inputComponent.image.displayHeight || 0);
-            } else if (field.inputOptions && field.inputOptions.size) {
-                // For fields with explicit size in options
-                fieldWidth = Math.max(fieldWidth, field.inputOptions.size[0] || 0);
-                fieldHeight = Math.max(fieldHeight, field.inputOptions.size[1] || 0);
-            } else if (field.options && field.options.inputOptions && field.options.inputOptions.size) {
-                // For fields with size defined in inputOptions
-                fieldWidth = Math.max(fieldWidth, field.options.inputOptions.size[0] || 0);
-                fieldHeight = Math.max(fieldHeight, field.options.inputOptions.size[1] || 0);
+            // Track the maximum width for all fields
+            maxFieldWidth = Math.max(maxFieldWidth, dimensions.width);
+            
+            // For vertical layout, accumulate total height
+            if (this.layout === 'vertical') {
+                totalHeight += dimensions.height + (this.fields.indexOf(field) < this.fields.length - 1 ? this.spacing : 0);
             }
-            
-            // Update maximums
-            maxFieldWidth = Math.max(maxFieldWidth, fieldWidth);
-            maxFieldHeight = Math.max(maxFieldHeight, fieldHeight);
         });
         
-        // If we couldn't determine dimensions from fields, use reasonable defaults
-        if (maxFieldWidth === 0) maxFieldWidth = 500; // Default to a reasonable button width
-        if (maxFieldHeight === 0) maxFieldHeight = 80; // Default height
+        // If we couldn't determine dimensions, use reasonable defaults
+        if (maxFieldWidth === 0) maxFieldWidth = 300;
+        if (totalHeight === 0 && this.layout === 'vertical') totalHeight = this.fields.length * 100;
         
         // Calculate total dimensions based on layout
         if (this.layout === 'vertical') {
             // For vertical layout, width is the maximum field width,
-            // height is sum of all field heights plus spacing
+            // height is the accumulated heights plus spacing
             return {
                 width: maxFieldWidth,
-                height: (maxFieldHeight * this.fields.length) + 
-                        (this.spacing * (this.fields.length - 1))
+                height: totalHeight
             };
         } else {
-            // For horizontal layout, width is sum of all field widths plus spacing,
-            // height is the maximum field height
+            // For horizontal layout, calculate based on individual field widths
+            let totalWidth = 0;
+            let maxHeight = 0;
+            
+            this.fields.forEach(field => {
+                const dimensions = this.getFieldDimensions(field);
+                totalWidth += dimensions.width + (this.fields.indexOf(field) < this.fields.length - 1 ? this.spacing : 0);
+                maxHeight = Math.max(maxHeight, dimensions.height);
+            });
+            
             return {
-                width: (maxFieldWidth * this.fields.length) + 
-                       (this.spacing * (this.fields.length - 1)),
-                height: maxFieldHeight
+                width: totalWidth,
+                height: maxHeight
             };
         }
     }

@@ -9,11 +9,29 @@ class SaveManager {
         this.maxSlots = 6; // Maximum number of save slots
         this.currentSave = null;
         this.defaultSave = {
-            currentScene: 'scene001',
-            currentChapter: 1,
-            currentDialogue: 1,
+            sceneId: 'scene001',
+            chapterId: 1,
+            dialogueId: '000',
             timestamp: null
         };
+    }
+    
+    new(){
+        this.currentSave = { ...this.defaultSave };
+    }
+
+    load(slot = null) {
+        this.currentSave = this._load(slot);
+    }
+
+    get(key){
+        return this.currentSave[key]
+    }
+
+    set(key, value){
+        if (key in this.currentSave){
+            this.currentSave[key]= value
+        }
     }
     
     /**
@@ -21,7 +39,9 @@ class SaveManager {
      * @param {number} slot - The save slot to load from (1-based index)
      * @returns {Object} The loaded save data
      */
-    load(slot = 1) {
+    _load(slot = null) {
+        // if slot null that it should try to load the slot data that was saved last.
+
         try {
             const saveKey = this.getSaveKey(slot);
             const savedData = localStorage.getItem(saveKey);

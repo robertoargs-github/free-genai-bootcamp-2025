@@ -3,15 +3,16 @@
     "title": "Welcome to Japan",
     "location_id": "apartment",
     "character_id": "alex",
+    "startsAt": "000",
     "dialogue": {
         "000": {
-            "speaker": "player",
+            "speakerId": "player",
             "japanese": "あなたは新しいアパートにおり、朝日の光が窓の中を流すように、あなたは起きた。",
             "english": "You wake up in your new apartment in Japan. The morning sunlight streams through the blinds as you hear someone in the kitchen.",
             "default_next_id": "001"
         },
         "001": {
-            "speaker": "alex",
+            "speakerId": "alex",
             "japanese": "おはよう！起きたんだね！",
             "english": "Oh, you're up! Good morning!",
             "choices": [
@@ -28,7 +29,7 @@
             ]
         },
         "002": {
-            "speaker": "alex",
+            "speakerId": "alex",
             "japanese": "そうだよ！日本へようこそ！アレックス・トンプソンだよ。１ヶ月間のルームメイトになる。カナダ出身だけど、日本には２年ぐらい住んでいるよ。",
             "english": "That's right! Welcome to Japan! I'm Alex Thompson, your roommate for the month. I'm from Canada, but I've been in Japan for about two years now.",
             "choices": [
@@ -45,7 +46,7 @@
             ]
         },
         "003": {
-            "speaker": "alex",
+            "speakerId": "alex",
             "japanese": "コーヒーを入れたよ。出かける前に飲む？君の語学学校のオリエンテーションは10時からだよ。",
             "english": "I made some coffee. Would you like some before we head out? Your language school orientation starts at 10:00.",
             "choices": [
@@ -62,16 +63,16 @@
             ]
         },
         "004": {
-            "speaker": "alex",
+            "speakerId": "alex",
             "japanese": "今8時30分ごろだよ。学校はここから歩いて15分だよ。今日は道を案内するね。",
             "english": "It's about 8:30 now. The school is a 15-minute walk from here. I'll show you the way today.",
             "default_next_id": "005"
         },
         "005": {
-            "speaker": "player",
+            "speakerId": "player",
             "japanese": "アレックスは親切にコーヒーを渡してくれた。彼と少し話した後、学校に向かう準備を始めた。",
             "english": "Alex hands you the coffee. After chatting with him a bit more, you start getting ready for school.",
-            "default_next_id": "scene002"
+            "ends": true
         }
     }
 }

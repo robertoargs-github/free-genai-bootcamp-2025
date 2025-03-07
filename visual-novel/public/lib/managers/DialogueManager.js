@@ -3,194 +3,96 @@
  * Handles dialogue display, progression, and choices
  */
 class DialogueManager {
-    constructor(scene) {
+    constructor(globalManagers,scene) {
+        this.g = globalManagers;
         this.scene = scene;
         
-        // Text display properties
-        this.textSpeed = scene.gameSettings.textSpeed || 30; // ms per character
-        this.isTyping = false;
-        this.dialogueComplete = false;
-        this.choosingOption = false;
+        this.sceneId = null; // this is the current scene
         
-        // Scene data
-        this.currentScene = null;
-        this.currentDialogueId = null;
-        this.dialogueData = null;
-        this.typingEffect = null;
+        // dialogueData[dialogueId] = dialogueNode
+        this.dialogueData = null; // contains all dialogue data for the current scene.
+        this.dialogueId = null; // this is the current dialogue
+        this.dialogueNode = null; // this is the current dialogue node
+
+        this.dialogueState = null; // contains the current dialogue state
+
+        this.mappings = null; // contains character names and IDs
     }
     
     create() {
         // This will be called after the UI is created
+        //const language = this.g.settings.get('language');
+        //const textSpedd = this.g.settings.get('textSpeed');
+        //const autoAdvanced = this.g.settings.get('autoAdvanced');
+        //const autoSpeed = this.g.settings.get('autoSpeed');
+        //const typewriterEffect = this.g.settings.get('typewriterEffect');
+        this.loadMappings();
         this.loadSceneData();
+        this.loadDialogueNode();
     }
     
+    // checks if the dialogue is loaded for rendering.
+    isLoaded(){
+        return this.dialogueData && this.dialogueNode && this.mappings;
+    }
+
+    loadMappings(){
+        this.mappings = this.scene.cache.json.get('mappings');
+    }
+
     loadSceneData() {
-        // Load the current scene data from the cache
-        const sceneId = this.scene.gameSettings.currentScene;
-        this.currentScene = sceneId;
+        const sceneId = this.g.saves.get('sceneId');
         
         try {
-            this.dialogueData = this.scene.cache.json.get(sceneId);
+            const cacheKey = `scene-${sceneId}`;
+            this.dialogueData = this.scene.cache.json.get(cacheKey);
             if (!this.dialogueData) {
-                console.error(`No dialogue data found for scene: ${sceneId}`);
+                console.error(`No dialogue data found for scene: ${cacheKey}`);
                 return;
             }
             
             // Start from the beginning or from the saved position
-            this.currentDialogueId = this.scene.gameSettings.currentDialogueId || this.dialogueData.startAt;
-            this.startDialogue();
+            this.dialogueId = this.g.saves.get('dialogueId') || this.dialogueData.startAt;
         } catch (error) {
             console.error(`Error loading scene data for ${sceneId}:`, error);
         }
     }
     
-    startDialogue() {
-        if (!this.dialogueData || !this.currentDialogueId) {
-            console.error('Cannot start dialogue: missing data or dialogue ID');
+    loadDialogueNode() {
+        this.dialogueNode = this.dialogueData.dialogue[this.dialogueId];
+        this.dialogueState = 'speaker'
+        if (!this.dialogueNode) {
+            console.error(`Dialogue node not found for ID: ${this.dialogueId}`);
             return;
         }
-        
-        const dialogueNode = this.dialogueData.dialogue[this.currentDialogueId];
-        if (!dialogueNode) {
-            console.error(`Dialogue node not found for ID: ${this.currentDialogueId}`);
-            return;
-        }
-        
-        this.displayDialogue(dialogueNode);
     }
-    
-    displayDialogue(dialogueNode) {
-        // If there's a character defined, update the character display
-        if (dialogueNode.character) {
-            this.scene.characterManager.updateCharacter(dialogueNode.character);
-        }
-        
-        // If there's a location defined, update the background
-        if (dialogueNode.location) {
-            this.scene.characterManager.updateBackground(dialogueNode.location);
-        }
-        
-        // Display the speaker's name
-        const speakerName = this.getSpeakerName(dialogueNode.speaker);
-        this.scene.nameText.setText(speakerName);
-        
-        // Display the dialogue text with typing effect
-        if (this.scene.japaneseText && (this.scene.gameSettings.language === 'japanese' || this.scene.gameSettings.language === 'dual')) {
-            this.displayTextWithTypingEffect(this.scene.japaneseText, dialogueNode.japanese || '');
-        }
-        
-        if (this.scene.englishText && (this.scene.gameSettings.language === 'english' || this.scene.gameSettings.language === 'dual')) {
-            this.displayTextWithTypingEffect(this.scene.englishText, dialogueNode.english || '', true);
-        }
-        
-        // Save current position
-        this.scene.gameSettings.currentDialogueId = dialogueNode.id;
-        this.scene.saveManager.saveGameState();
-    }
-    
-    displayTextWithTypingEffect(textObject, content, isEnglish = false) {
-        // Clear any existing typing effect
-        if (this.typingEffect) {
-            this.typingEffect.stop();
-        }
-        
-        // Reset text
-        textObject.setText('');
-        
-        // Set up the typing effect
-        this.isTyping = true;
-        this.dialogueComplete = false;
-        
-        let currentCharIndex = 0;
-        const totalChars = content.length;
-        
-        // Start the typing effect timer
-        this.typingEffect = this.scene.time.addEvent({
-            delay: this.textSpeed,
-            callback: () => {
-                // Add the next character
-                if (currentCharIndex < totalChars) {
-                    textObject.setText(textObject.text + content[currentCharIndex]);
-                    currentCharIndex++;
-                } else {
-                    // Typing is complete
-                    this.onTypingComplete();
-                }
-            },
-            callbackScope: this,
-            repeat: totalChars - 1
-        });
-    }
-    
-    onTypingComplete() {
-        this.isTyping = false;
-        this.dialogueComplete = true;
-        
-        // Auto-advance if in auto mode
-        if (this.scene.autoMode) {
-            this.scene.time.delayedCall(2000, this.advanceDialogue, [], this);
-        }
-        
-        // Skip immediately if in skip mode
-        if (this.scene.skipMode) {
-            this.advanceDialogue();
-        }
-    }
-    
-    completeTypingImmediately() {
-        if (!this.isTyping) return;
-        
-        // Stop the typing effect
-        if (this.typingEffect) {
-            this.typingEffect.remove();
-            this.typingEffect = null;
-        }
-        
-        // Show the full text immediately
-        const dialogueNode = this.dialogueData.dialogue[this.currentDialogueId];
-        
-        if (dialogueNode) {
-            if (this.scene.japaneseText && (this.scene.gameSettings.language === 'japanese' || this.scene.gameSettings.language === 'dual')) {
-                this.scene.japaneseText.setText(dialogueNode.japanese || '');
-            }
+   
+    isChoices(){
+        return this.dialogueNode.choices && this.dialogueNode.choices.length > 0;
+    }    
+
+    // next
+    // choice
+    // response
+    advance(action,value=null) {
+        console.log('advance',arguments)
+        if (action == 'next') {
+            // advance based on default_next_id
             
-            if (this.scene.englishText && (this.scene.gameSettings.language === 'english' || this.scene.gameSettings.language === 'dual')) {
-                this.scene.englishText.setText(dialogueNode.english || '');
+            // check if default_next_id exists if not throw an error.
+            if (!this.dialogueNode.default_next_id){
+                console.error('No default_next_id found for dialogue node:', this.dialogueNode);
+                return;
             }
+
+            this.dialogueId = this.dialogueNode.default_next_id;
+            this.dialogueNode = this.dialogueData.dialogue[this.dialogueId];
+        } else if (action == 'choice') {
+            // we are assuming the choice is an integer
+            const choice = this.dialogueData.dialogue[this.dialogueId].choices[value];
+            // if there is a response we need to show it.
+            // if we are advancing from response lets check for next_id otherwise fallback to default_next_id
         }
-        
-        // Mark typing as complete
-        this.onTypingComplete();
-    }
-    
-    advanceDialogue() {
-        if (!this.dialogueComplete || this.choosingOption) return;
-        
-        // Get the current dialogue node
-        const currentNode = this.dialogueData.dialogue[this.currentDialogueId];
-        
-        // If there are choices, show them
-        if (currentNode.choices && currentNode.choices.length > 0) {
-            this.scene.uiManager.showChoices(currentNode.choices);
-            return;
-        }
-        
-        // If there's a next dialogue, go to it
-        if (currentNode.next) {
-            this.currentDialogueId = currentNode.next;
-            this.startDialogue();
-            return;
-        }
-        
-        // If there's a next scene, go to it
-        if (currentNode.nextScene) {
-            this.goToNextScene(currentNode.nextScene);
-            return;
-        }
-        
-        // If we get here, the scenario is complete
-        console.log('Scenario complete');
-        this.scene.uiManager.showNotification('Scenario complete!');
     }
     
     handleChoice(choice) {
@@ -233,24 +135,29 @@ class DialogueManager {
             }
         });
     }
-    
-    getSpeakerName(speakerId) {
-        if (!speakerId) return '';
+
+    getJapaneseText(){
+        return this.dialogueNode.japanese;
+    }
+
+    getEnglishText(){
+        return this.dialogueNode.english;
+    }
+
+    getSpeakerName() {
+        // get speakerId from dialogue node
+        const speakerId = this.dialogueNode.speakerId;       
+
+        if (speakerId == 'player') {
+            return 'Player';
+        }
+
+        if (!this.mappings) {
+            console.error('Mappings not loaded');
+            return speakerId;
+        }
         
-        // Get character data - in a more complex system, this might come from a separate data store
-        const characterData = {
-            'alex': 'Alex Thompson',
-            'yamamoto': 'Yamamoto Sensei',
-            'minji': 'Kim Min-ji',
-            'carlos': 'Carlos Garcia',
-            'hiroshi': 'Tanaka Hiroshi',
-            'yuki': 'Nakamura Yuki',
-            'kenji': 'Suzuki Kenji',
-            'akiko': 'Watanabe Akiko',
-            'narrator': 'Narrator'
-        };
-        
-        return characterData[speakerId] || speakerId;
+        return this.mappings.characterNames[speakerId] || speakerId;
     }
 }
 

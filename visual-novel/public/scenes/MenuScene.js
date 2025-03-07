@@ -1,19 +1,6 @@
-class MenuScene extends Phaser.Scene {
+class MenuScene extends BaseScene {
     constructor() {
         super({ key: 'Menu' });
-    }
-    
-    init() {
-        // Ensure event bus exists
-        if (!window.eventBus) {
-            window.eventBus = new EventBus();
-        }
-        
-        // Get reference to event bus
-        this.eventBus = window.eventBus;
-        
-        // Get global managers from registry
-        this.g = this.game.registry.get('globalManagers');
     }
 
     create() {
@@ -60,74 +47,52 @@ class MenuScene extends Phaser.Scene {
         this.uiSettings = new SettingsUI(this.g.ui, this);
         this.uiSettings.create();
         this.uiSettings.hide();
+        super.create();
     }
-    
 
-    
-    /**
-     * Start a new game
-     */
-    startNewGame() {
-        // Create a new save in slot 1 with default values
-        this.g.saves.save(1, this.g.saves.defaultSave);
-        
-        // Play a sound effect if available
-        if (this.g.audio) {
-            this.g.audio.playSoundEffect('click');
-        }
-        
-        // Show a transition effect
-        this.cameras.main.fade(500, 0, 0, 0);
-        
-        // Start the game scene
-        this.cameras.main.once('camerafadeoutcomplete', () => {
-            this.scene.start('Game', { sceneId: 'scene001' });
-        });
+    registerEvents() {
+        this.g.eventBus.on('ui:button:new-game:pointdown',this.startGame);
+        this.g.eventBus.on('ui:button:continue:pointdown',this.continueGame);
+        this.g.eventBus.on('ui:button:load:pointdown',this.loadGame);
+        this.g.eventBus.on('ui:button:settings:pointdown',this.openSettings);
+        this.g.eventBus.on('ui:button:settings-cancel:pointdown',this.cancelSettings);
     }
-    
-    /**
-     * Continue from a saved game
-     */
-    continueGame() {
-        // Load save from slot 1
-        const saveData = this.g.saves.load(1);
-        
-        if (saveData) {
-            // Play a sound effect if available
-            if (this.g.audio) {
-                this.g.audio.playSoundEffect('click');
-            }
-            
-            // Show a transition effect
-            this.cameras.main.fade(500, 0, 0, 0);
-            
-            // Start the game scene with the saved data
-            this.cameras.main.once('camerafadeoutcomplete', () => {
-                this.scene.start('Game', { 
-                    sceneId: saveData.currentScene || 'scene001',
-                    saveData: saveData
-                });
-            });
-        } else {
-            // No save data found, show a notification
-            if (this.g.ui) {
-                this.g.ui.showNotification('No save data found!');
-            }
-        }
+
+    deregisterEvents() {
+        this.g.eventBus.off('ui:button:new-game:pointdown',this.startGame);
+        this.g.eventBus.off('ui:button:continue:pointdown',this.continueGame);
+        this.g.eventBus.off('ui:button:load:pointdown',this.loadGame);
+        this.g.eventBus.off('ui:button:settings:pointdown',this.openSettings);
+        this.g.eventBus.off('ui:button:settings-cancel:pointdown',this.cancelSettings);
     }
-    
-    /**
-     * Open the settings panel
-     */
-    openSettings() {
-        // Trigger settings UI to open via event bus
-        if (window.eventBus) {
-            window.eventBus.emit('settings:open');
-        }
+
+
+    startGame(ev) {
+        ev.scene.changeScene('Game', { slot: 'new' });
     }
-    
-    openLanguageHelp() {
-        // Switch to the language help scene
-        this.scene.start('LanguageHelp');
+
+    loadGame(ev){
+        // show load settings screen.
+    }
+
+    continueGame(ev){
+        ev.scene.changeScene('Game');
+    }
+
+    openSettings(ev) {
+        console.log('MenuScene:open settings')
+        ev.scene.ui.hide();
+        ev.scene.uiSettings.show();
+    }
+
+    cancelSettings(ev){
+        console.log('MenuScene:cancel settings')
+        ev.scene.ui.show();
+        ev.scene.uiSettings.hide();
+    }
+
+    continueGame(ev) {
+        console.log('continue game')
+        ev.scene.start('Game');
     }
 }

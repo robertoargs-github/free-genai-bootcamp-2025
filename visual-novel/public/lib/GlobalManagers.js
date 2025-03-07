@@ -47,32 +47,10 @@ class GlobalManagers {
         window.globalManagers = this;
     }
     
-    menuEvents() {
-        this.eventBus.on('ui:button:new-game:pointdown',this.startGame);
-        this.eventBus.on('ui:button:continue:pointdown',this.continueGame);
-        this.eventBus.on('ui:button:settings:pointdown',this.openSettings);
-    }
-
-    startGame(ev) {
-        console.log('ev',ev);
-    }
-
-    openSettings(ev) {
-        console.log('settings ui')
-        ev.scene.ui.hide();
-        ev.scene.uiSettings.show();
-    }
-
-
-
     /**
      * Set up global event listeners
      */
     setupEventListeners() {
-        this.menuEvents();
-        
-
-
         // Audio events
         this.eventBus.on('audio:play-bgm', data => { 
             this.audio.playBackgroundMusic(data.key, data.config); 
