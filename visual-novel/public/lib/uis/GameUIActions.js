@@ -20,7 +20,7 @@ class GameUIActions extends BaseUI{
 
     createActions(buttonData) {
         // horizontal container for actions
-        this.container = this.uim.createFields({
+        this.container = this.uim.createContainer({
             layout: 'horizontal',
             position: [this.x,this.y],
             spacing: this.spacing,

@@ -26,7 +26,7 @@ class DialogUI  extends BaseUI {
         this.y = 0//y;
         
         // create fields container to contain the dialogue.
-        this.messagesContainer = this.uim.createFields({
+        this.messagesContainer = this.uim.createContainer({
             layout: 'vertical',
             position: [this.x,this.y],
             spacing: this.spacing,

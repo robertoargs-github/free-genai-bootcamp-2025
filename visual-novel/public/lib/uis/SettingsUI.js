@@ -15,7 +15,7 @@ class SettingsUI extends BaseUI {
         const { width, height } = this.scene.game.canvas;
         
         // Create a fields container for all settings
-        this.settingsFields = this.uim.createFields({
+        this.settingsFields = this.uim.createContainer({
             position: [width * 0.5, height * 0.3], // Centered horizontally
             layout: 'vertical',
             spacing: 80,  // Further increased spacing to ensure no overlap
@@ -181,7 +181,7 @@ class SettingsUI extends BaseUI {
         // Create our actions withint horizontal fields container
         // position in the bottom left of the screen.
         const { width, height } = this.scene.game.canvas;
-        this.actionsContainer = this.uim.createFields({
+        this.actionsContainer = this.uim.createContainer({
             position: [width * 0.1, height * 0.9],
             layout: 'horizontal',
             spacing: 20

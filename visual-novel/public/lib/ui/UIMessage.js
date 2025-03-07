@@ -50,6 +50,14 @@ class UIMessage {
         this.bubble = this.scene.add.image(this.x, this.y, 'message-bubble')
         this.bubble.setDisplaySize(0,0); // make it invisible for now...
         this.bubble.setOrigin(0,0);
+
+        // create UIContainer to hold all messages
+        //this.bubble = this.uim.createContainer({
+        //    position: [this.x, this.y],
+        //    layout: 'vertical',
+        //    spacing: 16,
+        //    origin: [0,0]
+        //});
     }
 
     // based on the contents of text we need to resize
