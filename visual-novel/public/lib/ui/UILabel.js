@@ -34,9 +34,9 @@ class UILabel {
             this.x,
             this.y,
             this.text,
-            this.style
+            this.style,
         );
-        this.labelText.setOrigin(0, 0.5); // Align left, center vertically
+        this.labelText.setOrigin(0,0)
     }
     
     /**

@@ -2,11 +2,11 @@ class UIContainer {
     /**
      * Create a container for multiple UIField components with automatic spacing
      * @param {Phaser.Scene} scene - The Phaser scene
-     * @param {object} options - Options for the fields container
+     * @param {object} options - Options for the items container
      * @param {Array<number>} options.position - [x,y] position of the container
      * @param {string} options.layout - Layout direction ('vertical' or 'horizontal')
-     * @param {number} options.spacing - Spacing between fields
-     * @param {Array<UIField>} options.fields - Initial fields to add (optional)
+     * @param {number} options.spacing - Spacing between items
+     * @param {Array<UIField>} options.items - Initial items to add (optional)
      * @param {Array<number>} options.origin - [x,y] origin point (0-1) for the container (default: [0,0])
      */
     constructor(scene, options) {
@@ -17,53 +17,53 @@ class UIContainer {
         this.y = options.position[1];
         this.layout = options.layout || 'vertical';
         this.spacing = options.spacing !== undefined ? options.spacing : 20;
-        this.fields = [];
+        this.items = [];
         
         // Set origin (default to top-left [0,0])
         this.originX = options.origin ? options.origin[0] : 0;
         this.originY = options.origin ? options.origin[1] : 0;
         
-        // Add initial fields if provided
-        if (options.fields && Array.isArray(options.fields)) {
-            options.fields.forEach(field => this.addField(field));
+        // Add initial items if provided
+        if (options.items && Array.isArray(options.items)) {
+            options.items.forEach(item => this.addItem(item));
         }
     }
     
     /**
-     * Add a field to the container
-     * @param {UIField} field - The field to add
+     * Add a item to the container
+     * @param {UIField} item - The item to add
      * @returns {UIContainer} - This container instance for chaining
      */
-    addField(field) {
-        this.fields.push(field);
-        this.updateFieldPositions();
+    addItem(item) {
+        this.items.push(item);
+        this.updateItemPositions();
         return this;
     }
     
     /**
-     * Remove a field from the container
-     * @param {UIField} field - The field to remove
+     * Remove a item from the container
+     * @param {UIField} item - The item to remove
      * @returns {UIContainer} - This container instance for chaining
      */
-    removeField(field) {
-        const index = this.fields.indexOf(field);
+    removeItem(item) {
+        const index = this.items.indexOf(item);
         if (index !== -1) {
-            this.fields.splice(index, 1);
-            this.updateFieldPositions();
+            this.items.splice(index, 1);
+            this.updateItemPositions();
         }
         return this;
     }
     
     /**
-     * Get all fields in the container
-     * @returns {Array<UIField>} - Array of fields
+     * Get all items in the container
+     * @returns {Array<UIField>} - Array of items
      */
-    getFields() {
-        return this.fields;
+    getItems() {
+        return this.items;
     }
     
     /**
-     * Set the position of the container and all its fields
+     * Set the position of the container and all its items
      * @param {number} x - X position
      * @param {number} y - Y position
      * @returns {UIContainer} - This container instance for chaining
@@ -75,33 +75,33 @@ class UIContainer {
         this.x = x;
         this.y = y;
         
-        // Update all field positions
-        this.updateFieldPositions();
+        // Update all item positions
+        this.updateItemPositions();
         
         return this;
     }
     
     /**
-     * Set the spacing between fields
+     * Set the spacing between items
      * @param {number} spacing - Spacing value
      * @returns {UIContainer} - This container instance for chaining
      */
     setSpacing(spacing) {
         this.spacing = spacing;
-        this.updateFieldPositions();
+        this.updateItemPositions();
         return this;
     }
     
     /**
-     * Set visibility of this container and all its fields
-     * @param {boolean} visible - Whether the container and fields should be visible
+     * Set visibility of this container and all its items
+     * @param {boolean} visible - Whether the container and items should be visible
      * @returns {UIContainer} - This container instance for chaining
      */
     setVisible(visible) {
-        // Set visibility for all fields
-        this.fields.forEach(field => {
-            if (field && typeof field.setVisible === 'function') {
-                field.setVisible(visible);
+        // Set visibility for all items
+        this.items.forEach(item => {
+            if (item && typeof item.setVisible === 'function') {
+                item.setVisible(visible);
             }
         });
         
@@ -109,10 +109,10 @@ class UIContainer {
     }
     
     /**
-     * Update the positions of all fields based on container position, origin, and layout
+     * Update the positions of all items based on container position, origin, and layout
      * @private
      */
-    updateFieldPositions() {
+    updateItemPositions() {
         // Calculate the effective position based on origin
         // We need to determine total width/height to apply origin offset
         const containerDimensions = this.calculateContainerDimensions();
@@ -121,61 +121,61 @@ class UIContainer {
         let startX = this.x - (containerDimensions.width * this.originX);
         let startY = this.y - (containerDimensions.height * this.originY);
         
-        // Define positions for each field based on calculated dimensions
+        // Define positions for each item based on calculated dimensions
         if (this.layout === 'vertical') {
-            // For vertical layout, calculate field positions based on actual dimensions
+            // For vertical layout, calculate item positions based on actual dimensions
             let yOffset = 0;
             
-            this.fields.forEach((field, index) => {
-                // Position the field at the current offset
-                field.setPosition(startX, startY + yOffset);
+            this.items.forEach((item, index) => {
+                // Position the item at the current offset
+                item.setPosition(startX, startY + yOffset);
                 
-                // Calculate actual dimensions for this field
-                const dimensions = this.getFieldDimensions(field);
+                // Calculate actual dimensions for this item
+                const dimensions = this.getItemDimensions(item);
                 
-                // Add this field's height plus spacing to the offset for the next field
+                // Add this item's height plus spacing to the offset for the next item
                 yOffset += dimensions.height + this.spacing;
             });
         } else {
             // For horizontal layout, use standard positioning logic
             let currentX = startX;
             
-            this.fields.forEach((field, index) => {
-                // Position the field
-                field.setPosition(currentX, startY);
+            this.items.forEach((item, index) => {
+                // Position the item
+                item.setPosition(currentX, startY);
                 
-                // Get field dimensions
-                const fieldDimensions = this.getFieldDimensions(field);
+                // Get item dimensions
+                const itemDimensions = this.getItemDimensions(item);
                 
-                // Increment X for next field
-                currentX += fieldDimensions.width + this.spacing;
+                // Increment X for next item
+                currentX += itemDimensions.width + this.spacing;
             });
         }
     }
     
     /**
-     * Get dimensions for a specific field based on its type and components
-     * @param {UIField} field - The field to measure
-     * @returns {object} - {width, height} of the field
+     * Get dimensions for a specific item based on its type and components
+     * @param {UIField} item - The item to measure
+     * @returns {object} - {width, height} of the item
      * @private
      */
-    getFieldDimensions(field) {
+    getItemDimensions(item) {
         let width = 0;
         let height = 0;
         let labelOffset = 0;
         let componentHeight = 0;
         
-        // First check if the field has a non-empty label (adds to height)
-        if (field.label && field.label.text && field.label.text.text !== '') {
+        // First check if the item has a non-empty label (adds to height)
+        if (item.label && item.label.text && item.label.text.text !== '') {
             // Get the actual label height from the text component
-            labelOffset = field.label.text.displayHeight;
+            labelOffset = item.label.text.displayHeight;
             
             // Add the configured spacing between label and component
-            if (field.spacing !== undefined) {
-                labelOffset += field.spacing;
+            if (item.spacing !== undefined) {
+                labelOffset += item.spacing;
             } else {
-                // If no field spacing is defined, use a reasonable value based on component type
-                switch(field.inputType) {
+                // If no item spacing is defined, use a reasonable value based on component type
+                switch(item.inputType) {
                     case 'toggle':
                         labelOffset += 30; // Toggle needs more space
                         break;
@@ -189,47 +189,47 @@ class UIContainer {
         }
         
         // Determine width and height based on input component type
-        if (field.inputComponent) {
+        if (item.inputComponent) {
             // Handle button components
-            if (field.inputType === 'button' && field.inputComponent.image) {
-                width = field.inputComponent.image.displayWidth || 0;
-                componentHeight = field.inputComponent.image.displayHeight || 0;
+            if (item.inputType === 'button' && item.inputComponent.image) {
+                width = item.inputComponent.image.displayWidth || 0;
+                componentHeight = item.inputComponent.image.displayHeight || 0;
             } 
             // Handle toggle components (support for multiple options beyond on/off)
-            else if (field.inputType === 'toggle') {
+            else if (item.inputType === 'toggle') {
                 // For toggle components with pills
-                if (field.inputComponent.pills && field.inputComponent.pills.length > 0) {
+                if (item.inputComponent.pills && item.inputComponent.pills.length > 0) {
                     // Calculate total width across all pills plus spacing
                     width = 0;
                     
                     // Get actual width by summing all pill widths plus spacing
-                    for (let i = 0; i < field.inputComponent.pills.length; i++) {
-                        const pill = field.inputComponent.pills[i];
+                    for (let i = 0; i < item.inputComponent.pills.length; i++) {
+                        const pill = item.inputComponent.pills[i];
                         if (pill) {
                             width += pill.displayWidth || 0;
                             // Add spacing between pills (except after the last one)
-                            if (i < field.inputComponent.pills.length - 1) {
-                                width += field.inputComponent.spacing || 5;
+                            if (i < item.inputComponent.pills.length - 1) {
+                                width += item.inputComponent.spacing || 5;
                             }
                         }
                     }
                     
                     // Get height from the first pill (they should all be same height)
-                    componentHeight = field.inputComponent.pills[0] ? 
-                        field.inputComponent.pills[0].displayHeight : 40;
+                    componentHeight = item.inputComponent.pills[0] ? 
+                        item.inputComponent.pills[0].displayHeight : 40;
                     
                     // Add some extra padding for hover effects
                     componentHeight += 10;
                 } 
                 // Fallback to options-based calculation if no pills are created yet
-                else if (field.inputOptions && field.inputOptions.values) {
+                else if (item.inputOptions && item.inputOptions.values) {
                     // Calculate width based on number of values and spacing
-                    const numValues = field.inputOptions.values.length;
-                    const valueWidth = field.inputOptions.size ? field.inputOptions.size[0] : 80;
-                    const spacing = field.inputOptions.spacing || 5;
+                    const numValues = item.inputOptions.values.length;
+                    const valueWidth = item.inputOptions.size ? item.inputOptions.size[0] : 80;
+                    const spacing = item.inputOptions.spacing || 5;
                     
                     width = (valueWidth * numValues) + (spacing * (numValues - 1));
-                    componentHeight = field.inputOptions.size ? field.inputOptions.size[1] : 40;
+                    componentHeight = item.inputOptions.size ? item.inputOptions.size[1] : 40;
                 } 
                 // Last resort fallback
                 else {
@@ -238,37 +238,37 @@ class UIContainer {
                 }
             } 
             // Handle text input components
-            else if (field.inputType === 'textinput' && field.inputComponent.background) {
-                width = field.inputComponent.background.displayWidth || 0;
-                componentHeight = field.inputComponent.background.displayHeight || 0;
+            else if (item.inputType === 'textinput' && item.inputComponent.background) {
+                width = item.inputComponent.background.displayWidth || 0;
+                componentHeight = item.inputComponent.background.displayHeight || 0;
             } 
             // Handle slider components
-            else if (field.inputType === 'slider') {
-                if (field.inputComponent.track) {
-                    width = field.inputComponent.track.displayWidth || 0;
+            else if (item.inputType === 'slider') {
+                if (item.inputComponent.track) {
+                    width = item.inputComponent.track.displayWidth || 0;
                     // Add extra height for the handle and to prevent overlap with next element
-                    componentHeight = field.inputComponent.track.displayHeight + 20;
+                    componentHeight = item.inputComponent.track.displayHeight + 20;
                 }
                 // If we have a slider value text, make sure we account for its height
-                if (field.inputComponent.valueText) {
-                    componentHeight += field.inputComponent.valueText.displayHeight || 0;
+                if (item.inputComponent.valueText) {
+                    componentHeight += item.inputComponent.valueText.displayHeight || 0;
                 }
             }
         }
         
         // Fallback to options if we couldn't determine from component
-        if (width === 0 && field.inputOptions && field.inputOptions.size) {
-            width = field.inputOptions.size[0] || 0;
+        if (width === 0 && item.inputOptions && item.inputOptions.size) {
+            width = item.inputOptions.size[0] || 0;
             if (componentHeight === 0) {
-                componentHeight = field.inputOptions.size[1] || 0;
+                componentHeight = item.inputOptions.size[1] || 0;
             }
         }
         
         // Fallback to nested inputOptions if still not found
-        if (width === 0 && field.options && field.options.inputOptions && field.options.inputOptions.size) {
-            width = field.options.inputOptions.size[0] || 0;
+        if (width === 0 && item.options && item.options.inputOptions && item.options.inputOptions.size) {
+            width = item.options.inputOptions.size[0] || 0;
             if (componentHeight === 0) {
-                componentHeight = field.options.inputOptions.size[1] || 0;
+                componentHeight = item.options.inputOptions.size[1] || 0;
             }
         }
         
@@ -297,71 +297,71 @@ class UIContainer {
         }
         
         this.layout = layout;
-        this.updateFieldPositions();
+        this.updateItemPositions();
         return this;
     }
     
     /**
-     * Get a field by index
-     * @param {number} index - Index of the field to get
-     * @returns {UIField|null} - The field at the specified index or null
+     * Get a item by index
+     * @param {number} index - Index of the item to get
+     * @returns {UIField|null} - The item at the specified index or null
      */
-    getFieldAt(index) {
-        if (index >= 0 && index < this.fields.length) {
-            return this.fields[index];
+    getItemAt(index) {
+        if (index >= 0 && index < this.items.length) {
+            return this.items[index];
         }
         return null;
     }
     
     /**
-     * Calculate the total dimensions of the container based on fields and layout
+     * Calculate the total dimensions of the container based on items and layout
      * @private
      * @returns {object} - {width, height} of the container
      */
     calculateContainerDimensions() {
-        // Use base dimensions if no fields
-        if (this.fields.length === 0) {
+        // Use base dimensions if no items
+        if (this.items.length === 0) {
             return { width: 0, height: 0 };
         }
         
-        // Attempt to get actual dimensions from fields
-        let maxFieldWidth = 0;
+        // Attempt to get actual dimensions from items
+        let maxWidth = 0;
         let totalHeight = 0;
         
-        // Examine each field to get dimensions where possible
-        this.fields.forEach(field => {
-            // Get dimensions for this field using our helper method
-            const dimensions = this.getFieldDimensions(field);
+        // Examine each item to get dimensions where possible
+        this.items.forEach(item => {
+            // Get dimensions for this item using our helper method
+            const dimensions = this.getItemDimensions(item);
             
-            // Track the maximum width for all fields
-            maxFieldWidth = Math.max(maxFieldWidth, dimensions.width);
+            // Track the maximum width for all items
+            maxWidth = Math.max(maxWidth, dimensions.width);
             
             // For vertical layout, accumulate total height
             if (this.layout === 'vertical') {
-                totalHeight += dimensions.height + (this.fields.indexOf(field) < this.fields.length - 1 ? this.spacing : 0);
+                totalHeight += dimensions.height + (this.items.indexOf(item) < this.items.length - 1 ? this.spacing : 0);
             }
         });
         
         // If we couldn't determine dimensions, use reasonable defaults
-        if (maxFieldWidth === 0) maxFieldWidth = 300;
-        if (totalHeight === 0 && this.layout === 'vertical') totalHeight = this.fields.length * 100;
+        if (maxWidth === 0) maxWidth = 300;
+        if (totalHeight === 0 && this.layout === 'vertical') totalHeight = this.items.length * 100;
         
         // Calculate total dimensions based on layout
         if (this.layout === 'vertical') {
-            // For vertical layout, width is the maximum field width,
+            // For vertical layout, width is the maximum item width,
             // height is the accumulated heights plus spacing
             return {
-                width: maxFieldWidth,
+                width: maxWidth,
                 height: totalHeight
             };
         } else {
-            // For horizontal layout, calculate based on individual field widths
+            // For horizontal layout, calculate based on individual item widths
             let totalWidth = 0;
             let maxHeight = 0;
             
-            this.fields.forEach(field => {
-                const dimensions = this.getFieldDimensions(field);
-                totalWidth += dimensions.width + (this.fields.indexOf(field) < this.fields.length - 1 ? this.spacing : 0);
+            this.items.forEach(item => {
+                const dimensions = this.getItemDimensions(item);
+                totalWidth += dimensions.width + (this.items.indexOf(item) < this.items.length - 1 ? this.spacing : 0);
                 maxHeight = Math.max(maxHeight, dimensions.height);
             });
             
@@ -373,17 +373,17 @@ class UIContainer {
     }
     
     /**
-     * Destroy all fields and clean up resources
+     * Destroy all items and clean up resources
      */
     destroy() {
-        // Destroy all fields
-        this.fields.forEach(field => {
-            if (field.destroy && typeof field.destroy === 'function') {
-                field.destroy();
+        // Destroy all items
+        this.items.forEach(item => {
+            if (item.destroy && typeof item.destroy === 'function') {
+                item.destroy();
             }
         });
         
-        this.fields = [];
+        this.items = [];
     }
     
     /**
@@ -402,8 +402,8 @@ class UIContainer {
         this.originX = x;
         this.originY = y;
         
-        // Update field positions based on new origin
-        this.updateFieldPositions();
+        // Update item positions based on new origin
+        this.updateItemPositions();
         
         return this;
     }
@@ -435,9 +435,9 @@ class UIContainer {
             throw new Error('Spacing must be a number');
         }
         
-        // Validate fields if provided
-        if (options.fields !== undefined && !Array.isArray(options.fields)) {
-            throw new Error('Fields must be an array');
+        // Validate items if provided
+        if (options.items !== undefined && !Array.isArray(options.items)) {
+            throw new Error('Items must be an array');
         }
         
         // Validate origin if provided

@@ -12,7 +12,6 @@ class UIMessage {
 
         const width = this.scene.cameras.main.width;
         this.maxWidth = width / 2;
-        this.bubble = null; // the background image of the bubble
         this.japaneseText = null;
         this.englishText = null;
         this.nameText = null;
@@ -24,8 +23,13 @@ class UIMessage {
         this.createNameText();
         this.createJapaneseText();
         this.createEnglishText();
-        this.autoResizeBubble();
     }
+
+    setPosition(x, y) {
+        this.x = x;
+        this.y = y;
+        this.bubblePanel.setPosition(this.x, this.y);
+    }    
 
     update(options){
         this.nameText.setText(options.name);
@@ -43,69 +47,59 @@ class UIMessage {
             this.englishText.setText('');
             this.englishText.setVisible(false);
         }
-        this.autoResizeBubble();
+        // TODO update bubblePanel
     }
 
     createBubble() {
-        this.bubble = this.scene.add.image(this.x, this.y, 'message-bubble')
-        this.bubble.setDisplaySize(0,0); // make it invisible for now...
-        this.bubble.setOrigin(0,0);
+        this.bubblePanel = this.scene.g.ui.createPanel({
+            position: [this.x, this.y],
+            layout: 'vertical',
+            spacing: 16,
+            origin: [0,0],
+            panelOptions: {
+                backgroundImage: 'message-bubble'
+            }
+        });
 
-        // create UIContainer to hold all messages
-        //this.bubble = this.uim.createContainer({
-        //    position: [this.x, this.y],
-        //    layout: 'vertical',
-        //    spacing: 16,
-        //    origin: [0,0]
-        //});
-    }
-
-    // based on the contents of text we need to resize
-    // the bubble
-    autoResizeBubble() {
-        const gap = 16;
-        let height = 0;
-        let japaneseWidth = 0;
-        let englishWidth = 0;
-        if (this.japaneseText.visible) {
-            japaneseWidth = this.japaneseText.displayWidth;
-            height += this.japaneseText.displayHeight;
-        }
-        if (this.englishText.visible) {
-            englishWidth = this.englishText.displayWidth;
-            height += this.englishText.displayHeight + gap;
-        }
-        const width = Math.max(japaneseWidth, englishWidth);
-
-        this.bubble.setDisplaySize(width, height);
     }
 
     createNameText() {
-        this.nameText = this.scene.add.text(this.x, this.y, '', {
-            fontFamily: 'Arial',
-            fontSize: '32px',
-            color: '#ffffff'
-        }).setOrigin(0,0);
+        this.nameText = this.scene.g.ui.createLabel({
+            position: [0,0],
+            text: '',
+            style: {
+                fontFamily: 'Arial',
+                fontSize: '32px',
+                color: '#ffffff'
+            }
+        });
+        this.bubblePanel.addItem(this.nameText);
     }
 
     createJapaneseText() {
-        this.japaneseText = this.scene.add.text(this.x, this.y, '', {
-            fontFamily: 'Noto Sans JP',
-            fontSize: '28px',
-            color: '#ffffff',
-            align: 'left',
-            wordWrap: { width: this.maxWidth }
-        }).setOrigin(0,0);
+        this.japaneseText = this.scene.g.ui.createLabel({
+            position: [0,0],
+            text: '',
+            style: {
+                fontFamily: 'Noto Sans JP',
+                fontSize: '32px',
+                color: '#ffffff',
+            }
+        });
+        this.bubblePanel.addItem(this.japaneseText);
     }
 
     createEnglishText() {
-        this.englishText = this.scene.add.text(this.x, this.y, '', {
-            fontFamily: 'Arial',
-            fontSize: '24px',
-            color: '#ffffff',
-            align: 'left',
-            wordWrap: { width: this.maxWidth }
-        }).setOrigin(0,0);
+        this.englishText = this.scene.g.ui.createLabel({
+            position: [0,0],
+            text: '',
+            style: {
+                fontFamily: 'Arial',
+                fontSize: '24px',
+                color: '#ffffff',
+            }
+        });
+        this.bubblePanel.addItem(this.englishText);
     }
 
     validateOptions(options) {

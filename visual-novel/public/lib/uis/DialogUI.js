@@ -39,7 +39,7 @@ class DialogUI  extends BaseUI {
             position: [0,0], // the container is will override the position
             inputOptions: {} // we don't set options for message on create
         });
-        this.messagesContainer.addField(this.message);
+        this.messagesContainer.addItem(this.message);
 
         this.createNextButton();
     }
@@ -85,7 +85,7 @@ class DialogUI  extends BaseUI {
                 eventHandle: 'dialog-next'
             }
         })       
-        this.messagesContainer.addField(this.nextButton);
+        this.messagesContainer.addItem(this.nextButton);
     }
 
 }

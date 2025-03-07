@@ -45,7 +45,7 @@ class MenuUI extends BaseUI {
                 eventHandle: eventHandle
             }
         });
-        this.menuContainer.addField(button);
+        this.menuContainer.addItem(button);
     }
     
     // Override show method to add any specific behavior

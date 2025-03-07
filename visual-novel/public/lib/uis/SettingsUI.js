@@ -92,7 +92,7 @@ class SettingsUI extends BaseUI {
         });
 
         // Add field to the container
-        this.settingsFields.addField(nameInputField);
+        this.settingsFields.addItem(nameInputField);
 
         // Listen for value changes
         this.scene.g.eventBus.on('ui:textinput:settings-name:change', (data) => {
@@ -131,7 +131,7 @@ class SettingsUI extends BaseUI {
         });
         
         // Add field to the container
-        this.settingsFields.addField(bgmVolumeField);
+        this.settingsFields.addItem(bgmVolumeField);
         
         // Store reference to the slider component
         this.bgmSlider = bgmVolumeField.getInput();
@@ -164,7 +164,7 @@ class SettingsUI extends BaseUI {
         });
         
         // Add field to the container
-        this.settingsFields.addField(languageField);
+        this.settingsFields.addItem(languageField);
         
         // Get the toggle component from the field
         const languageToggle = languageField.getInput();
@@ -203,7 +203,7 @@ class SettingsUI extends BaseUI {
                 eventHandle: "settings-apply"
             }
         })
-        this.actionsContainer.addField(buttonField);
+        this.actionsContainer.addItem(buttonField);
     }
 
     createButtonCancel(){
@@ -218,7 +218,7 @@ class SettingsUI extends BaseUI {
                 eventHandle: "settings-cancel"
             }
         })
-        this.actionsContainer.addField(buttonField);
+        this.actionsContainer.addItem(buttonField);
 
 
     }

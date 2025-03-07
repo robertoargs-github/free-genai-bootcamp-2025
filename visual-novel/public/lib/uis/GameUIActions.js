@@ -47,7 +47,7 @@ class GameUIActions extends BaseUI{
 
             }
         });
-        this.container.addField(button);
+        this.container.addItem(button);
     }
 
     // Override show method to add any specific behavior

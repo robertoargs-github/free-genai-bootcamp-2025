@@ -37,6 +37,11 @@ class UIManager {
         return fields;
     }
     
+    createPanel(options) {
+        const panel = new UIPanel(this.scene, options);
+        return panel;
+    }
+    
     createTextInput(options) {
         const textInput = new UITextInput(this.scene, options);
         return textInput;
