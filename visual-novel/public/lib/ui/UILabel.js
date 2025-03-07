@@ -1,4 +1,4 @@
-class UILabel {
+class UILabel extends UIItem{
     /**
      * Create a text label for UI components
      * @param {Phaser.Scene} scene - The Phaser scene
@@ -8,9 +8,11 @@ class UILabel {
      * @param {object} options.style - Text style for the label (optional)
      */
     constructor(scene, options) {
+        super('label')
         this.scene = scene;
         this.validateOptions(options);
         
+        this.field = options.field;
         this.text = options.text || ''; // Default to empty string if no text provided
         this.x = options.position[0];
         this.y = options.position[1];
@@ -82,27 +84,9 @@ class UILabel {
      * @returns {UILabel} - This label instance for chaining
      */
     setVisible(visible) {
-        if (this.labelText && typeof this.labelText.setVisible === 'function') {
-            this.labelText.setVisible(visible);
-        }
-        return this;
+        this.labelText.setVisible(visible);
     }
     
-    /**
-     * Hide the label (for backwards compatibility)
-     * @returns {UILabel} - This label instance for chaining
-     */
-    hide() {
-        return this.setVisible(false);
-    }
-    
-    /**
-     * Show the label (for backwards compatibility)
-     * @returns {UILabel} - This label instance for chaining
-     */
-    show() {
-        return this.setVisible(true);
-    }
     
     /**
      * Destroy the label
@@ -110,7 +94,17 @@ class UILabel {
     destroy() {
         this.labelText.destroy();
     }
-    
+
+    getDimensions() {
+        if (this.labelText.visible === false){
+            return { width: 0, height: 0 };
+        } else {
+            return {
+                width: this.labelText.displayWidth || 0,
+                height: this.labelText.displayHeight || 0
+            };
+        }
+    }
     /**
      * Validate the options passed to the constructor
      * @param {object} options - The options object
@@ -135,4 +129,8 @@ class UILabel {
             throw new Error('Style must be an object');
         }
     }
+}
+
+if (typeof window !== 'undefined') {
+    window.UILabel = UILabel;
 }

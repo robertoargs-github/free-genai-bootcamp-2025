@@ -1,4 +1,4 @@
-class UIField {
+class UIField extends UIItem{
     /**
      * Create a field with a label and input component
      * @param {Phaser.Scene} scene - The Phaser scene
@@ -11,6 +11,8 @@ class UIField {
      * @param {number} options.spacing - Spacing between label and input (default: 10)
      */
     constructor(scene, options) {
+        super('field')
+
         this.scene = scene;
         this.validateOptions(options);
         
@@ -24,20 +26,7 @@ class UIField {
         if (options.spacing !== undefined) {
             this.spacing = options.spacing;
         } else {
-            // Set larger default spacing for components that need more space
-            switch(this.inputType) {
-                case 'slider':
-                    this.spacing = 35;
-                    break;
-                case 'toggle':
-                    this.spacing = 40;
-                    break;
-                case 'textinput':
-                    this.spacing = 35;
-                    break;
-                default:
-                    this.spacing = 25;
-            }
+            this.spacing = 12;
         }
         
         // Create the label
@@ -56,20 +45,23 @@ class UIField {
         this.label = new UILabel(this.scene, {
             text: this.labelText,
             position: [this.x, this.y],
-            style: style
+            style: style,
+            field: this
         });
-        
-        // If no label text was provided, we'll still position the input at the label's Y + spacing
-        // This ensures consistent positioning whether a label is visible or not
+        if (this.labelText === '' || this.labelText === null){
+            console.log('UiField',this, 'setINVISIBLE')
+            this.label.setVisible(false)
+        }
     }
     
-    /**
-     * Create the appropriate input component based on inputType
-     */
+    _getInputPositionY(){
+        return this.y + this.label.getDimensions().height + this.spacing;
+    }
+    
     createInputComponent() {
         // Position the input BELOW the label with spacing
         const inputX = this.x;
-        const inputY = this.y + this.spacing;
+        const inputY = this._getInputPositionY();
         
         // Add position to input options
         this.inputOptions.position = [inputX, inputY];
@@ -128,7 +120,7 @@ class UIField {
         
         // Position input BELOW the label with spacing
         const inputX = x;
-        const inputY = y + this.spacing;
+        const inputY = this._getInputPositionY();
         
         // Update the input position
         if (this.input && this.input.setPosition) {
@@ -185,4 +177,30 @@ class UIField {
             throw new Error('Input type must be a string');
         }
     }
+
+    getDimensions() {
+        // TODO - if the item is not visible, show this return 0,0?
+        // What should happen in this case?
+        const labelDimensions = this.label.getDimensions();
+        const inputDimensions = this.input.getDimensions();
+        const width = Math.max(labelDimensions.width, inputDimensions.width);
+        let height = labelDimensions.height + inputDimensions.height;
+        //console.log(
+        //    'UIField:getDimensions',
+        //    this.label,
+        //    this.input,
+        //    labelDimensions,
+        //    inputDimensions,
+        //    width,
+        //    height
+        //)
+        if (labelDimensions.height > 0) { // if there is no label, there is no gap between the two..
+            height += this.spacing;
+        }
+        return { width: width, height: height };
+    }
+}
+
+if (typeof window !== 'undefined') {
+    window.UIField = UIField;
 }

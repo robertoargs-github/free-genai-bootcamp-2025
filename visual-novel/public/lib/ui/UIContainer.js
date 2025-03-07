@@ -1,4 +1,4 @@
-class UIContainer {
+class UIContainer extends UIItem {
     /**
      * Create a container for multiple UIField components with automatic spacing
      * @param {Phaser.Scene} scene - The Phaser scene
@@ -10,6 +10,8 @@ class UIContainer {
      * @param {Array<number>} options.origin - [x,y] origin point (0-1) for the container (default: [0,0])
      */
     constructor(scene, options) {
+        super('panel')
+        
         this.scene = scene;
         this.validateOptions(options);
         
@@ -69,16 +71,11 @@ class UIContainer {
      * @returns {UIContainer} - This container instance for chaining
      */
     setPosition(x, y) {
-        const deltaX = x - this.x;
-        const deltaY = y - this.y;
-        
         this.x = x;
         this.y = y;
         
         // Update all item positions
         this.updateItemPositions();
-        
-        return this;
     }
     
     /**
@@ -113,178 +110,44 @@ class UIContainer {
      * @private
      */
     updateItemPositions() {
-        // Calculate the effective position based on origin
-        // We need to determine total width/height to apply origin offset
-        const containerDimensions = this.calculateContainerDimensions();
-        
-        // Apply origin offset to starting position
-        let startX = this.x - (containerDimensions.width * this.originX);
-        let startY = this.y - (containerDimensions.height * this.originY);
-        
         // Define positions for each item based on calculated dimensions
         if (this.layout === 'vertical') {
-            // For vertical layout, calculate item positions based on actual dimensions
-            let yOffset = 0;
-            
-            this.items.forEach((item, index) => {
-                // Position the item at the current offset
-                item.setPosition(startX, startY + yOffset);
-                
-                // Calculate actual dimensions for this item
-                const dimensions = this.getItemDimensions(item);
-                
-                // Add this item's height plus spacing to the offset for the next item
-                yOffset += dimensions.height + this.spacing;
-            });
-        } else {
-            // For horizontal layout, use standard positioning logic
-            let currentX = startX;
-            
-            this.items.forEach((item, index) => {
-                // Position the item
-                item.setPosition(currentX, startY);
-                
-                // Get item dimensions
-                const itemDimensions = this.getItemDimensions(item);
-                
-                // Increment X for next item
-                currentX += itemDimensions.width + this.spacing;
-            });
+            this._verticalUpdateItemPositions(this.y);
+        } else if (this.layout === 'horizontal') {
+            this._horizontalUpdateItemPositions(this.x);
         }
+        this._updateItemPositionsByOrigin();
     }
-    
-    /**
-     * Get dimensions for a specific item based on its type and components
-     * @param {UIField} item - The item to measure
-     * @returns {object} - {width, height} of the item
-     * @private
-     */
-    getItemDimensions(item) {
-        let width = 0;
-        let height = 0;
-        let labelOffset = 0;
-        let componentHeight = 0;
-        
-        // First check if the item has a non-empty label (adds to height)
-        if (item.label && item.label.text && item.label.text.text !== '') {
-            // Get the actual label height from the text component
-            labelOffset = item.label.text.displayHeight;
-            
-            // Add the configured spacing between label and component
-            if (item.spacing !== undefined) {
-                labelOffset += item.spacing;
-            } else {
-                // If no item spacing is defined, use a reasonable value based on component type
-                switch(item.inputType) {
-                    case 'toggle':
-                        labelOffset += 30; // Toggle needs more space
-                        break;
-                    case 'slider':
-                        labelOffset += 25; // Slider needs moderate space
-                        break;
-                    default:
-                        labelOffset += 20; // Default spacing
-                }
-            }
-        }
-        
-        // Determine width and height based on input component type
-        if (item.inputComponent) {
-            // Handle button components
-            if (item.inputType === 'button' && item.inputComponent.image) {
-                width = item.inputComponent.image.displayWidth || 0;
-                componentHeight = item.inputComponent.image.displayHeight || 0;
-            } 
-            // Handle toggle components (support for multiple options beyond on/off)
-            else if (item.inputType === 'toggle') {
-                // For toggle components with pills
-                if (item.inputComponent.pills && item.inputComponent.pills.length > 0) {
-                    // Calculate total width across all pills plus spacing
-                    width = 0;
-                    
-                    // Get actual width by summing all pill widths plus spacing
-                    for (let i = 0; i < item.inputComponent.pills.length; i++) {
-                        const pill = item.inputComponent.pills[i];
-                        if (pill) {
-                            width += pill.displayWidth || 0;
-                            // Add spacing between pills (except after the last one)
-                            if (i < item.inputComponent.pills.length - 1) {
-                                width += item.inputComponent.spacing || 5;
-                            }
-                        }
-                    }
-                    
-                    // Get height from the first pill (they should all be same height)
-                    componentHeight = item.inputComponent.pills[0] ? 
-                        item.inputComponent.pills[0].displayHeight : 40;
-                    
-                    // Add some extra padding for hover effects
-                    componentHeight += 10;
-                } 
-                // Fallback to options-based calculation if no pills are created yet
-                else if (item.inputOptions && item.inputOptions.values) {
-                    // Calculate width based on number of values and spacing
-                    const numValues = item.inputOptions.values.length;
-                    const valueWidth = item.inputOptions.size ? item.inputOptions.size[0] : 80;
-                    const spacing = item.inputOptions.spacing || 5;
-                    
-                    width = (valueWidth * numValues) + (spacing * (numValues - 1));
-                    componentHeight = item.inputOptions.size ? item.inputOptions.size[1] : 40;
-                } 
-                // Last resort fallback
-                else {
-                    width = 300;
-                    componentHeight = 40;
-                }
-            } 
-            // Handle text input components
-            else if (item.inputType === 'textinput' && item.inputComponent.background) {
-                width = item.inputComponent.background.displayWidth || 0;
-                componentHeight = item.inputComponent.background.displayHeight || 0;
-            } 
-            // Handle slider components
-            else if (item.inputType === 'slider') {
-                if (item.inputComponent.track) {
-                    width = item.inputComponent.track.displayWidth || 0;
-                    // Add extra height for the handle and to prevent overlap with next element
-                    componentHeight = item.inputComponent.track.displayHeight + 20;
-                }
-                // If we have a slider value text, make sure we account for its height
-                if (item.inputComponent.valueText) {
-                    componentHeight += item.inputComponent.valueText.displayHeight || 0;
-                }
-            }
-        }
-        
-        // Fallback to options if we couldn't determine from component
-        if (width === 0 && item.inputOptions && item.inputOptions.size) {
-            width = item.inputOptions.size[0] || 0;
-            if (componentHeight === 0) {
-                componentHeight = item.inputOptions.size[1] || 0;
-            }
-        }
-        
-        // Fallback to nested inputOptions if still not found
-        if (width === 0 && item.options && item.options.inputOptions && item.options.inputOptions.size) {
-            width = item.options.inputOptions.size[0] || 0;
-            if (componentHeight === 0) {
-                componentHeight = item.options.inputOptions.size[1] || 0;
-            }
-        }
-        
-        // Set reasonable defaults if all else fails
-        if (width === 0) width = 300; // Default width
-        if (componentHeight === 0) componentHeight = 40; // Default component height
-        
-        // For vertical layouts, elements with labels need more space
-        if (labelOffset > 0) {
-            height = labelOffset + componentHeight + 10; // Add extra padding between label and component
-        } else {
-            height = componentHeight;
-        }
-        
-        return { width, height };
+
+    _updateItemPositionsByOrigin() {
+        const containerDimensions = this.getDimensions();
+        let offsetX = (containerDimensions.width * this.originX);
+        let offsetY = (containerDimensions.height * this.originY);
+
+        this.items.forEach((item, index) => {
+            item.setPosition(
+                item.x - offsetX, 
+                item.y - offsetY
+            ); 
+        });
     }
+
+    _verticalUpdateItemPositions(yOffset) {
+        this.items.forEach((item, index) => {
+            item.setPosition(this.x, yOffset); // Position the item at the current offset
+            const dimensions = item.getDimensions(); // Calculate actual dimensions for this item
+            yOffset += dimensions.height + this.spacing; // Add this item's height plus spacing to the offset for the next item
+        });
+    }
+
+    _horizontalUpdateItemPositions(xOffset) {
+        this.items.forEach((item, index) => {
+            item.setPosition(xOffset, this.y); // Position the item
+            const dimensions = item.getDimensions(); // Get item dimensions
+            xOffset += dimensions.width + this.spacing; // Increment X for next item
+        });
+    }
+
     
     /**
      * Set the layout direction
@@ -314,62 +177,46 @@ class UIContainer {
     }
     
     /**
-     * Calculate the total dimensions of the container based on items and layout
-     * @private
+     * Get the total dimensions of the container based on items and layout
      * @returns {object} - {width, height} of the container
      */
-    calculateContainerDimensions() {
+    getDimensions() {
         // Use base dimensions if no items
         if (this.items.length === 0) {
             return { width: 0, height: 0 };
         }
         
         // Attempt to get actual dimensions from items
-        let maxWidth = 0;
-        let totalHeight = 0;
+        let width = 0;
+        let height = 0;
         
-        // Examine each item to get dimensions where possible
-        this.items.forEach(item => {
-            // Get dimensions for this item using our helper method
-            const dimensions = this.getItemDimensions(item);
-            
-            // Track the maximum width for all items
-            maxWidth = Math.max(maxWidth, dimensions.width);
-            
-            // For vertical layout, accumulate total height
-            if (this.layout === 'vertical') {
-                totalHeight += dimensions.height + (this.items.indexOf(item) < this.items.length - 1 ? this.spacing : 0);
-            }
-        });
-        
-        // If we couldn't determine dimensions, use reasonable defaults
-        if (maxWidth === 0) maxWidth = 300;
-        if (totalHeight === 0 && this.layout === 'vertical') totalHeight = this.items.length * 100;
-        
-        // Calculate total dimensions based on layout
         if (this.layout === 'vertical') {
-            // For vertical layout, width is the maximum item width,
-            // height is the accumulated heights plus spacing
-            return {
-                width: maxWidth,
-                height: totalHeight
-            };
-        } else {
-            // For horizontal layout, calculate based on individual item widths
-            let totalWidth = 0;
-            let maxHeight = 0;
-            
-            this.items.forEach(item => {
-                const dimensions = this.getItemDimensions(item);
-                totalWidth += dimensions.width + (this.items.indexOf(item) < this.items.length - 1 ? this.spacing : 0);
-                maxHeight = Math.max(maxHeight, dimensions.height);
+            this.items.forEach((item, index) => {
+                const dimensions = item.getDimensions();
+                height = height + dimensions.height 
+                // if not the last item, add spacing
+                if (index < this.items.length - 1) {
+                    height = height + this.spacing;
+                }
+                width = Math.max(width, dimensions.width);
             });
-            
-            return {
-                width: totalWidth,
-                height: maxHeight
-            };
+        } else if (this.layout === 'horizontal') {
+            this.items.forEach((item, index) => {
+                const dimensions = item.getDimensions();
+                width = width + dimensions.width 
+                // if not the last item, add spacing
+                if (index < this.items.length - 1) {
+                    width = width + this.spacing;
+                }
+                height = Math.max(height, dimensions.height);
+            });
         }
+
+        
+        return {
+            width: width,
+            height: height
+        };
     }
     
     /**
@@ -407,6 +254,7 @@ class UIContainer {
         
         return this;
     }
+
     
     /**
      * Validate the options passed to the constructor
@@ -448,4 +296,8 @@ class UIContainer {
             }
         }
     }
+}
+
+if (typeof window !== 'undefined') {
+    window.UIContainer = UIContainer;
 }

@@ -1,4 +1,4 @@
-class UIToggle {
+class UIToggle extends UIItem {
     /**
      * Create a toggle component with multiple options displayed horizontally
      * @param {Phaser.Scene} scene - The Phaser scene
@@ -12,6 +12,8 @@ class UIToggle {
      * @param {number} options.spacing - Optional spacing between pills (default: 10)
      */
     constructor(scene, options) {
+        super('toggle');
+
         this.scene = scene;
         this.validateOptions(options); // if anything fails it will throw an error
 
@@ -45,8 +47,6 @@ class UIToggle {
         // Highlight the initially selected pill
         this.updatePillAppearance();
     }
-
-
 
     /**
      * Create pills for each toggle option
@@ -201,6 +201,7 @@ class UIToggle {
      * @param {number} x - X coordinate
      * @param {number} y - Y coordinate
      */
+
     setPosition(x, y) {
         // Calculate position change
         const deltaX = x - this.x;
@@ -344,4 +345,19 @@ class UIToggle {
         
         return this;
     }
+
+    getDimensions() {
+        // TODO - if the item is not visible, show this return 0,0?
+        // What should happen in this case?
+        // Right now the the pills are not dynamic so if we change
+        // this in future we need to update this code logic.
+        return {
+            width: this.totalWidth || 0,
+            height: this.pillHeight || 0
+        };
+    }
+}
+
+if (typeof window !== 'undefined') {
+    window.UIToggle = UIToggle;
 }

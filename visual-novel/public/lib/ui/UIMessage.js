@@ -3,8 +3,10 @@
 // it has text label who the speaker is.
 // it has text for japanese dialog.
 // it has text for english dialog
-class UIMessage {
+class UIMessage extends UIItem{
     constructor(scene,options) {
+        super('message')
+
         this.scene = scene;
         this.validateOptions(options); 
         this.x = options.position[0];
@@ -47,17 +49,17 @@ class UIMessage {
             this.englishText.setText('');
             this.englishText.setVisible(false);
         }
-        // TODO update bubblePanel
+        this.bubblePanel.autoResizePanel();
     }
 
     createBubble() {
         this.bubblePanel = this.scene.g.ui.createPanel({
             position: [this.x, this.y],
             layout: 'vertical',
-            spacing: 16,
+            spacing: 8,
             origin: [0,0],
             panelOptions: {
-                backgroundImage: 'message-bubble'
+                backgroundImage: 'black-sq'
             }
         });
 
@@ -69,7 +71,7 @@ class UIMessage {
             text: '',
             style: {
                 fontFamily: 'Arial',
-                fontSize: '32px',
+                fontSize: '24px',
                 color: '#ffffff'
             }
         });
@@ -113,6 +115,11 @@ class UIMessage {
         }
     }
 
+    getDimensions() {
+        // TODO - if the item is not visible, show this return 0,0?
+        // What should happen in this case?
+        return this.bubblePanel.getDimensions();
+    }
 }
 
 if (typeof module !== 'undefined') {  

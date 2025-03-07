@@ -1,4 +1,4 @@
-class UISlider {
+class UISlider extends UIItem {
     /**
      * Create a slider component with draggable handle
      * @param {Phaser.Scene} scene - The Phaser scene
@@ -12,6 +12,8 @@ class UISlider {
      * @param {boolean} options.showValue - whether to show the current value text
      */
     constructor(scene, options) {
+        super('slider');
+
         this.scene = scene;
         this.validateOptions(options); // if anything fails it will throw an error
 
@@ -291,4 +293,20 @@ class UISlider {
         
         return this;
     }
+
+    getDimensions() {
+        // TODO - if the item is not visible, show this return 0,0?
+        // What should happen in this case?
+        // If the handle remains within the track then the track is the size
+        // is accurate, if we choose to update this so you can change the handle
+        // size then we need to update this code logic.
+        return {
+            width: this.track.displayWidth || 0,
+            height: this.track.displayHeight || 0
+        };
+    }
+}
+
+if (typeof window !== 'undefined') {
+    window.UISlider = UISlider;
 }

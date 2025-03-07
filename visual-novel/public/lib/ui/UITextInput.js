@@ -1,4 +1,4 @@
-class UITextInput {
+class UITextInput extends UIItem {
     /**
      * Create a text input field for user text entry
      * @param {Phaser.Scene} scene - The Phaser scene
@@ -12,6 +12,8 @@ class UITextInput {
      * @param {string} options.eventHandle - The string that is emitted in the eventbus
      */
     constructor(scene, options) {
+        super('textinput');
+
         this.scene = scene;
         this.validateOptions(options);
         
@@ -155,7 +157,15 @@ class UITextInput {
             paused: true
         });
     }
-    
+
+    getDimensions() {
+        // TODO - if the item is not visible, show this return 0,0?
+        // What should happen in this case?
+        return {
+            width: this.background.width || 0,
+            height: this.background.height || 0
+        };
+    }
     /**
      * Set up keyboard input handling
      */
@@ -340,10 +350,6 @@ class UITextInput {
      * @param {number} y - Y coordinate 
      */
     setPosition(x, y) {
-        // Calculate the change in position
-        const deltaX = x - this.x;
-        const deltaY = y - this.y;
-        
         // Update base position
         this.x = x;
         this.y = y;
@@ -421,4 +427,8 @@ class UITextInput {
         
         return this;
     }
+}
+
+if (typeof window !== 'undefined') {
+    window.UITextInput = UITextInput;
 }

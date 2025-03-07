@@ -1,4 +1,4 @@
-class UIButton {
+class UIButton extends UIItem {
     /**
      * 
      * @param {Phaser.Scene} scene 
@@ -9,29 +9,34 @@ class UIButton {
      * @param {function} options.eventHandle - the string that is emitted in the eventbus
      */
     constructor(scene,options){
+        super('button');
+
         this.scene = scene;
         this.validateOptions(options); // if anything fails it will throw an error
 
         this.buttonStyle = {
             fontFamily: 'Arial',
             fontSize: '28px',
-            color: '#ffffff'
+            color: '#000000'
         };
         
         // Store text (which may be empty string if not provided)
         this.buttonText = options.text || '';
         
+        options.image = options.image || 'button';
+        options.image_hover = options.image_hover || 'button-hover';
+
         // Create the button image with top-left positioning
-        this.image = this.scene.add.image(options.position[0], options.position[1], 'button')
-        this.image.setDisplaySize(options.size[0], options.size[1])
+        this.image = this.scene.add.image(options.position[0], options.position[1], options.image)
+        //this.image.setDisplaySize(options.size[0], options.size[1])
         this.image.setOrigin(0, 0) // Set origin to top-left
         this.image.setInteractive({ useHandCursor: true })
         this.image.on('pointerover', () => {
-            this.image.setTexture('button-hover');
+            this.image.setTexture(options.image_hover);
             this.scene.g.eventBus.emit(`ui:button:${options.eventHandle}:pointover`, { button: this, scene: this.scene });
         })
         this.image.on('pointerout', () => {
-            this.image.setTexture('button');
+            this.image.setTexture(options.image);
             this.scene.g.eventBus.emit(`ui:button:${options.eventHandle}:pointout`, { button: this, scene: this.scene });
         })
         this.image.on('pointerdown', () => {
@@ -47,6 +52,16 @@ class UIButton {
             this.buttonStyle
         )
         this.text.setOrigin(0.5); // Keep text centered within the button
+    }
+
+    getDimensions() {
+        if (this.image.visible === false) {
+            return {width: 0, height: 0};
+        }
+        return {
+            width: this.image.width || 0,
+            height: this.image.height || 0
+        };
     }
 
     validateOptions(options) {
@@ -122,11 +137,15 @@ class UIButton {
         // Update text position (centered within button)
         if (this.text && this.image) {
             // Calculate center of button for text positioning
-            const centerX = x + (this.image.displayWidth / 2);
-            const centerY = y + (this.image.displayHeight / 2);
+            const centerX = x + (this.image.width / 2);
+            const centerY = y + (this.image.height / 2);
             this.text.setPosition(centerX, centerY);
         }
         
         return this;
     }
+}
+
+if (typeof window !== 'undefined') {
+    window.UIButton = UIButton;
 }
