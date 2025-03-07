@@ -5,6 +5,11 @@
 - Each scene features one character with the player
 - Key decision points that lead to specific branches
 - All interactions flow naturally from one to the next
+## NodeState
+
+When a current dialogue node is set it a state.
+- speaker
+- response
 
 ## Story Data Structure Example
 
