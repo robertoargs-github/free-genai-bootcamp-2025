@@ -68,17 +68,11 @@ class PreloadScene extends Phaser.Scene {
             { id: 'name-box', path: 'ui/name-box.png' },
             { id: 'choice-box', path: 'ui/choice-box.png' },
             { id: 'menu-bg', path: 'ui/menu-background.png' },
+            { id: 'black-sq', path: 'ui/black-sq.png' },
             { id: 'button', path: 'ui/button.png' },
             { id: 'button-hover', path: 'ui/button-hover.png' },
-            { id: 'settings-icon', path: 'ui/settings-icon.png' },
-            { id: 'language-icon', path: 'ui/language-icon.png' },
-            { id: 'save-icon', path: 'ui/save-icon.png' },
-            { id: 'load-icon', path: 'ui/load-icon.png' },
-            { id: 'auto-icon', path: 'ui/auto-icon.png' },
-            { id: 'skip-icon', path: 'ui/skip-icon.png' },
-            { id: 'help-icon', path: 'ui/help-icon.png' },
-            { id: 'next-button', path: 'ui/next-button.png' },
-            { id: 'next-button-hover', path: 'ui/next-button-hover.png' }
+            { id: 'small-button', path: 'ui/small-button.png' },
+            { id: 'small-button-hover', path: 'ui/small-button.png' },
         ]);
         
         // Create placeholder UI elements if they don't exist

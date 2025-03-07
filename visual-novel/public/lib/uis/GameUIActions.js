@@ -41,6 +41,8 @@ class GameUIActions extends BaseUI{
             inputType: 'button',
             position: [0,0],
             inputOptions: {
+                image: 'small-button',
+                image_hover: 'small-button-hover',
                 text: text,
                 size: [this.buttonWidth,this.buttonHeight],
                 eventHandle: eventHandle

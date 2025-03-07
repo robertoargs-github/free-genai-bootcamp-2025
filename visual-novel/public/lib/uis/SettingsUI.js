@@ -18,7 +18,7 @@ class SettingsUI extends BaseUI {
         this.settingsFields = this.uim.createContainer({
             position: [width * 0.5, height * 0.3], // Centered horizontally
             layout: 'vertical',
-            spacing: 80,  // Further increased spacing to ensure no overlap
+            spacing: 32,
             origin: [0.5, 0]  // Center horizontally, align to top
         });
         
@@ -76,7 +76,6 @@ class SettingsUI extends BaseUI {
             label: 'Player Name',
             position: [0, 0],  // Position will be set by the Fields container
             inputType: 'textinput',
-            spacing: 20,  // Space between label and input
             inputOptions: {
                 size: [300, 40],        // Size of the text input
                 placeholder: 'Enter your name...',
@@ -119,7 +118,6 @@ class SettingsUI extends BaseUI {
             label: 'BGM Volume',
             position: [0, 0],  // Position will be set by the Fields container
             inputType: 'slider',
-            spacing: 40,  // Space between label and slider
             inputOptions: {
                 min: 0,
                 max: 100,

@@ -3,7 +3,7 @@ class MenuUI extends BaseUI {
     constructor(UIManager, scene) {
         super(scene); // Call BaseUI constructor
         this.uim = UIManager;
-        this.spacing = 20;
+        this.spacing = 16;
         this.buttonWidth = 500;
         this.buttonHeight = 80;
     }

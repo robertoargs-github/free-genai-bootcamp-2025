@@ -44,6 +44,7 @@ class MenuScene extends BaseScene {
         this.ui.create(width/2, height/2); // Center the menu in the scene
         this.ui.show();
 
+        this.uiSettings = null
         this.uiSettings = new SettingsUI(this.g.ui, this);
         this.uiSettings.create();
         this.uiSettings.hide();

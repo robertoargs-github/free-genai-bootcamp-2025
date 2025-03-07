@@ -10,6 +10,8 @@ class DialogUI  extends BaseUI {
         this.scene = scene;
         this.width = scene.cameras.main.width;
         this.height = scene.cameras.main.height;
+
+        this.spacing = 1;
         
         // Get reference to the event bus from the scene
         this.eventBus = window.eventBus;
@@ -22,22 +24,22 @@ class DialogUI  extends BaseUI {
     }
     
     create(x,y) {
-        this.x = 0//x;
-        this.y = 0//y;
+        this.x = x;
+        this.y = y;
         
         // create fields container to contain the dialog.
         this.messagesContainer = this.uim.createContainer({
             layout: 'vertical',
             position: [this.x,this.y],
-            spacing: this.spacing,
-            origin: [0,0]
+            spacing: 1,
+            origin: [0,1]
         });
         this.registerElement(this.messagesContainer);
 
         this.message = this.uim.createField({
             inputType: 'message',
             position: [0,0], // the container is will override the position
-            inputOptions: {} // we don't set options for message on create
+            inputOptions: {}
         });
         this.messagesContainer.addItem(this.message);
 
@@ -73,6 +75,7 @@ class DialogUI  extends BaseUI {
         } else {
             this.nextButton.setVisible(true)
         }
+        this.messagesContainer.updateItemPositions();
     }
     
     createNextButton() {

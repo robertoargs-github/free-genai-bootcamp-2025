@@ -27,13 +27,13 @@ class GameScene extends BaseScene {
         this.uiGameActions.create(width, 0);
         this.uiGameActions.show();
 
-        this.uiSettings = new SettingsUI(this.g.ui, this);
-        this.uiSettings.create(0, 0);
-        this.uiSettings.hide();
-
         this.uiDialog = new DialogUI(this.g.ui,this.dialogManager, this);
         this.uiDialog.create(0, height);
         this.uiDialog.show();
+
+        this.uiSettings = new SettingsUI(this.g.ui, this);
+        this.uiSettings.create(0, 0);
+        this.uiSettings.hide();
 
         //this.startGame(); // Start the story/dialog flow
         super.create();
