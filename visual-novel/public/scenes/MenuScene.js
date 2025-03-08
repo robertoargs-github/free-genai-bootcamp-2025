@@ -70,7 +70,12 @@ class MenuScene extends BaseScene {
 
     startGame(ev) {
         ev.scene.g.audio.playSoundEffect('click')
-        ev.scene.changeScene('Game', { slot: 'new' });
+        ev.scene.cameras.main.fadeOut(300, 0, 0, 0)
+        ev.scene.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
+            ev.scene.time.delayedCall(600, () => {
+                ev.scene.changeScene('Game', { slot: 'new' });
+            })
+        })
     }
 
     loadGame(ev){

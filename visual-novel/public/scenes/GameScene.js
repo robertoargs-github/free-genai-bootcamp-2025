@@ -4,6 +4,8 @@ class GameScene extends BaseScene {
     }
 
     create(data) {
+        this.cameras.main.fadeIn(600, 0, 0, 0)
+
         this.g.audio.updateScene(this);
         this.g.ui.updateScene(this);
 
