@@ -37,17 +37,14 @@ class GameUIActions extends BaseUI{
     }
 
     createButton(text, eventHandle) {
-        const button = this.uim.createField({
-            inputType: 'button',
+        const button = this.uim.createButton({
             position: [0,0],
-            inputOptions: {
-                image: 'small-button',
-                image_hover: 'small-button-hover',
-                text: text,
-                size: [this.buttonWidth,this.buttonHeight],
-                eventHandle: eventHandle
+            image: 'small-button',
+            image_hover: 'small-button-hover',
+            text: text,
+            size: [this.buttonWidth,this.buttonHeight],
+            eventHandle: eventHandle
 
-            }
         });
         this.container.addItem(button);
     }

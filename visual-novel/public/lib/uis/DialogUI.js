@@ -11,7 +11,7 @@ class DialogUI  extends BaseUI {
         this.width = scene.cameras.main.width;
         this.height = scene.cameras.main.height;
 
-        this.spacing = 1;
+        this.spacing = 12;
         
         // Get reference to the event bus from the scene
         this.eventBus = window.eventBus;
@@ -26,23 +26,8 @@ class DialogUI  extends BaseUI {
     create(x,y) {
         this.x = x;
         this.y = y;
-        
-        // create fields container to contain the dialog.
-        this.messagesContainer = this.uim.createContainer({
-            layout: 'vertical',
-            position: [this.x,this.y],
-            spacing: 1,
-            origin: [0,1]
-        });
-        this.registerElement(this.messagesContainer);
-
-        this.message = this.uim.createField({
-            inputType: 'message',
-            position: [0,0], // the container is will override the position
-            inputOptions: {}
-        });
-        this.messagesContainer.addItem(this.message);
-
+        this.createMessagesContainer();
+        this.createMessage();
         this.createNextButton();
     }
 
@@ -75,18 +60,36 @@ class DialogUI  extends BaseUI {
         } else {
             this.nextButton.setVisible(true)
         }
-        this.messagesContainer.updateItemPositions();
+        this.messagesContainer.update();
+    }
+
+    createMessagesContainer(){
+        // create fields container to contain the dialog.
+        this.messagesContainer = this.uim.createContainer({
+            layout: 'vertical',
+            position: [this.x,this.y],
+            spacing: this.spacing,
+            origin: [0,1]
+        });
+        this.registerElement(this.messagesContainer);
+    }
+
+    createMessage(){
+        this.message = this.uim.createField({
+            inputType: 'message',
+            position: [0,0], // the container is will override the position
+            inputOptions: {}
+        });
+        this.messagesContainer.addItem(this.message);
     }
     
     createNextButton() {
-        this.nextButton = this.uim.createField({
-            inputType: 'button',
+        this.nextButton = this.uim.createButton({
             position: [0,0], // the container is will override the position
-            inputOptions: {
-                text: 'Next',
-                size: [80,50],
-                eventHandle: 'dialog-next'
-            }
+            text: 'Next',
+            size: [80,50],
+            image: 'small-button',
+            eventHandle: 'dialog-next'
         })       
         this.messagesContainer.addItem(this.nextButton);
     }

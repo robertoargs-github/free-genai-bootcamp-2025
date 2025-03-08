@@ -24,11 +24,11 @@ class GameScene extends BaseScene {
         this.characterManager.create(); // Create background and scene elements
 
         this.uiGameActions = new GameUIActions(this.g.ui, this);
-        this.uiGameActions.create(width, 0);
+        this.uiGameActions.create(width - 12, 12);
         this.uiGameActions.show();
 
         this.uiDialog = new DialogUI(this.g.ui,this.dialogManager, this);
-        this.uiDialog.create(0, height);
+        this.uiDialog.create(12, height - 12);
         this.uiDialog.show();
 
         this.uiSettings = new SettingsUI(this.g.ui, this);

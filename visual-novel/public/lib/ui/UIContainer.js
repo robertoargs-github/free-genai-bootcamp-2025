@@ -296,6 +296,10 @@ class UIContainer extends UIItem {
             }
         }
     }
+
+    update(){
+        this.updateItemPositions()
+    }
 }
 
 if (typeof window !== 'undefined') {

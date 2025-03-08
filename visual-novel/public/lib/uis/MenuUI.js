@@ -36,14 +36,11 @@ class MenuUI extends BaseUI {
     }
 
     createButton(text, eventHandle){
-        const button = this.uim.createField({
-            inputType: 'button',
+        const button = this.uim.createButton({
             position: [0,0],
-            inputOptions: {
-                text: text,
-                size: [this.buttonWidth,this.buttonHeight],
-                eventHandle: eventHandle
-            }
+            text: text,
+            size: [this.buttonWidth,this.buttonHeight],
+            eventHandle: eventHandle
         });
         this.menuContainer.addItem(button);
     }
