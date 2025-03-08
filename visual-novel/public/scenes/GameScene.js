@@ -52,7 +52,7 @@ class GameScene extends BaseScene {
         this.g.eventBus.on('ui:button:gm-save:pointdown',this.save);
         this.g.eventBus.on('ui:button:gm-load:pointdown',this.load);
         this.g.eventBus.on('ui:button:gm-settings:pointdown',this.openSettings);
-        this.g.eventBus.on('ui:button:settings-cancel:pointdown',this.cancelSettings);
+        this.g.eventBus.on('ui:button:settings-close:pointdown',this.closeSettings);
         this.g.eventBus.on('ui:button:dialog-next:pointdown',this.dialogNext);
         this.g.eventBus.on('ui:button:dialog-choice-0:pointdown',this.dialogChoice0);
         this.g.eventBus.on('ui:button:dialog-choice-1:pointdown',this.dialogChoice1);
@@ -106,7 +106,7 @@ class GameScene extends BaseScene {
         ev.scene.uiSettings.show();
     }
 
-    cancelSettings(ev){
+    closeSettings(ev){
         ev.scene.g.audio.playSoundEffect('click')
         ev.scene.uiGameActions.show();
         ev.scene.uiSettings.hide();

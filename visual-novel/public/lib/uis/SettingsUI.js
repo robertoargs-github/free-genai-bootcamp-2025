@@ -191,42 +191,28 @@ class SettingsUI extends BaseUI {
         // Create our actions withint horizontal fields container
         // position in the bottom left of the screen.
         const { width, height } = this.scene.game.canvas;
+        const padding = 32;
         this.actionsContainer = this.uim.createContainer({
-            position: [width * 0.1, height * 0.9],
+            position: [width-padding, height-padding],
             layout: 'horizontal',
-            spacing: 20
+            spacing: 20,
+            origin: [1,1]
         });
         this.registerElement(this.actionsContainer);
-        this.createButtonApply();
-        this.createButtonCancel();
+        this.createButtonClose();
     }
 
-    createButtonApply(){
-        const buttonWidth = 300;
-        const buttonHeight = 80;
-        const buttonField = this.uim.createField({
-            inputType: 'button',
-            position: [0, 0],
-            inputOptions: {
-                text: "Apply",
-                size: [buttonWidth,buttonHeight],
-                eventHandle: "settings-apply"
-            }
-        })
-        this.actionsContainer.addItem(buttonField);
-    }
 
-    createButtonCancel(){
+    createButtonClose(){
         const buttonWidth = 300;
         const buttonHeight = 80;
-        const buttonField = this.uim.createField({
-            inputType: 'button',
+        const buttonField = this.uim.createButton({
             position: [0, 0],
-            inputOptions: {
-                text: "Cancel",
-                size: [buttonWidth,buttonHeight],
-                eventHandle: "settings-cancel"
-            }
+            image: 'small-button',
+            image_hover: 'small-button',
+            text: "Close",
+            size: [buttonWidth,buttonHeight],
+            eventHandle: "settings-close"
         })
         this.actionsContainer.addItem(buttonField);
 

@@ -56,7 +56,7 @@ class MenuScene extends BaseScene {
         this.g.eventBus.on('ui:button:continue:pointdown',this.continueGame);
         this.g.eventBus.on('ui:button:load:pointdown',this.loadGame);
         this.g.eventBus.on('ui:button:settings:pointdown',this.openSettings);
-        this.g.eventBus.on('ui:button:settings-cancel:pointdown',this.cancelSettings);
+        this.g.eventBus.on('ui:button:settings-close:pointdown',this.closeSettings);
     }
 
     deregisterEvents() {
@@ -64,36 +64,35 @@ class MenuScene extends BaseScene {
         this.g.eventBus.off('ui:button:continue:pointdown',this.continueGame);
         this.g.eventBus.off('ui:button:load:pointdown',this.loadGame);
         this.g.eventBus.off('ui:button:settings:pointdown',this.openSettings);
-        this.g.eventBus.off('ui:button:settings-cancel:pointdown',this.cancelSettings);
+        this.g.eventBus.off('ui:button:settings-close:pointdown',this.closeSettings);
     }
 
 
     startGame(ev) {
+        ev.scene.g.audio.playSoundEffect('click')
         ev.scene.changeScene('Game', { slot: 'new' });
     }
 
     loadGame(ev){
-        // show load settings screen.
+        ev.scene.g.audio.playSoundEffect('click')
     }
 
     continueGame(ev){
+        ev.scene.g.audio.playSoundEffect('click')
         ev.scene.changeScene('Game');
     }
 
     openSettings(ev) {
         console.log('MenuScene:open settings')
+        ev.scene.g.audio.playSoundEffect('click')
         ev.scene.ui.hide();
         ev.scene.uiSettings.show();
     }
 
-    cancelSettings(ev){
-        console.log('MenuScene:cancel settings')
+    closeSettings(ev){
+        console.log('MenuScene:close settings')
+        ev.scene.g.audio.playSoundEffect('click')
         ev.scene.ui.show();
         ev.scene.uiSettings.hide();
-    }
-
-    continueGame(ev) {
-        console.log('continue game')
-        ev.scene.start('Game');
     }
 }
