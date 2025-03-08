@@ -54,8 +54,6 @@ class PreloadScene extends Phaser.Scene {
         const isPending = this.game.registry.get('globalManagersPending');
         
         if (isPending) {
-            console.log('Finalizing global managers initialization');
-            
             // Get the existing GlobalManagers instance from registry
             const globalManagers = this.game.registry.get('globalManagers');
             
@@ -109,7 +107,7 @@ class PreloadScene extends Phaser.Scene {
             { id: 'classroom', path: 'scenes/classroom.jpg', name: 'Language School Classroom' },
             { id: 'cafe', path: 'scenes/cafe.jpg', name: 'Cafe Interior' },
             { id: 'post-office', path: 'scenes/post-office.jpg', name: 'Post Office Interior' },
-            { id: 'store', path: 'scenes/store.jpg', name: 'Corner Store Interior' }
+            { id: 'store', path: 'scenes/corner-store.jpg', name: 'Corner Store Interior' }
         ];
         
         // Load background assets using AssetLoader
@@ -120,7 +118,7 @@ class PreloadScene extends Phaser.Scene {
         // Define audio assets to load
         const audioAssets = [
             { id: 'click', path: 'click.wav' },
-            { id: 'transition', path: 'transition.mp3' },
+            { id: 'transition', path: 'transition.wav' },
             { id: 'bg-music', path: 'bg.wav' }
         ];
         
@@ -142,7 +140,7 @@ class PreloadScene extends Phaser.Scene {
         // Define data files to load
         const dataFiles = [
             { id: 'mappings', path: 'mappings.json' },
-            { id: 'story-main', path: 'story/story.json' },
+            { id: 'story-main', path: 'stories/main.json' },
             { id: 'scene-scene001', path: 'scenes/scene001.json' }
             // In a full game, you would load all scenes here
         ];
@@ -154,7 +152,6 @@ class PreloadScene extends Phaser.Scene {
     createPlaceholderUI() {
         // This function would generate placeholder UI elements if they don't exist
         // Similar to what we did in the BootScene
-        console.log('Creating placeholder UI elements if needed');
         
         // In a real implementation, you would check if files exist and create them if not
         // For this demo, we'll assume they don't exist and create basic placeholders

@@ -68,7 +68,6 @@ class BootScene extends Phaser.Scene {
             
             // We'll log that we created a placeholder, but in a real game
             // you would save this file to disk
-            console.log('Created placeholder loading background');
         }
         
         // Generate simple loading bar if it doesn't exist
@@ -88,7 +87,6 @@ class BootScene extends Phaser.Scene {
             this.textures.addBase64('loading-bar', barDataURL);
             
             // We'll log that we created a placeholder
-            console.log('Created placeholder loading bar');
         }
     }
 }

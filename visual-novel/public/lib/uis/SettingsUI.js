@@ -124,7 +124,6 @@ class SettingsUI extends BaseUI {
         // Calculate volume from settings (convert from 0-0.2 to 0-100)
         let volume = this.scene.g.settings.get(options.settingsKey)
         volume = (volume / 0.2) * 100
-        console.log('v',volume)
         // Create a field with label and volume slider
         const bgmVolumeField = this.uim.createField({
             label: options.label,
