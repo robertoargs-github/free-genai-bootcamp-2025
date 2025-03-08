@@ -19,6 +19,7 @@ class UIContainer extends UIItem {
         this.y = options.position[1];
         this.layout = options.layout || 'vertical';
         this.spacing = options.spacing !== undefined ? options.spacing : 20;
+        this.padding = options.padding || 0;
         this.items = [];
         
         // Set origin (default to top-left [0,0])
@@ -126,8 +127,8 @@ class UIContainer extends UIItem {
 
         this.items.forEach((item, index) => {
             item.setPosition(
-                item.x - offsetX, 
-                item.y - offsetY
+                item.x - offsetX + this.padding, 
+                item.y - offsetY + this.padding
             ); 
         });
     }
@@ -214,8 +215,8 @@ class UIContainer extends UIItem {
 
         
         return {
-            width: width,
-            height: height
+            width: width + (this.padding * 2),
+            height: height + (this.padding * 2)
         };
     }
     

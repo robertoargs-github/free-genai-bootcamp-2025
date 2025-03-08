@@ -57,6 +57,7 @@ class UIMessage extends UIItem{
             position: [this.x, this.y],
             layout: 'vertical',
             spacing: 8,
+            padding: 16,
             origin: [0,0],
             panelOptions: {
                 backgroundImage: 'black-sq'
@@ -98,7 +99,7 @@ class UIMessage extends UIItem{
             style: {
                 fontFamily: 'Arial',
                 fontSize: '24px',
-                color: '#ffffff',
+                color: '#808080',
             }
         });
         this.bubblePanel.addItem(this.englishText);
