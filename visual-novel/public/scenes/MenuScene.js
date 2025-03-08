@@ -21,7 +21,7 @@ class MenuScene extends BaseScene {
             .setDisplaySize(width, height);
         
         // Add title text
-        this.add.text(width / 2, height / 4, '日本語学習ビジュアルノベル', {
+        const mainTitle = this.add.text(width / 2, 0, '日本語学習ビジュアルノベル', {
             fontFamily: 'Noto Sans JP',
             fontSize: '80px',
             color: '#ffffff',
@@ -29,8 +29,8 @@ class MenuScene extends BaseScene {
             strokeThickness: 12,
             align: 'center'
         }).setOrigin(0.5);
-        
-        this.add.text(width / 2, height / 4 + 80, 'Japanese Language Learning Visual Novel', {
+
+        const subTitle = this.add.text(width / 2, height / 4 + 80, 'Japanese Language Learning Visual Novel', {
             fontFamily: 'Arial',
             fontSize: '40px',
             color: '#ffffff',
@@ -38,6 +38,26 @@ class MenuScene extends BaseScene {
             strokeThickness: 8,
             align: 'center'
         }).setOrigin(0.5);
+        subTitle.alpha = 0;
+
+        const tweenMainTitle = this.tweens.add({
+            targets: mainTitle,
+            y: height / 4,
+            duration: 1000,
+            ease: 'Power3',
+            repeat: 0
+        });
+        tweenMainTitle.on('complete', function(tween, targets){
+            const tweenSubTitle = this.tweens.add({
+                targets: subTitle,
+                alpha: 1,
+                duration: 1000,
+                ease: 'Power3',
+                repeat: 0
+            });
+        }, this);
+        //tween.play();
+
         
         // Create menu UI with buttons
         this.ui = new MenuUI(this.g.ui, this);

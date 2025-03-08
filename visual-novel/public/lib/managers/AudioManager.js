@@ -76,12 +76,17 @@ class AudioManager {
     setBgmVolume(volume) {
         const adjustedVolume = Math.max(0, Math.min(1, volume));
         this.bgMusic.setVolume(adjustedVolume);
-        this.scene.gameSettings.bgmVolume = adjustedVolume;
     }
     
     setSfxVolume(volume) {
         const adjustedVolume = Math.max(0, Math.min(1, volume));
-        this.scene.gameSettings.sfxVolume = adjustedVolume;
+        //this.sfxSound.setVolume(adjustedVolume);
+    }
+
+    setVoiceVolume(volume){
+        const adjustedVolume = Math.max(0, Math.min(1, volume));
+        //this.voiceSound.setVolume(adjustedVolume);
+
     }
     
     // Method to play a click sound with error handling

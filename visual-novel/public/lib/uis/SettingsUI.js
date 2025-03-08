@@ -49,7 +49,33 @@ class SettingsUI extends BaseUI {
         
         // Future settings could be added here
         //this.createFontSlider();
+        this.registerEvents();
     }
+
+    registerEvents() {
+        this.scene.g.eventBus.on('ui:slider:settings-bgm-volume:change',this.bgmVolumeChange)
+        this.scene.g.eventBus.on('ui:slider:settings-sfx-volume:change',this.sfxVolumeChange)
+        this.scene.g.eventBus.on('ui:slider:settings-voice-volume:change',this.voiceVolumeChange)
+    }
+
+    bgmVolumeChange(ev) {
+        const value = (ev.value / 100) * 0.2
+        ev.scene.g.audio.setBgmVolume(value);
+        ev.scene.g.settings.update('bgmVolume', value);
+    }
+
+    sfxVolumeChange(ev) {
+        const value = (ev.value / 100) * 0.2
+        ev.scene.g.audio.setSfxVolume(value);
+        ev.scene.g.settings.update('sfxVolume', value);
+    }
+
+    voiceVolumeChange(ev) {
+        const value = (ev.value / 100) * 0.2
+        ev.scene.g.audio.setVoiceVolume(value);
+        ev.scene.g.settings.update('voiceVolume', value);
+    }
+
 
     // Override show method to add any specific behavior
     show() {
@@ -125,7 +151,7 @@ class SettingsUI extends BaseUI {
         let volume = this.scene.g.settings.get(options.settingsKey)
         volume = (volume / 0.2) * 100
         // Create a field with label and volume slider
-        const bgmVolumeField = this.uim.createField({
+        const volumeField = this.uim.createField({
             label: options.label,
             position: [0, 0],  // Position will be set by the Fields container
             inputType: 'slider',
@@ -138,23 +164,7 @@ class SettingsUI extends BaseUI {
                 padding: 10              // Add padding to ensure handle is visible
             }
         });
-        
-        // Add field to the container
-        this.settingsFields.addItem(bgmVolumeField);
-        
-        // Store reference to the slider component
-        this.bgmSlider = bgmVolumeField.getInput();
-        
-        // Listen for changes to update settings
-        this.scene.g.eventBus.on('ui:slider:settings-bgm-volume:change', (data) => {
-            // Update BGM volume in settings manager
-            if (this.scene.g.settings) {
-                // the data.value represent 0 to 100%
-                // but the value range of set audio for bgm is 0 to 0.2
-                const value = (data.value / 100) * 0.2
-                this.scene.g.audio.setBgmVolume(value);
-            }
-        });
+        this.settingsFields.addItem(volumeField);
     }
 
     createLanguageToggle(){

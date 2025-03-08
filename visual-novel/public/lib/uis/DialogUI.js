@@ -32,6 +32,7 @@ class DialogUI  extends BaseUI {
         this.createMessage();
         this.createChoices();
         this.createNextButton();
+
     }
 
     updateMessageText(){
