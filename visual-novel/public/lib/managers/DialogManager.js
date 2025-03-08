@@ -77,8 +77,6 @@ class DialogManager {
     advance(action,value=null) {
         console.log('advance',arguments)
         if (action == 'next') {
-            // advance based on default_next_id
-            
             // check if default_next_id exists if not throw an error.
             if (!this.dialogNode.default_next_id){
                 console.error('No default_next_id found for dialog node:', this.dialogNode);
@@ -90,6 +88,13 @@ class DialogManager {
         } else if (action == 'choice') {
             // we are assuming the choice is an integer
             const choice = this.dialogData.dialog[this.dialogId].choices[value];
+            if (choice.next_id){
+                this.dialogId = choice.next_id
+                this.dialogNode = this.dialogData.dialog[this.dialogId];
+            } else {
+                this.dialogId = this.dialogNode.default_next_id
+                this.dialogNode = this.dialogData.dialog[this.dialogId];
+            }
             console.log(choice)
             // if there is a response we need to show it.
             // if we are advancing from response lets check for next_id otherwise fallback to default_next_id

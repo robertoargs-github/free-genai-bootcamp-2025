@@ -11,6 +11,7 @@ class UIButton extends UIItem {
     constructor(scene,options){
         super('button');
 
+        this.visible = true
         this.scene = scene;
         this.textAlign = options.textAlign || 'center'
         this.validateOptions(options); // if anything fails it will throw an error
@@ -82,13 +83,14 @@ class UIButton extends UIItem {
     }
 
     getDimensions() {
-        if (this.image.visible === false) {
+        if (this.visible) {
+            return {
+                width: this.image.width || 0,
+                height: this.image.height || 0
+            };
+        } else {
             return {width: 0, height: 0};
         }
-        return {
-            width: this.image.width || 0,
-            height: this.image.height || 0
-        };
     }
 
     validateOptions(options) {
@@ -136,17 +138,9 @@ class UIButton extends UIItem {
      * @returns {UIButton} - This button instance for chaining
      */
     setVisible(visible) {
-        // Set visibility for button image
-        if (this.image && typeof this.image.setVisible === 'function') {
-            this.image.setVisible(visible);
-        }
-        
-        // Set visibility for button text
-        if (this.text && typeof this.text.setVisible === 'function') {
-            this.text.setVisible(visible);
-        }
-        
-        return this;
+        this.visible = visible;
+        this.image.setVisible(visible);
+        this.text.setVisible(visible);
     }
     
     /**
