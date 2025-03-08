@@ -48,10 +48,6 @@ class UIField extends UIItem{
             style: style,
             field: this
         });
-        if (this.labelText === '' || this.labelText === null){
-            console.log('UiField',this, 'setINVISIBLE')
-            this.label.setVisible(false)
-        }
     }
     
     _getInputPositionY(){
