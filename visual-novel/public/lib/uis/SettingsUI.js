@@ -25,8 +25,21 @@ class SettingsUI extends BaseUI {
         // Register the fields container with BaseUI
         this.registerElement(this.settingsFields);
         
-        // Add BGM volume field
-        this.createBgmVolumeSlider();
+        this.createVolumeSlider({
+            settingsKey: 'bgmVolume',
+            label: 'BGM Volume',
+            eventHandle: 'settings-bgm-volume'
+        });
+        this.createVolumeSlider({
+            settingsKey: 'sfxVolume',
+            label: 'SFX Volume',
+            eventHandle: 'settings-sfx-volume'
+        });
+        this.createVolumeSlider({
+            settingsKey: 'voiceVolume',
+            label: 'Voice Volume',
+            eventHandle: 'settings-voice-volume'
+        });
         
         // Add language toggle field
         this.createLanguageToggle();
@@ -35,7 +48,6 @@ class SettingsUI extends BaseUI {
         this.createNameTextInput();
         
         // Future settings could be added here
-        //this.createSfxVolumeSlider();
         //this.createFontSlider();
     }
 
@@ -108,14 +120,14 @@ class SettingsUI extends BaseUI {
         });
     }
 
-    createBgmVolumeSlider(){
+    createVolumeSlider(options){
         // Calculate volume from settings (convert from 0-0.2 to 0-100)
-        let volume = this.scene.g.settings.get('bgmVolume')
+        let volume = this.scene.g.settings.get(options.settingsKey)
         volume = (volume / 0.2) * 100
-        
+        console.log('v',volume)
         // Create a field with label and volume slider
         const bgmVolumeField = this.uim.createField({
-            label: 'BGM Volume',
+            label: options.label,
             position: [0, 0],  // Position will be set by the Fields container
             inputType: 'slider',
             inputOptions: {
@@ -123,7 +135,7 @@ class SettingsUI extends BaseUI {
                 max: 100,
                 value: volume,
                 size: [300, 30],         // Size of the slider
-                eventHandle: "settings-bgm-volume",
+                eventHandle: options.eventHandle,
                 padding: 10              // Add padding to ensure handle is visible
             }
         });

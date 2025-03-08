@@ -15,6 +15,7 @@ class SettingsManager {
             autoSpeed: 2000,       // ms to wait before advancing in auto mode
             bgmVolume: 0.01,       // 0-1
             sfxVolume: 0.1,        // 0-1
+            voiceVolume: 0.1,      // 0-1
             fontSize: 24,          // base font size
             typewriterEffect: true // use typewriter effect for text
         };
