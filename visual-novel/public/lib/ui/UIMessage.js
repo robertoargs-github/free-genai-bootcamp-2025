@@ -25,6 +25,7 @@ class UIMessage extends UIItem{
         this.createNameText();
         this.createJapaneseText();
         this.createEnglishText();
+        this.createPlayButton();
     }
 
     setPosition(x, y) {
@@ -63,7 +64,18 @@ class UIMessage extends UIItem{
                 backgroundImage: 'black-sq'
             }
         });
+    }
 
+    createPlayButton(){
+        this.playButton = this.scene.g.ui.createButton({
+            position: [0,0],
+            image: 'play-button',
+            image_hover: 'play-button',
+            text: '',
+            size: [64,64],
+            eventHandle: 'dialog-play'
+        })
+        this.bubblePanel.addItem(this.playButton);
     }
 
     createNameText() {

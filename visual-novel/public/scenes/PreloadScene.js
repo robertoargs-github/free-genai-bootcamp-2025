@@ -69,6 +69,7 @@ class PreloadScene extends Phaser.Scene {
             { id: 'choice-box', path: 'ui/choice-box.png' },
             { id: 'menu-bg', path: 'ui/menu-background.png' },
             { id: 'black-sq', path: 'ui/black-sq.png' },
+            { id: 'play-button', path: 'ui/play-button2.png' },
             { id: 'button', path: 'ui/button.png' },
             { id: 'button-hover', path: 'ui/button-hover.png' },
             { id: 'small-button', path: 'ui/small-button.png' },
