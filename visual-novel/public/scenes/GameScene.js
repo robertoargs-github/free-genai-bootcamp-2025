@@ -64,25 +64,50 @@ class GameScene extends BaseScene {
     }
 
 
-    dialogNext(ev){    ev.scene.dialogManager.advance('next'); }
-    dialogChoice0(ev){ ev.scene.dialogManager.advance('choice',0); }
-    dialogChoice1(ev){ ev.scene.dialogManager.advance('choice',1); }
-    dialogChoice2(ev){ ev.scene.dialogManager.advance('choice',2); }
-    dialogChoice3(ev){ ev.scene.dialogManager.advance('choice',3); }
-    dialogChoice4(ev){ ev.scene.dialogManager.advance('choice',4); }
-    dialogChoice5(ev){ ev.scene.dialogManager.advance('choice',5); }
+    dialogNext(ev){    
+        ev.scene.g.audio.playSoundEffect('click')
+        ev.scene.dialogManager.advance('next'); 
+    }
+    dialogChoice0(ev){ 
+        ev.scene.g.audio.playSoundEffect('click')
+        ev.scene.dialogManager.advance('choice',0); 
+    }
+    dialogChoice1(ev){ 
+        ev.scene.g.audio.playSoundEffect('click')
+        ev.scene.dialogManager.advance('choice',1); 
+    }
+    dialogChoice2(ev){ 
+        ev.scene.g.audio.playSoundEffect('click')
+        ev.scene.dialogManager.advance('choice',2); 
+    }
+    dialogChoice3(ev){ 
+        ev.scene.g.audio.playSoundEffect('click')
+        ev.scene.dialogManager.advance('choice',3); 
+    }
+    dialogChoice4(ev){ 
+        ev.scene.g.audio.playSoundEffect('click')
+        ev.scene.dialogManager.advance('choice',4); 
+    }
+    dialogChoice5(ev){ 
+        ev.scene.g.audio.playSoundEffect('click')
+        ev.scene.dialogManager.advance('choice',5); 
+    }
     dialogPlay(ev) {
-        console.log('dialogPlay')
+        const audioKey = ev.scene.dialogManager.dialogNode.audio
+        if (audioKey){
+            console.log('dialogPlay')
+            ev.scene.g.audio.playSoundEffect(`dialog-${audioKey}`)
+        }
     }
 
     openSettings(ev) {
-        console.log('GameScene:open settings')
+        ev.scene.g.audio.playSoundEffect('click')
         ev.scene.uiGameActions.hide();
         ev.scene.uiSettings.show();
     }
 
     cancelSettings(ev){
-        console.log('GameScene:cancel settings')
+        ev.scene.g.audio.playSoundEffect('click')
         ev.scene.uiGameActions.show();
         ev.scene.uiSettings.hide();
     }

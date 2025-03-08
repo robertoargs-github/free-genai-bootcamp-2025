@@ -7,6 +7,7 @@
     "dialog": {
         "000": {
             "speakerId": "player",
+            "audio": "wake-up",
             "japanese": "あなたは新しいアパートにおり、朝日の光が窓の中を流すように、あなたは起きた。",
             "english": "You wake up in your new apartment in Japan. The morning sunlight streams through the blinds as you hear someone in the kitchen.",
             "default_next_id": "001"

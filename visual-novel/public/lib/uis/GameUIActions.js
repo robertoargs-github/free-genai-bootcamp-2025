@@ -30,7 +30,6 @@ class GameUIActions extends BaseUI{
 
         // loop through and create buttons
         for (let button of buttonData) {
-            console.log('button',button)
             this.createButton(button.text, button.eventHandle);
         }
 

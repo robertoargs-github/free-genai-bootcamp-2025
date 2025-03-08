@@ -37,8 +37,7 @@ class AudioManager {
     
     playSoundEffect(key, config = {}) {
         try {
-            // Default volume is the global SFX volume
-            const volume = this.scene.gameSettings.sfxVolume
+            const volume = this.g.settings.get('sfxVolume');
             
             // Play the sound effect
             this.scene.sound.play(key, {

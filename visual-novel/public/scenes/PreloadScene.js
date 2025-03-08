@@ -28,6 +28,7 @@ class PreloadScene extends Phaser.Scene {
         this.loadCharacterAssets(); // Load character images
         this.loadBackgroundAssets(); // Load background images
         this.loadAudioAssets(); // Load audio assets
+        this.loadDialogAudioAssets(); // Load audio assets for dialog
         this.loadStoryData();  // Load story data
     }
 
@@ -64,9 +65,6 @@ class PreloadScene extends Phaser.Scene {
     loadUIAssets() {
         // Load UI assets using AssetLoader
         this.assetLoader.preloadImages([
-            { id: 'dialog-box', path: 'ui/dialog-box.png' },
-            { id: 'name-box', path: 'ui/name-box.png' },
-            { id: 'choice-box', path: 'ui/choice-box.png' },
             { id: 'menu-bg', path: 'ui/menu-background.png' },
             { id: 'black-sq', path: 'ui/black-sq.png' },
             { id: 'play-button', path: 'ui/play-button2.png' },
@@ -117,6 +115,16 @@ class PreloadScene extends Phaser.Scene {
             { id: 'click', path: 'click.wav' },
             { id: 'transition', path: 'transition.mp3' },
             { id: 'bg-music', path: 'bg.wav' }
+        ];
+        
+        // Load audio assets using AssetLoader
+        this.assetLoader.preloadAudio(audioAssets);
+    }
+
+    loadDialogAudioAssets() {
+        // Define audio assets to load
+        const audioAssets = [
+            { id: 'dialog-wake-up', path: 'dialog/wake_up.wav' },
         ];
         
         // Load audio assets using AssetLoader
