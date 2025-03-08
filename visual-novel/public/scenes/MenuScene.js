@@ -30,7 +30,7 @@ class MenuScene extends BaseScene {
             align: 'center'
         }).setOrigin(0.5);
         
-        this.add.text(width / 2, height / 4 + 100, 'Japanese Language Learning Visual Novel', {
+        this.add.text(width / 2, height / 4 + 80, 'Japanese Language Learning Visual Novel', {
             fontFamily: 'Arial',
             fontSize: '40px',
             color: '#ffffff',
