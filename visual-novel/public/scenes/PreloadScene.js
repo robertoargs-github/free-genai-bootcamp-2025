@@ -10,10 +10,17 @@ class PreloadScene extends Phaser.Scene {
         // Initialize AssetLoader
         this.assetLoader = new AssetLoader(this);
         
+        const width = this.cameras.main.width;
+        const height = this.cameras.main.height;
+
+        this.add.image(0,0, 'loading-bg')
+        .setDisplaySize(width, height)
+        .setOrigin(0,0);
+
         // Create loading bar
         this.loadingBar = this.assetLoader.createLoadingBar(
-            this.cameras.main.width / 2 - 200, 
-            this.cameras.main.height / 2 - 20, 
+            width / 2 - 200, 
+            height / 2 - 20, 
             400, 
             40, 
             2

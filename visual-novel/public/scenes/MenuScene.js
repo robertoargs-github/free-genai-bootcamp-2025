@@ -23,25 +23,25 @@ class MenuScene extends BaseScene {
         // Add title text
         this.add.text(width / 2, height / 4, '日本語学習ビジュアルノベル', {
             fontFamily: 'Noto Sans JP',
-            fontSize: '48px',
+            fontSize: '80px',
             color: '#ffffff',
             stroke: '#000000',
-            strokeThickness: 4,
+            strokeThickness: 12,
             align: 'center'
         }).setOrigin(0.5);
         
-        this.add.text(width / 2, height / 4 + 60, 'Japanese Language Learning Visual Novel', {
+        this.add.text(width / 2, height / 4 + 100, 'Japanese Language Learning Visual Novel', {
             fontFamily: 'Arial',
-            fontSize: '32px',
+            fontSize: '40px',
             color: '#ffffff',
             stroke: '#000000',
-            strokeThickness: 3,
+            strokeThickness: 8,
             align: 'center'
         }).setOrigin(0.5);
         
         // Create menu UI with buttons
         this.ui = new MenuUI(this.g.ui, this);
-        this.ui.create(width/2, height/2); // Center the menu in the scene
+        this.ui.create(width/2, height/2 + 60); // Center the menu in the scene
         this.ui.show();
 
         this.uiSettings = null
