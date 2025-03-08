@@ -90,23 +90,9 @@ class DialogManager {
         } else if (action == 'choice') {
             // we are assuming the choice is an integer
             const choice = this.dialogData.dialog[this.dialogId].choices[value];
+            console.log(choice)
             // if there is a response we need to show it.
             // if we are advancing from response lets check for next_id otherwise fallback to default_next_id
-        }
-    }
-    
-    handleChoice(choice) {
-        // Process the player's choice
-        this.choosingOption = false;
-        this.scene.uiManager.clearChoices();
-        
-        if (choice.next) {
-            this.currentDialogId = choice.next;
-            this.startDialog();
-        } else if (choice.nextScene) {
-            this.goToNextScene(choice.nextScene);
-        } else {
-            console.error('Choice has no next dialog or scene', choice);
         }
     }
     
@@ -134,6 +120,10 @@ class DialogManager {
                 });
             }
         });
+    }
+
+    getChoices(){
+        return this.dialogNode.choices;
     }
 
     getJapaneseText(){

@@ -11,6 +11,8 @@ class DialogUI  extends BaseUI {
         this.width = scene.cameras.main.width;
         this.height = scene.cameras.main.height;
 
+        this.choices = []
+
         this.spacing = 12;
         
         // Get reference to the event bus from the scene
@@ -28,43 +30,61 @@ class DialogUI  extends BaseUI {
         this.y = y;
         this.createMessagesContainer();
         this.createMessage();
+        this.createChoices();
         this.createNextButton();
     }
 
-    update() {
-        if (this.d.isLoaded()){
-            const attrs = {}           
-            attrs.name = this.d.getSpeakerName();
-            switch(this.scene.g.settings.get('language')) { 
-                case 'japanese':
-                    attrs.japaneseText = this.d.getJapaneseText();
-                    break;
-                case 'english':
-                    attrs.englishText = this.d.getEnglishText();
-                    break;
-                case 'dual':
-                    attrs.japaneseText = this.d.getJapaneseText();
-                    attrs.englishText = this.d.getEnglishText();
-                    break;
-                default:
-                    // raise error
-                    console.error('Invalid language setting:', this.scene.g.settings.get('language'));
-                    break;
-            }
-            this.message.input.update(attrs);
+    updateMessageText(){
+        const attrs = {}           
+        attrs.name = this.d.getSpeakerName();
+        switch(this.scene.g.settings.get('language')) { 
+            case 'japanese':
+                attrs.japaneseText = this.d.getJapaneseText();
+                break;
+            case 'english':
+                attrs.englishText = this.d.getEnglishText();
+                break;
+            case 'dual':
+                attrs.japaneseText = this.d.getJapaneseText();
+                attrs.englishText = this.d.getEnglishText();
+                break;
+            default:
+                // raise error
+                console.error('Invalid language setting:', this.scene.g.settings.get('language'));
+                break;
         }
-        // update japanese text 
+        this.message.input.update(attrs);
+    }
+
+    updateChoicesText(){
+        for (let i = 0; i < 7; i++) {
+            const choices = this.d.getChoices()
+            if (choices[i] === undefined) {
+                this.choices[i].setText('')
+                this.choices[i].setVisible(false)
+            } else {
+                this.choices[i].setText(choices[i].japanese)
+                this.choices[i].setVisible(true)
+            }
+        }
+    }
+
+    update() {
+        if (!this.d.isLoaded()){ return }
+        this.updateMessageText()
 
         if (this.d.isChoices()){
+            this.choicesContainer.setVisible(true)
             this.nextButton.setVisible(false)
+            this.updateChoicesText()
         } else {
+            this.choicesContainer.setVisible(false)
             this.nextButton.setVisible(true)
         }
         this.messagesContainer.update();
     }
 
     createMessagesContainer(){
-        // create fields container to contain the dialog.
         this.messagesContainer = this.uim.createContainer({
             layout: 'vertical',
             position: [this.x,this.y],
@@ -72,6 +92,29 @@ class DialogUI  extends BaseUI {
             origin: [0,1]
         });
         this.registerElement(this.messagesContainer);
+    }
+
+    createChoices(){
+        this.choicesContainer = this.uim.createContainer({
+            layout: 'vertical',
+            position: [this.x,this.y],
+            spacing: this.spacing,
+            origin: [0,0]
+        });
+
+        for (let i = 0; i < 7; i++) {
+            this.choices[i] = this.uim.createButton({
+                position: [0,0],
+                text: `Choice ${i}`,
+                size: [80,50],
+                textAlign: 'left',
+                image: 'small-button',
+                image_hover: 'small-button-hover',
+                eventHandle: `dialog-choice-${i}`
+            })
+            this.choicesContainer.addItem(this.choices[i])
+        }
+        this.messagesContainer.addItem(this.choicesContainer);
     }
 
     createMessage(){
@@ -89,6 +132,7 @@ class DialogUI  extends BaseUI {
             text: 'Next',
             size: [80,50],
             image: 'small-button',
+            image_hover: 'small-button-hover',
             eventHandle: 'dialog-next'
         })       
         this.messagesContainer.addItem(this.nextButton);

@@ -12,6 +12,7 @@ class UIButton extends UIItem {
         super('button');
 
         this.scene = scene;
+        this.textAlign = options.textAlign || 'center'
         this.validateOptions(options); // if anything fails it will throw an error
 
         this.buttonStyle = {
@@ -45,13 +46,39 @@ class UIButton extends UIItem {
             
         // Create the text with proper positioning (if text was provided)
         // Position text to be centered within the button
+        
+
+
+        const txtPos = this.alignTextPosition(
+            options.position[0],
+            options.position[1],
+            options.size[0],
+            options.size[1]
+        )
         this.text = this.scene.add.text(
-            options.position[0] + (options.size[0] / 2), 
-            options.position[1] + (options.size[1] / 2), 
+            txtPos.x,
+            txtPos.y,
             this.buttonText,
             this.buttonStyle
         )
-        this.text.setOrigin(0.5); // Keep text centered within the button
+        this.text.setOrigin(txtPos.origin.x,txtPos.origin.y);
+    }
+
+    alignTextPosition(x,y,width,height){
+        let txtY, txtX, originX, originY;
+        originX = 0
+        originY = 0.5
+        if (this.textAlign === 'left') {
+            txtX = x
+        } else if (this.textAlign === 'right') {
+            // TODO
+            txtX = x
+        } else if (this.textAlign === 'center') {
+            txtX = x + (width / 2)
+            originX = 0.5
+        }
+        txtY = y + (height / 2)
+        return {x: txtX, y: txtY, origin: {x: originX, y: originY}}
     }
 
     getDimensions() {
@@ -98,6 +125,10 @@ class UIButton extends UIItem {
             }
         }
     }
+
+    setText(text){
+        this.text.setText(text)
+    }
     
     /**
      * Set visibility of this button and all its components
@@ -136,10 +167,15 @@ class UIButton extends UIItem {
         
         // Update text position (centered within button)
         if (this.text && this.image) {
+            const txtPos = this.alignTextPosition(
+                x,
+                y,
+                this.image.width,
+                this.image.height
+            )
             // Calculate center of button for text positioning
-            const centerX = x + (this.image.width / 2);
-            const centerY = y + (this.image.height / 2);
-            this.text.setPosition(centerX, centerY);
+            this.text.setPosition(txtPos.x, txtPos.y);
+            this.text.setOrigin(txtPos.origin.x,txtPos.origin.y);
         }
         
         return this;

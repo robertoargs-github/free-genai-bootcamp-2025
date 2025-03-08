@@ -54,12 +54,22 @@ class GameScene extends BaseScene {
         this.g.eventBus.on('ui:button:gm-settings:pointdown',this.openSettings);
         this.g.eventBus.on('ui:button:settings-cancel:pointdown',this.cancelSettings);
         this.g.eventBus.on('ui:button:dialog-next:pointdown',this.dialogNext);
+        this.g.eventBus.on('ui:button:dialog-choice-0:pointdown',this.dialogChoice0);
+        this.g.eventBus.on('ui:button:dialog-choice-1:pointdown',this.dialogChoice1);
+        this.g.eventBus.on('ui:button:dialog-choice-2:pointdown',this.dialogChoice2);
+        this.g.eventBus.on('ui:button:dialog-choice-3:pointdown',this.dialogChoice3);
+        this.g.eventBus.on('ui:button:dialog-choice-4:pointdown',this.dialogChoice4);
+        this.g.eventBus.on('ui:button:dialog-choice-5:pointdown',this.dialogChoice5);
     }
 
 
-    dialogNext(ev){
-        ev.scene.dialogManager.advance('next');
-    }
+    dialogNext(ev){    ev.scene.dialogManager.advance('next'); }
+    dialogChoice0(ev){ ev.scene.dialogManager.advance('choice',0); }
+    dialogChoice1(ev){ ev.scene.dialogManager.advance('choice',1); }
+    dialogChoice2(ev){ ev.scene.dialogManager.advance('choice',2); }
+    dialogChoice3(ev){ ev.scene.dialogManager.advance('choice',3); }
+    dialogChoice4(ev){ ev.scene.dialogManager.advance('choice',4); }
+    dialogChoice5(ev){ ev.scene.dialogManager.advance('choice',5); }
 
     openSettings(ev) {
         console.log('GameScene:open settings')

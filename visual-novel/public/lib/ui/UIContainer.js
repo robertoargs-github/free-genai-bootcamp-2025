@@ -14,6 +14,7 @@ class UIContainer extends UIItem {
         
         this.scene = scene;
         this.validateOptions(options);
+        this.visible = true
         
         this.x = options.position[0];
         this.y = options.position[1];
@@ -97,6 +98,7 @@ class UIContainer extends UIItem {
      */
     setVisible(visible) {
         // Set visibility for all items
+        this.visible = visible
         this.items.forEach(item => {
             if (item && typeof item.setVisible === 'function') {
                 item.setVisible(visible);
@@ -183,6 +185,9 @@ class UIContainer extends UIItem {
      */
     getDimensions() {
         // Use base dimensions if no items
+        if (this.visible === false) {
+            return { width: 0, height: 0 };
+        }
         if (this.items.length === 0) {
             return { width: 0, height: 0 };
         }
