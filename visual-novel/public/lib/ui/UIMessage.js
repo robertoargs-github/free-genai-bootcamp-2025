@@ -80,6 +80,7 @@ class UIMessage extends UIItem{
     }
 
     createJapaneseText() {
+        const width = this.scene.cameras.main.width * 0.8;
         this.japaneseText = this.scene.g.ui.createLabel({
             position: [0,0],
             text: '',
@@ -87,12 +88,14 @@ class UIMessage extends UIItem{
                 fontFamily: 'Noto Sans JP',
                 fontSize: '32px',
                 color: '#ffffff',
+                wordWrap: { width: width, useAdvancedWrap: true }
             }
         });
         this.bubblePanel.addItem(this.japaneseText);
     }
 
     createEnglishText() {
+        const width = this.scene.cameras.main.width * 0.8;
         this.englishText = this.scene.g.ui.createLabel({
             position: [0,0],
             text: '',
@@ -100,6 +103,7 @@ class UIMessage extends UIItem{
                 fontFamily: 'Arial',
                 fontSize: '24px',
                 color: '#808080',
+                wordWrap: { width: width, useAdvancedWrap: true }
             }
         });
         this.bubblePanel.addItem(this.englishText);
