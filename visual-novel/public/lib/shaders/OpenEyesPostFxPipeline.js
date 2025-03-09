@@ -63,8 +63,8 @@ class OpenEyesPostFxPipeline extends Phaser.Renderer.WebGL.Pipelines.PostFXPipel
       // Width is constant and very wide
       // Height increases as eye opens
       vec2 eyeRadius = vec2(
-          2.0,                            // Always wide enough to exceed screen
-          max(0.001, uOpenAmount * 0.5)   // Height based on open amount
+          1.8,                            // Always wide enough to exceed screen
+          max(0.001, uOpenAmount * 0.52)   // Height based on open amount
       );
       
       // Calculate edge width - automatically fade out as the eye opens
@@ -146,7 +146,7 @@ class OpenEyesPostFxPipeline extends Phaser.Renderer.WebGL.Pipelines.PostFXPipel
   
       // Initialize state - store values but don't set uniforms yet
       this._openAmount = 0;         // Start with eyes closed (0 = closed, 1 = open)
-      this._blurAmount = 0.008;     // Default blur amount
+      this._blurAmount = 0.018;     // Default blur amount
       this._edgeBlurAmount = 0.2;   // Default edge blur/feathering (0.2 is moderate)
       this._isBooted = false;       // Track if the pipeline has been booted
     }
