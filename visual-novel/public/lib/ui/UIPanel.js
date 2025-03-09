@@ -2,6 +2,7 @@
 class UIPanel extends UIContainer {
     constructor(scene, options) {
         super(scene, options);
+        this.minWidth = options.minWidth || 0;
         this.validatePanelOptions(options.panelOptions);
         this.createBackground(options.panelOptions);
     }
@@ -35,8 +36,10 @@ class UIPanel extends UIContainer {
 
     autoResizePanel(){
         const containerDimensions = this.getDimensions();
+        const width = Math.max(this.minWidth,containerDimensions.width)
+        console.log('width',width)
         this.background.setDisplaySize(
-            containerDimensions.width, 
+            width,
             containerDimensions.height
         );
     }

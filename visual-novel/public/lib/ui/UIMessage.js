@@ -94,6 +94,7 @@ class UIMessage extends UIItem{
             position: [this.x, this.y],
             layout: 'vertical',
             spacing: 8,
+            minWidth: 400,
             padding: 16,
             origin: [0,0],
             panelOptions: {
