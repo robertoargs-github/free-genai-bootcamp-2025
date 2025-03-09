@@ -69,6 +69,18 @@ class MenuScene extends BaseScene {
         this.uiSettings.create();
         this.uiSettings.hide();
         super.create();
+
+        this.renderer.pipelines.addPostPipeline(OpeningBarsPostFxPipeline.name, OpeningBarsPostFxPipeline);
+        this.cameras.main.setPostPipeline(OpeningBarsPostFxPipeline);
+
+        const pipeline = this.cameras.main.getPostPipeline(OpeningBarsPostFxPipeline.name);
+        pipeline.progress = 0
+        this.tweens.add({
+            targets: pipeline,
+            progress: 1,
+            duration: 2000
+        });
+
     }
 
     registerEvents() {

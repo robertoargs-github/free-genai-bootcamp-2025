@@ -41,7 +41,7 @@ class PreloadScene extends Phaser.Scene {
     create() {
         // Complete initialization of global managers now that all assets are loaded
         this.finalizeGlobalManagers();
-        
+
         // Start the menu scene
         this.scene.start('Menu');
     }
@@ -63,8 +63,6 @@ class PreloadScene extends Phaser.Scene {
             this.game.registry.remove('globalManagersPending');
         }
     }
-    
-
     
     loadUIAssets() {
         // Load UI assets using AssetLoader
