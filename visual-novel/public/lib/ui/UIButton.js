@@ -11,6 +11,9 @@ class UIButton extends UIItem {
     constructor(scene,options){
         super('button');
 
+        this.x = options.position[0];
+        this.y = options.position[1];
+
         this.visible = true
         this.scene = scene;
         this.textAlign = options.textAlign || 'center'
@@ -31,7 +34,7 @@ class UIButton extends UIItem {
         this.eventHandle = options.eventHandle || 'default';
 
         // Create the button image with top-left positioning
-        this.image = this.scene.add.image(options.position[0], options.position[1], this.imageKey)
+        this.image = this.scene.add.image(this.x, this.y, this.imageKey)
         //this.image.setDisplaySize(options.size[0], options.size[1])
         this.image.setOrigin(0, 0) // Set origin to top-left
         this.image.setInteractive({ useHandCursor: true })

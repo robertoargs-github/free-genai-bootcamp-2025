@@ -124,14 +124,15 @@ class UIContainer extends UIItem {
 
     _updateItemPositionsByOrigin() {
         const containerDimensions = this.getDimensions();
-        let offsetX = (containerDimensions.width * this.originX);
-        let offsetY = (containerDimensions.height * this.originY);
+        let width = containerDimensions.width;
+        let height = containerDimensions.height;
+        let offsetX = (width * this.originX);
+        let offsetY = (height * this.originY);
 
         this.items.forEach((item, index) => {
-            item.setPosition(
-                item.x - offsetX + this.padding, 
-                item.y - offsetY + this.padding
-            ); 
+            const newX = item.x - offsetX + this.padding
+            const newY = item.y - offsetY + this.padding
+            item.setPosition(newX, newY);
         });
     }
 

@@ -100,12 +100,9 @@ class UIMessage extends UIItem{
     }
 
     createPlayButton(){
-        this.playButton = this.scene.g.ui.createButton({
+        this.playButton = this.scene.g.ui.createPlayButton({
             position: [0,0],
-            image: 'play-button',
-            image_hover: 'play-button',
-            text: '',
-            size: [64,64],
+            mode: 'play2stop',
             eventHandle: 'dialog-play'
         })
         this.bubblePanel.addItem(this.playButton);

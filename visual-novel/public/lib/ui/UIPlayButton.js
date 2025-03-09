@@ -11,9 +11,13 @@ class UIPlayButton extends UIItem {
      */
     constructor(scene, options) {
       super('play-button')
+      this.validateOptions(options); // if anything fails it will throw an error
+
+      this.x = options.position[0];
+      this.y = options.position[1];
+
       this.scene = scene;
       this.visible = true
-      this.validateOptions(options); // if anything fails it will throw an error
       
       // possible states
       // stopped - the button is ready to be played
@@ -31,8 +35,9 @@ class UIPlayButton extends UIItem {
       this.imagePlayKey = options.image || 'play-button';
       this.imagePauseKey = options.image_pause || 'pause-button';
       this.imageStopKey = options.image_stop || 'stop-button';
+      console.log('imagekey', this.imagePlayKey)
 
-      this.image = this.scene.add.image(options.position[0], options.position[1], this.imagePlayKey)
+      this.image = this.scene.add.image(this.x, this.y, this.imagePlayKey)
       this.image.setOrigin(0, 0) // Set origin to top-left
       this.image.setInteractive({ useHandCursor: true })
       this.image.on('pointerover', this.pointerOver,this)
@@ -41,40 +46,76 @@ class UIPlayButton extends UIItem {
       this.image.on('pointerup', this.pointerUp,this)
     }
 
+    setStop() {
+      this.state = 'stopped'
+      this.image.setTexture(this.imagePlayKey)
+    }
+
     pointerDown() {
       let action = null;
       if (this.mode === 'play2pause') {
-        if (this.state === 'paused') {
+        if (this.state === 'stopped') {
           this.state = 'playing'
           action = 'play'
+          this.image.setTexture(this.imagePauseKey)
+        } else if (this.state === 'paused') {
+          this.state = 'playing'
+          action = 'play'
+          this.image.setTexture(this.imagePauseKey)
         } else if (this.state === 'playing') {
           this.state = 'paused'
           action = 'pause'
+          this.image.setTexture(this.imagePlayKey)
         }
       } else if (this.mode === 'play2stop') {
         if (this.state === 'stopped') {
           this.state = 'playing'
           action = 'play'
+          this.image.setTexture(this.imageStopKey)
         } else if (this.state === 'playing') {
           this.state = 'stopped'
           action = 'stop'
+          this.image.setTexture(this.imagePlayKey)
         }
       }
-      this.scene.g.eventBus.emit(`ui:play-button:${this.eventHandle}:pointerdown`, { button: this, scene: this.scene, action: action });
+      this.scene.g.eventBus.emit(`ui:play-button:${this.eventHandle}:pointerdown`, { item: this, scene: this.scene, action: action });
     }
 
     pointerUp() {
-        this.scene.g.eventBus.emit(`ui:play-button:${this.eventHandle}:pointerup`, { button: this, scene: this.scene });
+        this.scene.g.eventBus.emit(`ui:play-button:${this.eventHandle}:pointerup`, { item: this, scene: this.scene });
     }
 
     pointerOver() {
-        this.image.setTexture(this.imageHoverKey);
-        this.scene.g.eventBus.emit(`ui:play-button:${this.eventHandle}:pointover`, { button: this, scene: this.scene });
+        this.scene.g.eventBus.emit(`ui:play-button:${this.eventHandle}:pointover`, { item: this, scene: this.scene });
     }
 
     pointerOut() {
-        this.image.setTexture(this.imageKey);
-        this.scene.g.eventBus.emit(`ui:play-button:${this.eventHandle}:pointout`, { button: this, scene: this.scene });
+        this.scene.g.eventBus.emit(`ui:play-button:${this.eventHandle}:pointout`, { item: this, scene: this.scene });
+    }
+
+    getDimensions() {
+      if (this.visible) {
+          return {
+              width: this.image.width || 0,
+              height: this.image.height || 0
+          };
+      } else {
+          return {width: 0, height: 0};
+      }
+    }
+
+    setVisible(visible) {
+      this.visible = visible;
+      this.image.setVisible(visible);
+    }
+
+    setPosition(x, y) {
+        // Store the new position
+        this.x = x;
+        this.y = y;
+        //update the positions
+        this.image.x = x;
+        this.image.y = y;
     }
 
     validateOptions(options) {

@@ -103,6 +103,15 @@ class AudioManager {
             console.warn(`Error playing sound effect ${key}:`, error);
         }
     }
+
+    stopDialog(sceneId,voiceKey) {
+        const key = `dialog-${sceneId}-${voiceKey}`
+        try {
+            this.voiceAudios[key].stop();
+        } catch (error) {
+            console.warn(`Error stopping sound effect ${key}:`, error);
+        }
+    }
     
     playBgm () {
         if (this.bgMusic && !this.bgMusic.isPlaying) {

@@ -55,8 +55,7 @@ class GameScene extends BaseScene {
         this.g.eventBus.on('ui:button:dialog-choice-3:pointerdown',this.dialogChoice3);
         this.g.eventBus.on('ui:button:dialog-choice-4:pointerdown',this.dialogChoice4);
         this.g.eventBus.on('ui:button:dialog-choice-5:pointerdown',this.dialogChoice5);
-        this.g.eventBus.on('ui:button:dialog-play:pointerdown',this.dialogPlay);
-        this.g.eventBus.on('ui:button:dialog-stop:pointerdown',this.dialogStop);
+        this.g.eventBus.on('ui:play-button:dialog-play:pointerdown',this.dialogAudioAction);
     }
 
 
@@ -88,11 +87,20 @@ class GameScene extends BaseScene {
         ev.scene.g.audio.playSoundEffect('click')
         ev.scene.dialogManager.advance('choice',5); 
     }
+    
+    dialogAudioAction(ev){
+        if (ev.action === 'play') {
+            ev.scene.dialogPlay(ev);
+        } else if (ev.action === 'pause') {
+            ev.scene.dialogPause(ev);
+        } else if (ev.action === 'stop') {
+            ev.scene.dialogStop(ev);
+        }
+    }
+
     dialogPlay(ev) {
-        console.log('playDialog')
         const audioKey = ev.scene.dialogManager.dialogNode.audio
         if (audioKey){
-        
             // Set up event listeners before playing
             //this.currentAudio.once('complete', this.onAudioComplete, this);
 
@@ -116,7 +124,10 @@ class GameScene extends BaseScene {
         }
     }
     dialogStop(ev) {
-        console.log('dialogStop')
+        ev.item.setStop()
+        const sceneId = ev.scene.g.saves.get('sceneId');
+        const audioKey = ev.scene.dialogManager.dialogNode.audio
+        ev.scene.g.audio.stopDialog(sceneId, audioKey)
     }
 
     openSettings(ev) {

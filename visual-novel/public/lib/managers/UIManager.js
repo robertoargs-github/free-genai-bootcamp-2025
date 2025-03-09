@@ -51,4 +51,9 @@ class UIManager {
         const message = new UIMessage(this.scene, options);
         return message;
     }
+
+    createPlayButton(options) {
+        const playButton = new UIPlayButton(this.scene, options);
+        return playButton;
+    }
 }
