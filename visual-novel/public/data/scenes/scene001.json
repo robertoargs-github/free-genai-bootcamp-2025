@@ -12,10 +12,10 @@
             "words": [
                 {"word": "あなた","start": 0.031,"end": 0.554},
                 {"word": "は","start": 0.554,"end": 0.835},
-                {"word": "新しい","start": 0.835,"end": 1.479}
+                {"word": "新しい","start": 0.835,"end": 1.479},
                 {"word": "アパート","start": 1.479,"end": 1.841},
                 {"word": "に","start": 1.841,"end": 1.961},
-                {"word": "おり","start": 1.961,"end": 2.786},
+                {"word": "おり, ","start": 1.961,"end": 2.786},
                 {"word": "朝日","start": 2.786,"end": 3.047},
                 {"word": "の","start": 3.047,"end": 3.288},
                 {"word": "光","start": 3.288,"end": 3.509},
@@ -28,7 +28,7 @@
                 {"word": "ように","start": 4.897,"end": 5.641},
                 {"word": "あなた","start": 5.641,"end": 6.023},
                 {"word": "は","start": 6.023,"end": 6.143},
-                {"word": "起きた","start": 6.143,"end": 6.666}
+                {"word": "起きた。","start": 6.143,"end": 6.666}
             ],
             "english": "You wake up in your new apartment in Japan. The morning sunlight streams through the blinds as you hear someone in the kitchen.",
             "default_next_id": "001"
