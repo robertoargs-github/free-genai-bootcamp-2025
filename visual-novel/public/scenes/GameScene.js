@@ -4,6 +4,16 @@ class GameScene extends BaseScene {
     }
 
     create() {
+        this.isReady = false
+        console.log('yeee!')
+        //this.g.audio.stopBgm(this.ready.bind(this))
+        this.ready()
+    }
+
+    ready(){
+        console.log('ready!')
+        this.isReady = true
+        console.log('ready!')
         this.cameras.main.fadeIn(600, 0, 0, 0)
 
         this.g.audio.updateScene(this);
@@ -39,8 +49,30 @@ class GameScene extends BaseScene {
 
         //this.startGame(); // Start the story/dialog flow
         super.create();
+
+        this.loadTransition(OpenEyesPostFxPipeline)
+        this.playTransition()
     }
 
+    loadTransition(postFxPipeline){
+        this.renderer.pipelines.addPostPipeline(postFxPipeline.name, postFxPipeline);
+        this.cameras.main.setPostPipeline(postFxPipeline);
+    }
+
+    playTransition(){
+        const pipeline = this.cameras.main.getPostPipeline(OpenEyesPostFxPipeline.name);
+        pipeline.edgeBlurAmount = 1.5;  // Strong edge blur
+        pipeline.openAmount = 0;   
+        this.tweens.add({
+            targets: pipeline,
+            openAmount: 1, // Open the eye
+            duration: 1000, 
+            ease: 'Cubic.easeOut', // Use any easing function
+            onComplete: () => {
+                console.log('Eye opening complete');
+            }
+        });
+    }
 
     registerEvents() {
         this.g.eventBus.on('ui:button:gm-quick-save:pointerdown',this.quickSave);
@@ -188,12 +220,7 @@ class GameScene extends BaseScene {
     }
 
     update() {
+        if (!this.isReady) {return }
         this.uiDialog.update();
-        // Let each manager update its state
-        //this.dialogManager.update();
-        //this.inputManager.update();
-        //this.uiManager.update();
-        //this.audioManager.update();
-        //this.characterManager.update();
     }
 }

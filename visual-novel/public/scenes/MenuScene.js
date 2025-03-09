@@ -69,28 +69,9 @@ class MenuScene extends BaseScene {
         this.uiSettings.create();
         this.uiSettings.hide();
         super.create();
-
-        //const postFxPipeline = OpeningBarsPostFxPipeline
-        const postFxPipeline = OpenEyesPostFxPipeline
-        this.loadTransition(postFxPipeline)
     }
 
-    loadTransition(postFxPipeline){
-        this.renderer.pipelines.addPostPipeline(postFxPipeline.name, postFxPipeline);
-        this.cameras.main.setPostPipeline(postFxPipeline);
-        const pipeline = this.cameras.main.getPostPipeline(postFxPipeline.name);
-        pipeline.edgeBlurAmount = 1.5;  // Strong edge blur
-        pipeline.openAmount = 0;   
-        this.tweens.add({
-            targets: pipeline,
-            openAmount: 1, // Open the eye
-            duration: 1000, 
-            ease: 'Cubic.easeOut', // Use any easing function
-            onComplete: () => {
-                console.log('Eye opening complete');
-            }
-        });
-    }
+
 
     registerEvents() {
         this.g.eventBus.on('ui:button:new-game:pointerdown',this.startGame);

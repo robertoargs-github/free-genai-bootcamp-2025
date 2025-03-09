@@ -35,8 +35,6 @@ class AudioManager {
         }
     }
 
-
-
     createSfxAudios () {
         try {
             for (const audioAsset of window.audioAssets) {
@@ -57,6 +55,7 @@ class AudioManager {
                 volume,
                 loop: true
             });
+
         } catch (error) {
             console.error('Error setting up background music:', error);
         }
@@ -108,14 +107,51 @@ class AudioManager {
     }
     
     playBgm () {
+        const volume = this.g.settings.get('bgmVolume');
         if (this.bgMusic && !this.bgMusic.isPlaying) {
+            // Start with volume at 0
+            this.bgMusic.setVolume(0);
             this.bgMusic.play();
+            
+            // Create a proxy object for the tween to modify
+            const volumeControl = { value: 0 };
+            
+            this.scene.tweens.add({
+                targets: volumeControl,
+                value: volume,
+                duration: 2500,
+                onUpdate: () => {
+                    // Update the actual volume on each tween step
+                    this.bgMusic.setVolume(volumeControl.value);
+                },
+                onComplete: () => { 
+                    // Ensure final volume is set correctly
+                    this.bgMusic.setVolume(volume);
+                }
+            });
         }
     }
 
-    stopBgm() {
+    stopBgm(onAfterComplete) {
         if (this.bgMusic && this.bgMusic.isPlaying) {
-            this.bgMusic.stop();
+            // Create a proxy object for the tween to modify
+            const volumeControl = { value: this.bgMusic.volume };
+            console.log(volumeControl)
+            
+            this.scene.tweens.add({
+                targets: volumeControl,
+                value: 0,  // Fade to silence
+                duration: 2500,  // Match your fade-in duration or adjust as needed
+                onUpdate: () => {
+                    // Update the actual volume on each tween step
+                    this.bgMusic.setVolume(volumeControl.value);
+                },
+                onComplete: () => { 
+                    this.bgMusic.stop();
+                    console.log('done bgstop');
+                    onAfterComplete()
+                }
+            });
         }
     }
     
