@@ -148,6 +148,10 @@ class DialogManager {
         return this.dialogNode.japanese;
     }
 
+    getJapaneseTextWords(){
+        return this.dialogNode.words;
+    }
+
     getEnglishText(){
         return this.dialogNode.english;
     }

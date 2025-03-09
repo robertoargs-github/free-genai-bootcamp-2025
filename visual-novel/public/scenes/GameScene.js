@@ -112,7 +112,7 @@ class GameScene extends BaseScene {
             let audioTimeUpdateEvent = ev.scene.time.addEvent({
                 delay: 50,
                 callback: function(){
-                    ev.scene.g.eventBus.emit('ui:sentence:update-highlighting');
+                    ev.scene.g.eventBus.emit('ui:sentence:update-highlighting', { dialogAudio: dialogAudio });
                 },
                 callbackScope: ev.scene,
                 loop: true
@@ -124,7 +124,7 @@ class GameScene extends BaseScene {
                     audioTimeUpdateEvent.remove();
                     audioTimeUpdateEvent = null;
                 }
-                ev.scene.g.eventBus.emit('ui:sentence:clear-highlighting');
+                ev.scene.g.eventBus.emit('ui:sentence:reset-highlighting');
                 ev.item.setStop()
             }
             dialogAudio.on('complete',onAudioComplete)

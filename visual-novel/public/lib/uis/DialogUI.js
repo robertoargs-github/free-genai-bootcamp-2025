@@ -40,14 +40,13 @@ class DialogUI  extends BaseUI {
         attrs.name = this.d.getSpeakerName();
         switch(this.scene.g.settings.get('language')) { 
             case 'japanese':
-                attrs.japaneseText = this.d.getJapaneseText();
-                break;
-            case 'english':
-                attrs.englishText = this.d.getEnglishText();
+                attrs.mainText = this.d.getJapaneseText();
+                attrs.mainTextWords = this.d.getJapaneseTextWords();
                 break;
             case 'dual':
-                attrs.japaneseText = this.d.getJapaneseText();
-                attrs.englishText = this.d.getEnglishText();
+                attrs.mainText = this.d.getJapaneseText();
+                attrs.mainTextWords = this.d.getJapaneseTextWords();
+                attrs.subText = this.d.getEnglishText();
                 break;
             default:
                 // raise error

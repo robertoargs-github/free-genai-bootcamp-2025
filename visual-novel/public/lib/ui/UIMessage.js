@@ -14,8 +14,9 @@ class UIMessage extends UIItem{
 
         const width = this.scene.cameras.main.width;
         this.maxWidth = width / 2;
-        this.japaneseText = null;
-        this.englishText = null;
+        this.mainText = null;
+        this.mainTextWords = null;
+        this.subText = null;
         this.nameText = null;
         this.create();
     }
@@ -23,42 +24,26 @@ class UIMessage extends UIItem{
     create() {
         this.createBubble();
         this.createNameText();
-        this.createJapaneseText();
-        this.createEnglishText();
+        this.createMainText();
+        this.createMainTextWithHighlighting();
+        this.createSubText();
         this.createPlayButton();
+        this.registerEvents();
     }
 
     registerEvents() {
-        this.g.eventBus.on('ui:sentence:reset-highlighting', this.resetHighlighting, this);
-        this.g.eventBus.on('ui:sentence:update-highlighting', this.updateHighlighting, this);
+        this.scene.g.eventBus.on('ui:sentence:update-highlighting', this.updateHighlighting, this);
+        this.scene.g.eventBus.on('ui:sentence:reset-highlighting', this.resetHighlighting, this);
     }
 
     // Update word highlighting based on current audio time
-    updateHighlighting() {
-        if (!this.isPlaying || !this.currentAudio) return;
-        
-        const currentTime = this.currentAudio.seek;
-        
-        // Check each word's time range
-        for (let i = 0; i < this.wordsData.length; i++) {
-          const wordData = this.wordsData[i];
-          const wordObject = this.words[i];
-          
-          // If current time is within this word's time range
-          if (currentTime >= wordData.start && currentTime <= wordData.end) {
-            wordObject.setColor(this.highlightColor);
-          } else {
-            wordObject.setColor(this.normalColor);
-          }
-        }
-      }
+    updateHighlighting(ev) {
+        const currentTime = ev.dialogAudio.seek;
+        this.mainTextWithHighlighting.highlightWord(currentTime);
+    }
 
     resetHighlighting() {
-        for (let i = 0; i < this.words.length; i++) {
-            if (i < this.wordsData.length) {
-            this.words[i].setColor(this.normalColor);
-            }
-        }
+        this.mainTextWithHighlighting.resetHighlighting();
     }
 
     setPosition(x, y) {
@@ -69,19 +54,31 @@ class UIMessage extends UIItem{
 
     update(options){
         this.nameText.setText(options.name);
-        if (options.japaneseText) {
-            this.japaneseText.setText(options.japaneseText);
-            this.japaneseText.setVisible(true);
+        if (options.mainText) {
+            if (options.mainTextWords) {
+                this.mainTextWithHighlighting.setVisible(true)
+                this.mainTextWithHighlighting.set(options.mainTextWords);
+                this.mainText.setText(options.mainText);
+                this.mainText.setVisible(false);
+            } else {
+                this.mainTextWithHighlighting.setVisible(false)
+                this.mainTextWithHighlighting.clear();
+                this.mainText.setText(options.mainText);
+                this.mainText.setVisible(true);
+            }
+
         } else {
-            this.japaneseText.setText('');
-            this.japaneseText.setVisible(false);
+            this.mainText.setText('');
+            this.mainText.setVisible(false);
         }
-        if (options.englishText) {
-            this.englishText.setText(options.englishText);
-            this.englishText.setVisible(true);
+        
+        // there is subText show it, if not hide it
+        if (options.subText) {
+            this.subText.setText(options.subText);
+            this.subText.setVisible(true);
         } else {
-            this.englishText.setText('');
-            this.englishText.setVisible(false);
+            this.subText.setText('');
+            this.subText.setVisible(false);
         }
         this.bubblePanel.autoResizePanel();
     }
@@ -121,9 +118,9 @@ class UIMessage extends UIItem{
         this.bubblePanel.addItem(this.nameText);
     }
 
-    createJapaneseText() {
+    createMainText() {
         const width = this.scene.cameras.main.width * 0.8;
-        this.japaneseText = this.scene.g.ui.createLabel({
+        this.mainText = this.scene.g.ui.createLabel({
             position: [0,0],
             text: '',
             style: {
@@ -133,12 +130,20 @@ class UIMessage extends UIItem{
                 wordWrap: { width: width, useAdvancedWrap: true }
             }
         });
-        this.bubblePanel.addItem(this.japaneseText);
+        this.bubblePanel.addItem(this.mainText);
     }
 
-    createEnglishText() {
+    createMainTextWithHighlighting() {
         const width = this.scene.cameras.main.width * 0.8;
-        this.englishText = this.scene.g.ui.createLabel({
+        this.mainTextWithHighlighting = new UISentence(this.scene,{
+            wordWrap: width
+        })
+        this.bubblePanel.addItem(this.mainTextWithHighlighting);
+    }
+
+    createSubText() {
+        const width = this.scene.cameras.main.width * 0.8;
+        this.subText = this.scene.g.ui.createLabel({
             position: [0,0],
             text: '',
             style: {
@@ -148,7 +153,7 @@ class UIMessage extends UIItem{
                 wordWrap: { width: width, useAdvancedWrap: true }
             }
         });
-        this.bubblePanel.addItem(this.englishText);
+        this.bubblePanel.addItem(this.subText);
     }
 
      /**
