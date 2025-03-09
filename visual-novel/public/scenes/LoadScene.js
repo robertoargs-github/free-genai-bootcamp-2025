@@ -6,7 +6,6 @@ class LoadScene extends BaseScene {
   }
 
   init(data) {
-    console.log('LoadScene init', data)
     this.sceneId = data.sceneId
     this.dialogData = data.dialogData
   }

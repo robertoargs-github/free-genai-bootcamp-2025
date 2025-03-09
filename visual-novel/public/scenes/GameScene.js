@@ -100,16 +100,16 @@ class GameScene extends BaseScene {
 
     dialogPlay(ev) {
         const audioKey = ev.scene.dialogManager.dialogNode.audio
+        const sceneId = ev.scene.g.saves.get('sceneId');
         if (audioKey){
-            // Set up event listeners before playing
-            //this.currentAudio.once('complete', this.onAudioComplete, this);
+            const dialogAudio = ev.scene.g.audio.getDialog(sceneId, audioKey)
 
             // Reset all word colors
             ev.scene.g.eventBus.emit('ui:sentence:reset-highlighting');
 
             // Set up time update using a timer event
             // Check every 50ms for better accuracy with word timing
-            ev.scene.g.audio.audioTimeUpdateEvent = ev.scene.time.addEvent({
+            let audioTimeUpdateEvent = ev.scene.time.addEvent({
                 delay: 50,
                 callback: function(){
                     ev.scene.g.eventBus.emit('ui:sentence:update-highlighting');
@@ -117,9 +117,19 @@ class GameScene extends BaseScene {
                 callbackScope: ev.scene,
                 loop: true
             });
+    
+            // Called when audio completes playing
+            const onAudioComplete = () => {
+                if (audioTimeUpdateEvent) {
+                    audioTimeUpdateEvent.remove();
+                    audioTimeUpdateEvent = null;
+                }
+                ev.scene.g.eventBus.emit('ui:sentence:clear-highlighting');
+                ev.item.setStop()
+            }
+            dialogAudio.on('complete',onAudioComplete)
 
-            console.log('dialogPlay')
-            const sceneId = ev.scene.g.saves.get('sceneId');
+
             ev.scene.g.audio.playDialog(sceneId, audioKey)
         }
     }

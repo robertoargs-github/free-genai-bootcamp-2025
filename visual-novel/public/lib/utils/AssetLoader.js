@@ -68,7 +68,6 @@ class AssetLoader {
                 continue;
             }
             const key = `dialog-${audio[0]}-${audio[1]}`;
-            console.log('loadassetvoice:',key);
             this.scene.load.audio(key, `assets/audio/dialog/${audio[0]}/${audio[1]}.wav`);
         }
     }

@@ -9,7 +9,6 @@ class AudioManager {
         this.bgMusic = null;
         this.sfxAudios = {};
         this.voiceAudios = {};
-        this.audioTimeUpdateEvent = null; // to track when audio is playing
         this.soundEffects = {
             click: null,
             transition: null
@@ -21,27 +20,22 @@ class AudioManager {
         this.createSfxAudios();
     }
 
+
+    getDialog(sceneId,voiceKey){
+        const key = `dialog-${sceneId}-${voiceKey}`
+        return this.voiceAudios[key];
+    }
+
     createDialog(dialogKeys){
         this.voiceAudios = {};
         const volume = this.g.settings.get('voiceVolume');
         for (const dialogKey of dialogKeys) {
-            const audio = this.scene.sound.add(dialogKey,{ volume});
+            let audio = this.scene.sound.add(dialogKey,{volume});
             this.voiceAudios[dialogKey] = audio;
         }
     }
 
-    
-    // Called when audio completes playing
-    onAudioComplete() {
-        if (this.audioTimeUpdateEvent) {
-          this.audioTimeUpdateEvent.remove();
-          this.audioTimeUpdateEvent = null;
-        }
-        
-        this.g.eventBus.emit('ui:sentence:clear-highlighting');
-        this.resetWordColors();
-        this.isPlaying = false;
-      }
+
 
     createSfxAudios () {
         try {

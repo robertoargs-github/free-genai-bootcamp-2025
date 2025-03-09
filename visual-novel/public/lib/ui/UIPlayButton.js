@@ -35,7 +35,6 @@ class UIPlayButton extends UIItem {
       this.imagePlayKey = options.image || 'play-button';
       this.imagePauseKey = options.image_pause || 'pause-button';
       this.imageStopKey = options.image_stop || 'stop-button';
-      console.log('imagekey', this.imagePlayKey)
 
       this.image = this.scene.add.image(this.x, this.y, this.imagePlayKey)
       this.image.setOrigin(0, 0) // Set origin to top-left
