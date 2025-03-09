@@ -103,39 +103,23 @@ class UIButton extends UIItem {
         }
     }
 
+    /**
+     * Validates the options passed to the constructor
+     * @param {object} options - The options to validate
+     */
     validateOptions(options) {
-        // validate text if provided
-        if (options.text !== undefined && typeof options.text !== 'string') {
-            throw new Error('Text must be a string');
-        }
-
-        // validate size
-        if (!options.size) {
-            throw new Error('Size is required');
-            // validate is array, array is two cells and both are intergers
-            if (!Array.isArray(options.size) || options.size.length !== 2 ||
-                typeof options.size[0] !== 'number' || typeof options.size[1] !== 'number') {
-                    throw new Error('Size must be an array of two numbers');
-                }
-
-        }
-        // validate position
-        if (!options.position) {
-            throw new Error('Position is required');
-            // validate is array, array is two cells and both are intergers
-            if (!Array.isArray(options.position) || options.position.length !== 2 ||
-                typeof options.position[0] !== 'number' || typeof options.position[1] !== 'number') {
-                    throw new Error('Position must be an array of two numbers');
-                }
-        }
-        // validate eventHandle
-        if (!options.eventHandle) {
-            throw new Error('Event handle is required');
-            // validate is string
-            if (typeof options.eventHandle !== 'string') {
-                throw new Error('Event handle must be a string');
-            }
-        }
+        OptsValidator.validate(options, {
+            text: { type: 'string' },
+            position: { type: 'position', required: true },
+            size: { type: 'size', required: true },
+            eventHandle: { type: 'string', required: true },
+            backgroundColor: { type: 'string' },
+            textColor: { type: 'string' },
+            hoverColor: { type: 'string' },
+            textStyle: { type: 'object' },
+            visible: { type: 'boolean' },
+            disabled: { type: 'boolean' }
+        });
     }
 
     setText(text){

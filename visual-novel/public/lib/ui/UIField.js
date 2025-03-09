@@ -76,9 +76,6 @@ class UIField extends UIItem{
             case 'button':
                 this.input = new UIButton(this.scene, this.inputOptions);
                 break;
-            case 'message':
-                this.input = new UIMessage(this.scene, this.inputOptions);
-                break;
             default:
                 console.warn(`Input type '${this.inputType}' not supported`);
                 break;
@@ -150,28 +147,25 @@ class UIField extends UIItem{
      * Validate the options passed to the constructor
      * @param {object} options - The options object
      */
+    /**
+     * Validates the options passed to the constructor
+     * @param {object} options - The options to validate
+     */
     validateOptions(options) {
-        // Validate label if provided
-        if (options.label !== undefined && typeof options.label !== 'string') {
-            throw new Error('Label text must be a string');
-        }
-        
-        // Validate position
-        if (!options.position) {
-            throw new Error('Position is required');
-        }
-        if (!Array.isArray(options.position) || options.position.length !== 2 ||
-            typeof options.position[0] !== 'number' || typeof options.position[1] !== 'number') {
-            throw new Error('Position must be an array of two numbers');
-        }
-        
-        // Validate input type
-        if (!options.inputType) {
-            throw new Error('Input type is required');
-        }
-        if (typeof options.inputType !== 'string') {
-            throw new Error('Input type must be a string');
-        }
+        OptsValidator.validate(options, {
+            label: { type: 'string' },
+            position: { type: 'position', required: true },
+            inputType: { 
+                type: 'oneOf', 
+                required: true,
+                values: ['toggle', 'slider', 'textinput', 'button']
+            },
+            initialValue: { type: 'string' },
+            placeholder: { type: 'string' },
+            required: { type: 'boolean' },
+            labelStyle: { type: 'object' },
+            inputStyle: { type: 'object' }
+        });
     }
 
     getDimensions() {

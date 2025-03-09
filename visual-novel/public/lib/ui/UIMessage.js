@@ -154,15 +154,18 @@ class UIMessage extends UIItem{
         this.bubblePanel.addItem(this.englishText);
     }
 
+     /**
+     * Validates the options passed to the constructor
+     * @param {object} options - The options to validate
+     */
     validateOptions(options) {
-        // Validate position
-        if (!options.position) {
-            throw new Error('Position is required');
-        }
-        if (!Array.isArray(options.position) || options.position.length !== 2 ||
-            typeof options.position[0] !== 'number' || typeof options.position[1] !== 'number') {
-            throw new Error('Position must be an array of two numbers');
-        }
+        OptsValidator.validate(options, {
+            position: { type: 'position', required: true },
+            size: { type: 'size' },
+            backgroundImage: { type: 'string' },
+            textStyle: { type: 'object' },
+            padding: { type: 'number' }
+        });
     }
 
     getDimensions() {

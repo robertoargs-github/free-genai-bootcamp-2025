@@ -274,54 +274,25 @@ class UIToggle extends UIItem {
      * @param {object} options 
      */
     validateOptions(options) {
-        // Validate values array
-        if (!options.values) {
-            throw new Error('Values array is required');
-        }
-        if (!Array.isArray(options.values) || options.values.length < 2) {
-            throw new Error('Values must be an array with at least 2 items');
-        }
-
-        // Validate initial index if provided
-        if (options.initialIndex !== undefined) {
-            if (typeof options.initialIndex !== 'number') {
-                throw new Error('Initial index must be a number');
+        // Use OptsValidator to validate all required options
+        OptsValidator.validate(options, {
+            values: { 
+                type: 'array', 
+                required: true, 
+                message: 'Values array is required',
+                minLength: 2,
+                minLengthMessage: 'Values must be an array with at least 2 items'
+            },
+            position: { type: 'position', required: true },
+            size: { type: 'size', required: true },
+            eventHandle: { type: 'string', required: true },
+            spacing: { type: 'number' },
+            initialIndex: { 
+                type: 'indexInBounds', 
+                arrayKey: 'values',
+                message: 'Initial index must be between 0 and the last index of values array'
             }
-            if (options.initialIndex < 0 || options.initialIndex >= options.values.length) {
-                throw new Error(`Initial index must be between 0 and ${options.values.length - 1}`);
-            }
-        }
-
-        // Validate size
-        if (!options.size) {
-            throw new Error('Size is required');
-        }
-        if (!Array.isArray(options.size) || options.size.length !== 2 ||
-            typeof options.size[0] !== 'number' || typeof options.size[1] !== 'number') {
-            throw new Error('Size must be an array of two numbers');
-        }
-
-        // Validate position
-        if (!options.position) {
-            throw new Error('Position is required');
-        }
-        if (!Array.isArray(options.position) || options.position.length !== 2 ||
-            typeof options.position[0] !== 'number' || typeof options.position[1] !== 'number') {
-            throw new Error('Position must be an array of two numbers');
-        }
-
-        // Validate eventHandle
-        if (!options.eventHandle) {
-            throw new Error('Event handle is required');
-        }
-        if (typeof options.eventHandle !== 'string') {
-            throw new Error('Event handle must be a string');
-        }
-
-        // Validate spacing if provided
-        if (options.spacing !== undefined && typeof options.spacing !== 'number') {
-            throw new Error('Spacing must be a number');
-        }
+        });
     }
     
     /**

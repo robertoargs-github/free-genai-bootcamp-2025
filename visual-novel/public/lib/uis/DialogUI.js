@@ -54,7 +54,7 @@ class DialogUI  extends BaseUI {
                 console.error('Invalid language setting:', this.scene.g.settings.get('language'));
                 break;
         }
-        this.message.input.update(attrs);
+        this.message.update(attrs);
     }
 
     updateChoicesText(){
@@ -119,8 +119,7 @@ class DialogUI  extends BaseUI {
     }
 
     createMessage(){
-        this.message = this.uim.createField({
-            inputType: 'message',
+        this.message = this.uim.createMessage({
             position: [0,0], // the container is will override the position
             inputOptions: {}
         });
