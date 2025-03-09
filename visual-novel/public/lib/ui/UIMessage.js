@@ -80,6 +80,12 @@ class UIMessage extends UIItem{
             this.subText.setText('');
             this.subText.setVisible(false);
         }
+        const audioKey = this.scene.dialogManager.dialogNode.audio
+        if (audioKey) {
+            this.playButton.setVisible(true)
+        } else {
+            this.playButton.setVisible(false)
+        }
         this.bubblePanel.autoResizePanel();
     }
 
