@@ -25,31 +25,23 @@ class UIButton extends UIItem {
         // Store text (which may be empty string if not provided)
         this.buttonText = options.text || '';
         
-        options.image = options.image || 'button';
-        options.image_hover = options.image_hover || 'button-hover';
+        this.imageKey = options.image || 'button';
+        this.imageHoverKey = options.image_hover || 'button-hover';
+
+        this.eventHandle = options.eventHandle || 'default';
 
         // Create the button image with top-left positioning
-        this.image = this.scene.add.image(options.position[0], options.position[1], options.image)
+        this.image = this.scene.add.image(options.position[0], options.position[1], this.imageKey)
         //this.image.setDisplaySize(options.size[0], options.size[1])
         this.image.setOrigin(0, 0) // Set origin to top-left
         this.image.setInteractive({ useHandCursor: true })
-        this.image.on('pointerover', () => {
-            this.image.setTexture(options.image_hover);
-            this.scene.g.eventBus.emit(`ui:button:${options.eventHandle}:pointover`, { button: this, scene: this.scene });
-        })
-        this.image.on('pointerout', () => {
-            this.image.setTexture(options.image);
-            this.scene.g.eventBus.emit(`ui:button:${options.eventHandle}:pointout`, { button: this, scene: this.scene });
-        })
-        this.image.on('pointerdown', () => {
-            this.scene.g.eventBus.emit(`ui:button:${options.eventHandle}:pointdown`, { button: this, scene: this.scene });
-        });
+        this.image.on('pointerover', this.pointerOver,this)
+        this.image.on('pointerout', this.pointerOut,this)
+        this.image.on('pointerdown', this.pointerDown,this)
+        this.image.on('pointerup', this.pointerUp,this)
             
         // Create the text with proper positioning (if text was provided)
         // Position text to be centered within the button
-        
-
-
         const txtPos = this.alignTextPosition(
             options.position[0],
             options.position[1],
@@ -80,6 +72,24 @@ class UIButton extends UIItem {
         }
         txtY = y + (height / 2)
         return {x: txtX, y: txtY, origin: {x: originX, y: originY}}
+    }
+
+    pointerDown() {
+        this.scene.g.eventBus.emit(`ui:button:${this.eventHandle}:pointerdown`, { button: this, scene: this.scene });
+    }
+
+    pointerUp() {
+        this.scene.g.eventBus.emit(`ui:button:${this.eventHandle}:pointerup`, { button: this, scene: this.scene });
+    }
+
+    pointerOver() {
+        this.image.setTexture(this.imageHoverKey);
+        this.scene.g.eventBus.emit(`ui:button:${this.eventHandle}:pointover`, { button: this, scene: this.scene });
+    }
+
+    pointerOut() {
+        this.image.setTexture(this.imageKey);
+        this.scene.g.eventBus.emit(`ui:button:${this.eventHandle}:pointout`, { button: this, scene: this.scene });
     }
 
     getDimensions() {

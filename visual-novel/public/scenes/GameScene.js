@@ -43,19 +43,20 @@ class GameScene extends BaseScene {
 
 
     registerEvents() {
-        this.g.eventBus.on('ui:button:gm-quick-save:pointdown',this.quickSave);
-        this.g.eventBus.on('ui:button:gm-save:pointdown',this.save);
-        this.g.eventBus.on('ui:button:gm-load:pointdown',this.load);
-        this.g.eventBus.on('ui:button:gm-settings:pointdown',this.openSettings);
-        this.g.eventBus.on('ui:button:settings-close:pointdown',this.closeSettings);
-        this.g.eventBus.on('ui:button:dialog-next:pointdown',this.dialogNext);
-        this.g.eventBus.on('ui:button:dialog-choice-0:pointdown',this.dialogChoice0);
-        this.g.eventBus.on('ui:button:dialog-choice-1:pointdown',this.dialogChoice1);
-        this.g.eventBus.on('ui:button:dialog-choice-2:pointdown',this.dialogChoice2);
-        this.g.eventBus.on('ui:button:dialog-choice-3:pointdown',this.dialogChoice3);
-        this.g.eventBus.on('ui:button:dialog-choice-4:pointdown',this.dialogChoice4);
-        this.g.eventBus.on('ui:button:dialog-choice-5:pointdown',this.dialogChoice5);
-        this.g.eventBus.on('ui:button:dialog-play:pointdown',this.dialogPlay);
+        this.g.eventBus.on('ui:button:gm-quick-save:pointerdown',this.quickSave);
+        this.g.eventBus.on('ui:button:gm-save:pointerdown',this.save);
+        this.g.eventBus.on('ui:button:gm-load:pointerdown',this.load);
+        this.g.eventBus.on('ui:button:gm-settings:pointerdown',this.openSettings);
+        this.g.eventBus.on('ui:button:settings-close:pointerdown',this.closeSettings);
+        this.g.eventBus.on('ui:button:dialog-next:pointerdown',this.dialogNext);
+        this.g.eventBus.on('ui:button:dialog-choice-0:pointerdown',this.dialogChoice0);
+        this.g.eventBus.on('ui:button:dialog-choice-1:pointerdown',this.dialogChoice1);
+        this.g.eventBus.on('ui:button:dialog-choice-2:pointerdown',this.dialogChoice2);
+        this.g.eventBus.on('ui:button:dialog-choice-3:pointerdown',this.dialogChoice3);
+        this.g.eventBus.on('ui:button:dialog-choice-4:pointerdown',this.dialogChoice4);
+        this.g.eventBus.on('ui:button:dialog-choice-5:pointerdown',this.dialogChoice5);
+        this.g.eventBus.on('ui:button:dialog-play:pointerdown',this.dialogPlay);
+        this.g.eventBus.on('ui:button:dialog-stop:pointerdown',this.dialogStop);
     }
 
 
@@ -113,7 +114,9 @@ class GameScene extends BaseScene {
             const sceneId = ev.scene.g.saves.get('sceneId');
             ev.scene.g.audio.playDialog(sceneId, audioKey)
         }
-
+    }
+    dialogStop(ev) {
+        console.log('dialogStop')
     }
 
     openSettings(ev) {

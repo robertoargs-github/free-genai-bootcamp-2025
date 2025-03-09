@@ -72,19 +72,19 @@ class MenuScene extends BaseScene {
     }
 
     registerEvents() {
-        this.g.eventBus.on('ui:button:new-game:pointdown',this.startGame);
-        this.g.eventBus.on('ui:button:continue:pointdown',this.continueGame);
-        this.g.eventBus.on('ui:button:load:pointdown',this.loadGame);
-        this.g.eventBus.on('ui:button:settings:pointdown',this.openSettings);
-        this.g.eventBus.on('ui:button:settings-close:pointdown',this.closeSettings);
+        this.g.eventBus.on('ui:button:new-game:pointerdown',this.startGame);
+        this.g.eventBus.on('ui:button:continue:pointerdown',this.continueGame);
+        this.g.eventBus.on('ui:button:load:pointerdown',this.loadGame);
+        this.g.eventBus.on('ui:button:settings:pointerdown',this.openSettings);
+        this.g.eventBus.on('ui:button:settings-close:pointerdown',this.closeSettings);
     }
 
     deregisterEvents() {
-        this.g.eventBus.off('ui:button:new-game:pointdown',this.startGame);
-        this.g.eventBus.off('ui:button:continue:pointdown',this.continueGame);
-        this.g.eventBus.off('ui:button:load:pointdown',this.loadGame);
-        this.g.eventBus.off('ui:button:settings:pointdown',this.openSettings);
-        this.g.eventBus.off('ui:button:settings-close:pointdown',this.closeSettings);
+        this.g.eventBus.off('ui:button:new-game:pointerdown',this.startGame);
+        this.g.eventBus.off('ui:button:continue:pointrdown',this.continueGame);
+        this.g.eventBus.off('ui:button:load:pointerdown',this.loadGame);
+        this.g.eventBus.off('ui:button:settings:pointerdown',this.openSettings);
+        this.g.eventBus.off('ui:button:settings-close:pointerdown',this.closeSettings);
     }
 
 
