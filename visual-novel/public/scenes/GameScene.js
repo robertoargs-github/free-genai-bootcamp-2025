@@ -3,13 +3,12 @@ class GameScene extends BaseScene {
         super({ key: 'Game' });
     }
 
-    create(data) {
+    create() {
         this.cameras.main.fadeIn(600, 0, 0, 0)
 
         this.g.audio.updateScene(this);
+        this.g.audio.create();
         this.g.ui.updateScene(this);
-
-        this.loadGame(data.slot)
 
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
@@ -18,6 +17,7 @@ class GameScene extends BaseScene {
 
         this.dialogManager = new DialogManager(this.g,this);
         this.dialogManager.create();
+        this.g.audio.createDialog(this.dialogManager.getAudioDialogs());
 
         this.backgroundManager = new BackgroundManager(this.g,this.dialogManager,this);
         this.backgroundManager.create();
@@ -41,13 +41,6 @@ class GameScene extends BaseScene {
         super.create();
     }
 
-    loadGame(slot){
-        if (slot == 'new'){
-            this.g.saves.new();   
-        } else {
-            this.g.save.load(slot)
-        }
-    }
 
     registerEvents() {
         this.g.eventBus.on('ui:button:gm-quick-save:pointdown',this.quickSave);
@@ -95,11 +88,32 @@ class GameScene extends BaseScene {
         ev.scene.dialogManager.advance('choice',5); 
     }
     dialogPlay(ev) {
+        console.log('playDialog')
         const audioKey = ev.scene.dialogManager.dialogNode.audio
         if (audioKey){
+        
+            // Set up event listeners before playing
+            //this.currentAudio.once('complete', this.onAudioComplete, this);
+
+            // Reset all word colors
+            ev.scene.g.eventBus.emit('ui:sentence:reset-highlighting');
+
+            // Set up time update using a timer event
+            // Check every 50ms for better accuracy with word timing
+            ev.scene.g.audio.audioTimeUpdateEvent = ev.scene.time.addEvent({
+                delay: 50,
+                callback: function(){
+                    ev.scene.g.eventBus.emit('ui:sentence:update-highlighting');
+                },
+                callbackScope: ev.scene,
+                loop: true
+            });
+
             console.log('dialogPlay')
-            ev.scene.g.audio.playSoundEffect(`dialog-${audioKey}`)
+            const sceneId = ev.scene.g.saves.get('sceneId');
+            ev.scene.g.audio.playDialog(sceneId, audioKey)
         }
+
     }
 
     openSettings(ev) {

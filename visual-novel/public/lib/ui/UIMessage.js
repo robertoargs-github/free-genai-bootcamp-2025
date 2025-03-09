@@ -28,6 +28,39 @@ class UIMessage extends UIItem{
         this.createPlayButton();
     }
 
+    registerEvents() {
+        this.g.eventBus.on('ui:sentence:reset-highlighting', this.resetHighlighting, this);
+        this.g.eventBus.on('ui:sentence:update-highlighting', this.updateHighlighting, this);
+    }
+
+    // Update word highlighting based on current audio time
+    updateHighlighting() {
+        if (!this.isPlaying || !this.currentAudio) return;
+        
+        const currentTime = this.currentAudio.seek;
+        
+        // Check each word's time range
+        for (let i = 0; i < this.wordsData.length; i++) {
+          const wordData = this.wordsData[i];
+          const wordObject = this.words[i];
+          
+          // If current time is within this word's time range
+          if (currentTime >= wordData.start && currentTime <= wordData.end) {
+            wordObject.setColor(this.highlightColor);
+          } else {
+            wordObject.setColor(this.normalColor);
+          }
+        }
+      }
+
+    resetHighlighting() {
+        for (let i = 0; i < this.words.length; i++) {
+            if (i < this.wordsData.length) {
+            this.words[i].setColor(this.normalColor);
+            }
+        }
+    }
+
     setPosition(x, y) {
         this.x = x;
         this.y = y;

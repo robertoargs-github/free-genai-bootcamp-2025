@@ -6,6 +6,7 @@ window.onload = function() {
     // Add all scenes to the game
     game.scene.add('Boot', BootScene);
     game.scene.add('Preload', PreloadScene);
+    game.scene.add('Load', LoadScene);
     game.scene.add('Menu', MenuScene);
     game.scene.add('Game', GameScene);
     

@@ -6,10 +6,10 @@ class MenuScene extends BaseScene {
     create() {
         // Set up audio
         this.g.audio.updateScene(this);
-        this.g.audio.createBgm();
+        this.g.audio.create();
         this.g.audio.playBgm();
 
-        // Set up UI
+        // Set up U
         this.g.ui.updateScene(this);
 
         // Get screen dimensions
@@ -89,22 +89,29 @@ class MenuScene extends BaseScene {
 
 
     startGame(ev) {
+        ev.scene.g.saves.new();   
         ev.scene.g.audio.playSoundEffect('click')
         ev.scene.cameras.main.fadeOut(300, 0, 0, 0)
         ev.scene.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
-            ev.scene.time.delayedCall(600, () => {
-                ev.scene.changeScene('Game', { slot: 'new' });
-            })
+            const sceneId = ev.scene.g.saves.get('sceneId');           
+            const dialogData = DialogManager.loadSceneData(sceneId,ev.scene);
+            ev.scene.changeScene('Load', {
+                sceneId: sceneId,
+                dialogData: dialogData
+            });
         })
     }
 
     loadGame(ev){
         ev.scene.g.audio.playSoundEffect('click')
+        //this.g.save.load(slot)
+        ev.scene.changeScene('Load');
     }
 
     continueGame(ev){
         ev.scene.g.audio.playSoundEffect('click')
-        ev.scene.changeScene('Game');
+        //this.g.save.load(slot)
+        ev.scene.changeScene('Load');
     }
 
     openSettings(ev) {

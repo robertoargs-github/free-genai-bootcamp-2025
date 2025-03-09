@@ -27,7 +27,10 @@ class DialogManager {
         //const autoSpeed = this.g.settings.get('autoSpeed');
         //const typewriterEffect = this.g.settings.get('typewriterEffect');
         this.loadMappings();
-        this.loadSceneData();
+        const sceneId = this.g.saves.get('sceneId');
+        this.dialogData = DialogManager.loadSceneData(sceneId,this.scene);
+        // Start from the beginning or from the saved position
+        this.dialogId = this.g.saves.get('dialogId') || this.dialogData.startAt;
         this.loadDialogNode();
     }
     
@@ -40,19 +43,29 @@ class DialogManager {
         this.mappings = this.scene.cache.json.get('mappings');
     }
 
-    loadSceneData() {
+    getAudioDialogs(){
+        const dialogs = [];
         const sceneId = this.g.saves.get('sceneId');
-        
+        for (const dialogId in this.dialogData.dialog) {
+            const dialogNode = this.dialogData.dialog[dialogId];
+            const voiceKey = dialogNode.audio;
+            if (voiceKey){
+                dialogs.push(`dialog-${sceneId}-${voiceKey}`);
+            }
+        }
+        return dialogs;
+    }    
+
+    static loadSceneData(sceneId,scene) {
         try {
             const cacheKey = `scene-${sceneId}`;
-            this.dialogData = this.scene.cache.json.get(cacheKey);
-            if (!this.dialogData) {
+            const dialogData = scene.cache.json.get(cacheKey);
+            if (!dialogData) {
                 console.error(`No dialog data found for scene: ${cacheKey}`);
                 return;
+            } else {
+                return dialogData;
             }
-            
-            // Start from the beginning or from the saved position
-            this.dialogId = this.g.saves.get('dialogId') || this.dialogData.startAt;
         } catch (error) {
             console.error(`Error loading scene data for ${sceneId}:`, error);
         }

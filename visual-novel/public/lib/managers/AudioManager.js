@@ -7,10 +7,53 @@ class AudioManager {
         this.g = globalManagers;
         this.scene = null; // Initialize scene to null
         this.bgMusic = null;
+        this.sfxAudios = {};
+        this.voiceAudios = {};
+        this.audioTimeUpdateEvent = null; // to track when audio is playing
         this.soundEffects = {
             click: null,
             transition: null
         };
+    }
+
+    create(){
+        this.createBgm();
+        this.createSfxAudios();
+    }
+
+    createDialog(dialogKeys){
+        this.voiceAudios = {};
+        const volume = this.g.settings.get('voiceVolume');
+        for (const dialogKey of dialogKeys) {
+            const audio = this.scene.sound.add(dialogKey,{ volume});
+            this.voiceAudios[dialogKey] = audio;
+        }
+    }
+
+    
+    // Called when audio completes playing
+    onAudioComplete() {
+        if (this.audioTimeUpdateEvent) {
+          this.audioTimeUpdateEvent.remove();
+          this.audioTimeUpdateEvent = null;
+        }
+        
+        this.g.eventBus.emit('ui:sentence:clear-highlighting');
+        this.resetWordColors();
+        this.isPlaying = false;
+      }
+
+    createSfxAudios () {
+        try {
+            for (const audioAsset of window.audioAssets) {
+                const volume = this.g.settings.get('sfxVolume');
+                this.sfxAudios[audioAsset.id] = this.scene.sound.add(audioAsset.id, {
+                    volume
+                });
+            }
+        } catch (error) {
+            console.error('Error setting up sound effects:', error);
+        }
     }
 
     createBgm () {
@@ -34,15 +77,27 @@ class AudioManager {
         this.scene = scene;
     }
     
-    
     playSoundEffect(key, config = {}) {
         try {
             const volume = this.g.settings.get('sfxVolume');
             
             // Play the sound effect
-            this.scene.sound.play(key, {
+            this.sfxAudios[key].play({
                 volume,
                 ...config
+            });
+        } catch (error) {
+            console.warn(`Error playing sound effect ${key}:`, error);
+        }
+    }
+    
+    playDialog(sceneId,voiceKey) {
+        const key = `dialog-${sceneId}-${voiceKey}`
+        try {
+            const volume = this.g.settings.get('voiceVolume');
+            this.voiceAudios[key].play({
+                volume,
+                loop: false
             });
         } catch (error) {
             console.warn(`Error playing sound effect ${key}:`, error);
@@ -80,22 +135,15 @@ class AudioManager {
     
     setSfxVolume(volume) {
         const adjustedVolume = Math.max(0, Math.min(1, volume));
-        //this.sfxSound.setVolume(adjustedVolume);
+        for (const audioAsset of window.audioAssets) {
+            this.sfxAudios[audioAsset.id].setVolume(adjustedVolume);
+        }
     }
 
     setVoiceVolume(volume){
         const adjustedVolume = Math.max(0, Math.min(1, volume));
         //this.voiceSound.setVolume(adjustedVolume);
 
-    }
-    
-    // Method to play a click sound with error handling
-    playClickSound() {
-        try {
-            this.playSoundEffect('click');
-        } catch (e) {
-            console.warn('Click sound not available');
-        }
     }
 }
 
