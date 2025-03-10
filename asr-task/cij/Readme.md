@@ -82,9 +82,9 @@ docker run --gpus all -it -v ".:/app" ghcr.io/jim60105/whisperx:large-v3-ja -- \
 
 # usage example
 ```sh
-python formatter.py --accurate output/og-comic-learn.txt \
---whisperx output/comic-learn_standard.json \
---output output/comic-learn_aligned.json
+python formatter.py --accurate output/og-comic-learn-short.txt \
+--whisperx output/comic-learn_standard-short.json \
+--output output/comic-learn_aligned-short.json
 ```
 
 ```sh

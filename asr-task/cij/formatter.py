@@ -62,17 +62,6 @@ def align_transcript_with_llm(
         
         # Extract the JSON response
         result = json.loads(response.choices[0].message.content)
-        
-        # Validate the result
-        if "segments" not in result:
-            # If the LLM didn't include a segments key, try to fix it
-            result = {"segments": result}
-        
-        # Ensure all segments have required fields
-        for segment in result["segments"]:
-            if not all(k in segment for k in ["text", "start", "end"]):
-                raise ValueError(f"Segment missing required fields: {segment}")
-        
         return result
         
     except Exception as e:
