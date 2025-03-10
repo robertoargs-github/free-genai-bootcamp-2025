@@ -54,7 +54,24 @@ class AssetLoader {
             }
         }
     }
-    
+
+    // assume all audio files are .wav
+    // assume the voices are store in /audio/dialog/<sceneid>/<voice>.wav
+    loadVoiceAssets(voiceAudios) {
+        if (!voiceAudios || !Array.isArray(voiceAudios)) {
+            console.error('Invalid voice array provided to AssetLoader.loadVoiceAssets');
+            return;
+        }
+        for (const audio of voiceAudios) {
+            if (!audio) {
+                console.warn('Invalid audio in loadVoiceAssets, skipping', audio);
+                continue;
+            }
+            const key = `dialog-${audio[0]}-${audio[1]}`;
+            this.scene.load.audio(key, `assets/audio/dialog/${audio[0]}/${audio[1]}.wav`);
+        }
+    }
+
     /**
      * Preload a list of sprite sheets
      * @param {Array} spriteSheets - Array of sprite sheet objects

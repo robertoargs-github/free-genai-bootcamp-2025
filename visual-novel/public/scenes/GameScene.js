@@ -3,13 +3,22 @@ class GameScene extends BaseScene {
         super({ key: 'Game' });
     }
 
-    create(data) {
+    create() {
+        this.isReady = false
+        console.log('yeee!')
+        //this.g.audio.stopBgm(this.ready.bind(this))
+        this.ready()
+    }
+
+    ready(){
+        console.log('ready!')
+        this.isReady = true
+        console.log('ready!')
         this.cameras.main.fadeIn(600, 0, 0, 0)
 
         this.g.audio.updateScene(this);
+        this.g.audio.create();
         this.g.ui.updateScene(this);
-
-        this.loadGame(data.slot)
 
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
@@ -18,6 +27,7 @@ class GameScene extends BaseScene {
 
         this.dialogManager = new DialogManager(this.g,this);
         this.dialogManager.create();
+        this.g.audio.createDialog(this.dialogManager.getAudioDialogs());
 
         this.backgroundManager = new BackgroundManager(this.g,this.dialogManager,this);
         this.backgroundManager.create();
@@ -39,30 +49,45 @@ class GameScene extends BaseScene {
 
         //this.startGame(); // Start the story/dialog flow
         super.create();
+
+        this.loadTransition(OpenEyesPostFxPipeline)
+        this.playTransition()
     }
 
-    loadGame(slot){
-        if (slot == 'new'){
-            this.g.saves.new();   
-        } else {
-            this.g.save.load(slot)
-        }
+    loadTransition(postFxPipeline){
+        this.renderer.pipelines.addPostPipeline(postFxPipeline.name, postFxPipeline);
+        this.cameras.main.setPostPipeline(postFxPipeline);
+    }
+
+    playTransition(){
+        const pipeline = this.cameras.main.getPostPipeline(OpenEyesPostFxPipeline.name);
+        pipeline.edgeBlurAmount = 1.5;  // Strong edge blur
+        pipeline.openAmount = 0;   
+        this.tweens.add({
+            targets: pipeline,
+            openAmount: 1, // Open the eye
+            duration: 1000, 
+            ease: 'Cubic.easeOut', // Use any easing function
+            onComplete: () => {
+                console.log('Eye opening complete');
+            }
+        });
     }
 
     registerEvents() {
-        this.g.eventBus.on('ui:button:gm-quick-save:pointdown',this.quickSave);
-        this.g.eventBus.on('ui:button:gm-save:pointdown',this.save);
-        this.g.eventBus.on('ui:button:gm-load:pointdown',this.load);
-        this.g.eventBus.on('ui:button:gm-settings:pointdown',this.openSettings);
-        this.g.eventBus.on('ui:button:settings-close:pointdown',this.closeSettings);
-        this.g.eventBus.on('ui:button:dialog-next:pointdown',this.dialogNext);
-        this.g.eventBus.on('ui:button:dialog-choice-0:pointdown',this.dialogChoice0);
-        this.g.eventBus.on('ui:button:dialog-choice-1:pointdown',this.dialogChoice1);
-        this.g.eventBus.on('ui:button:dialog-choice-2:pointdown',this.dialogChoice2);
-        this.g.eventBus.on('ui:button:dialog-choice-3:pointdown',this.dialogChoice3);
-        this.g.eventBus.on('ui:button:dialog-choice-4:pointdown',this.dialogChoice4);
-        this.g.eventBus.on('ui:button:dialog-choice-5:pointdown',this.dialogChoice5);
-        this.g.eventBus.on('ui:button:dialog-play:pointdown',this.dialogPlay);
+        this.g.eventBus.on('ui:button:gm-quick-save:pointerdown',this.quickSave);
+        this.g.eventBus.on('ui:button:gm-save:pointerdown',this.save);
+        this.g.eventBus.on('ui:button:gm-load:pointerdown',this.load);
+        this.g.eventBus.on('ui:button:gm-settings:pointerdown',this.openSettings);
+        this.g.eventBus.on('ui:button:settings-close:pointerdown',this.closeSettings);
+        this.g.eventBus.on('ui:button:dialog-next:pointerdown',this.dialogNext);
+        this.g.eventBus.on('ui:button:dialog-choice-0:pointerdown',this.dialogChoice0);
+        this.g.eventBus.on('ui:button:dialog-choice-1:pointerdown',this.dialogChoice1);
+        this.g.eventBus.on('ui:button:dialog-choice-2:pointerdown',this.dialogChoice2);
+        this.g.eventBus.on('ui:button:dialog-choice-3:pointerdown',this.dialogChoice3);
+        this.g.eventBus.on('ui:button:dialog-choice-4:pointerdown',this.dialogChoice4);
+        this.g.eventBus.on('ui:button:dialog-choice-5:pointerdown',this.dialogChoice5);
+        this.g.eventBus.on('ui:play-button:dialog-play:pointerdown',this.dialogAudioAction);
     }
 
 
@@ -94,12 +119,57 @@ class GameScene extends BaseScene {
         ev.scene.g.audio.playSoundEffect('click')
         ev.scene.dialogManager.advance('choice',5); 
     }
+    
+    dialogAudioAction(ev){
+        if (ev.action === 'play') {
+            ev.scene.dialogPlay(ev);
+        } else if (ev.action === 'pause') {
+            ev.scene.dialogPause(ev);
+        } else if (ev.action === 'stop') {
+            ev.scene.dialogStop(ev);
+        }
+    }
+
     dialogPlay(ev) {
         const audioKey = ev.scene.dialogManager.dialogNode.audio
+        const sceneId = ev.scene.g.saves.get('sceneId');
         if (audioKey){
-            console.log('dialogPlay')
-            ev.scene.g.audio.playSoundEffect(`dialog-${audioKey}`)
+            const dialogAudio = ev.scene.g.audio.getDialog(sceneId, audioKey)
+
+            // Reset all word colors
+            ev.scene.g.eventBus.emit('ui:sentence:reset-highlighting');
+
+            // Set up time update using a timer event
+            // Check every 50ms for better accuracy with word timing
+            let audioTimeUpdateEvent = ev.scene.time.addEvent({
+                delay: 50,
+                callback: function(){
+                    ev.scene.g.eventBus.emit('ui:sentence:update-highlighting', { dialogAudio: dialogAudio });
+                },
+                callbackScope: ev.scene,
+                loop: true
+            });
+    
+            // Called when audio completes playing
+            const onAudioComplete = () => {
+                if (audioTimeUpdateEvent) {
+                    audioTimeUpdateEvent.remove();
+                    audioTimeUpdateEvent = null;
+                }
+                ev.scene.g.eventBus.emit('ui:sentence:reset-highlighting');
+                ev.item.setStop()
+            }
+            dialogAudio.on('complete',onAudioComplete)
+
+
+            ev.scene.g.audio.playDialog(sceneId, audioKey)
         }
+    }
+    dialogStop(ev) {
+        ev.item.setStop()
+        const sceneId = ev.scene.g.saves.get('sceneId');
+        const audioKey = ev.scene.dialogManager.dialogNode.audio
+        ev.scene.g.audio.stopDialog(sceneId, audioKey)
     }
 
     openSettings(ev) {
@@ -150,12 +220,7 @@ class GameScene extends BaseScene {
     }
 
     update() {
+        if (!this.isReady) {return }
         this.uiDialog.update();
-        // Let each manager update its state
-        //this.dialogManager.update();
-        //this.inputManager.update();
-        //this.uiManager.update();
-        //this.audioManager.update();
-        //this.characterManager.update();
     }
 }

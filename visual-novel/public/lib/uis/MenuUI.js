@@ -18,6 +18,7 @@ class MenuUI extends BaseUI {
             {text: 'Load',eventHandle: 'load'},
             {text: 'Settings',eventHandle: 'settings'}
         ]);
+
     }
 
     createButtons(buttonData) {

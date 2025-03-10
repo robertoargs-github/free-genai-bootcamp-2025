@@ -2,6 +2,7 @@
 class UIPanel extends UIContainer {
     constructor(scene, options) {
         super(scene, options);
+        this.minWidth = options.minWidth || 0;
         this.validatePanelOptions(options.panelOptions);
         this.createBackground(options.panelOptions);
     }
@@ -12,10 +13,20 @@ class UIPanel extends UIContainer {
         this.background.setOrigin(0,0);
     }
 
+    /**
+     * Validates the panel options passed to the constructor
+     * @param {object} options - The options to validate
+     */
     validatePanelOptions(options) {
-        if (!options.backgroundImage) {
-            throw new Error('backgroundImage is required for UIPanel');
-        }
+        OptsValidator.validate(options, {
+            backgroundImage: { 
+                type: 'string', 
+                required: true, 
+                message: 'backgroundImage is required for UIPanel' 
+            },
+            position: { type: 'position' },
+            size: { type: 'size' }
+        });
     }
 
     setPosition(x, y) {
@@ -25,8 +36,10 @@ class UIPanel extends UIContainer {
 
     autoResizePanel(){
         const containerDimensions = this.getDimensions();
+        const width = Math.max(this.minWidth,containerDimensions.width)
+        console.log('width',width)
         this.background.setDisplaySize(
-            containerDimensions.width, 
+            width,
             containerDimensions.height
         );
     }

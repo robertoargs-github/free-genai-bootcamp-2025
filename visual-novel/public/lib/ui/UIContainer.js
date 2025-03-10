@@ -124,14 +124,15 @@ class UIContainer extends UIItem {
 
     _updateItemPositionsByOrigin() {
         const containerDimensions = this.getDimensions();
-        let offsetX = (containerDimensions.width * this.originX);
-        let offsetY = (containerDimensions.height * this.originY);
+        let width = containerDimensions.width;
+        let height = containerDimensions.height;
+        let offsetX = (width * this.originX);
+        let offsetY = (height * this.originY);
 
         this.items.forEach((item, index) => {
-            item.setPosition(
-                item.x - offsetX + this.padding, 
-                item.y - offsetY + this.padding
-            ); 
+            const newX = item.x - offsetX + this.padding
+            const newY = item.y - offsetY + this.padding
+            item.setPosition(newX, newY);
         });
     }
 
@@ -267,40 +268,26 @@ class UIContainer extends UIItem {
      * @param {object} options 
      * @private
      */
+    /**
+     * Validates the options passed to the constructor
+     * @param {object} options - The options to validate
+     */
     validateOptions(options) {
-        // Validate position
-        if (!options.position) {
-            throw new Error('Position is required');
-        }
-        if (!Array.isArray(options.position) || options.position.length !== 2 ||
-            typeof options.position[0] !== 'number' || typeof options.position[1] !== 'number') {
-            throw new Error('Position must be an array of two numbers');
-        }
-        
-        // Validate layout if provided
-        if (options.layout !== undefined && 
-            options.layout !== 'vertical' && 
-            options.layout !== 'horizontal') {
-            throw new Error("Layout must be 'vertical' or 'horizontal'");
-        }
-        
-        // Validate spacing if provided
-        if (options.spacing !== undefined && typeof options.spacing !== 'number') {
-            throw new Error('Spacing must be a number');
-        }
-        
-        // Validate items if provided
-        if (options.items !== undefined && !Array.isArray(options.items)) {
-            throw new Error('Items must be an array');
-        }
-        
-        // Validate origin if provided
-        if (options.origin !== undefined) {
-            if (!Array.isArray(options.origin) || options.origin.length !== 2 ||
-                typeof options.origin[0] !== 'number' || typeof options.origin[1] !== 'number') {
-                throw new Error('Origin must be an array of two numbers');
-            }
-        }
+        OptsValidator.validate(options, {
+            position: { type: 'position', required: true },
+            layout: { 
+                type: 'oneOf', 
+                values: ['vertical', 'horizontal'],
+                message: "Layout must be 'vertical' or 'horizontal'"
+            },
+            spacing: { type: 'number' },
+            items: { type: 'array' },
+            origin: { type: 'position' },
+            padding: { type: 'number' },
+            backgroundColor: { type: 'string' },
+            backgroundAlpha: { type: 'number' },
+            visible: { type: 'boolean' }
+        });
     }
 
     update(){

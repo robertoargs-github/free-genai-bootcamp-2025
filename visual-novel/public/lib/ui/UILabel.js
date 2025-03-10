@@ -109,25 +109,19 @@ class UILabel extends UIItem{
      * Validate the options passed to the constructor
      * @param {object} options - The options object
      */
+     /**
+     * Validates the options passed to the constructor
+     * @param {object} options - The options to validate
+     */
     validateOptions(options) {
-        // Validate text if provided
-        if (options.text !== undefined && typeof options.text !== 'string') {
-            throw new Error('Label text must be a string');
-        }
-        
-        // Validate position
-        if (!options.position) {
-            throw new Error('Position is required');
-        }
-        if (!Array.isArray(options.position) || options.position.length !== 2 ||
-            typeof options.position[0] !== 'number' || typeof options.position[1] !== 'number') {
-            throw new Error('Position must be an array of two numbers');
-        }
-        
-        // Validate style if provided
-        if (options.style && typeof options.style !== 'object') {
-            throw new Error('Style must be an object');
-        }
+        OptsValidator.validate(options, {
+            text: { type: 'string' },
+            position: { type: 'position', required: true },
+            style: { type: 'object' },
+            origin: { type: 'array' },
+            depth: { type: 'number' },
+            visible: { type: 'boolean' }
+        });
     }
 }
 

@@ -129,64 +129,33 @@ class UISlider extends UIItem {
      * Validate the options passed to the constructor
      * @param {object} options 
      */
+    /**
+     * Validates the options passed to the constructor
+     * @param {object} options - The options to validate
+     */
     validateOptions(options) {
-        // Validate min
-        if (options.min === undefined) {
-            throw new Error('Min value is required');
-        }
-        if (typeof options.min !== 'number') {
-            throw new Error('Min value must be a number');
-        }
-
-        // Validate max
-        if (options.max === undefined) {
-            throw new Error('Max value is required');
-        }
-        if (typeof options.max !== 'number') {
-            throw new Error('Max value must be a number');
-        }
-
-        // Validate that max > min
-        if (options.max <= options.min) {
-            throw new Error('Max value must be greater than min value');
-        }
-
-        // Validate initial value
-        if (options.value === undefined) {
-            throw new Error('Initial value is required');
-        }
-        if (typeof options.value !== 'number') {
-            throw new Error('Initial value must be a number');
-        }
-        if (options.value < options.min || options.value > options.max) {
-            throw new Error('Initial value must be between min and max');
-        }
-
-        // Validate size
-        if (!options.size) {
-            throw new Error('Size is required');
-        }
-        if (!Array.isArray(options.size) || options.size.length !== 2 ||
-            typeof options.size[0] !== 'number' || typeof options.size[1] !== 'number') {
-            throw new Error('Size must be an array of two numbers');
-        }
-
-        // Validate position
-        if (!options.position) {
-            throw new Error('Position is required');
-        }
-        if (!Array.isArray(options.position) || options.position.length !== 2 ||
-            typeof options.position[0] !== 'number' || typeof options.position[1] !== 'number') {
-            throw new Error('Position must be an array of two numbers');
-        }
-
-        // Validate eventHandle
-        if (!options.eventHandle) {
-            throw new Error('Event handle is required');
-        }
-        if (typeof options.eventHandle !== 'string') {
-            throw new Error('Event handle must be a string');
-        }
+        // Use OptsValidator to validate all required options
+        OptsValidator.validate(options, {
+            min: { type: 'number', required: true },
+            max: { type: 'number', required: true },
+            value: { 
+                type: 'numberInRange', 
+                required: true,
+                minKey: 'min',
+                maxKey: 'max',
+                message: 'Initial value must be between min and max'
+            },
+            max: { 
+                type: 'maxGreaterThanMin', 
+                minKey: 'min',
+                message: 'Max value must be greater than min value'
+            },
+            position: { type: 'position', required: true },
+            size: { type: 'size', required: true },
+            eventHandle: { type: 'string', required: true },
+            step: { type: 'number' },
+            onChange: { type: 'function' }
+        });
     }
 
     /**

@@ -372,32 +372,21 @@ class UITextInput extends UIItem {
      * Validate the options passed to the constructor
      * @param {object} options
      */
+    /**
+     * Validates the options passed to the constructor
+     * @param {object} options - The options to validate
+     */
     validateOptions(options) {
-        // Validate position
-        if (!options.position) {
-            throw new Error('Position is required');
-        }
-        if (!Array.isArray(options.position) || options.position.length !== 2 ||
-            typeof options.position[0] !== 'number' || typeof options.position[1] !== 'number') {
-            throw new Error('Position must be an array of two numbers');
-        }
-        
-        // Validate size
-        if (!options.size) {
-            throw new Error('Size is required');
-        }
-        if (!Array.isArray(options.size) || options.size.length !== 2 ||
-            typeof options.size[0] !== 'number' || typeof options.size[1] !== 'number') {
-            throw new Error('Size must be an array of two numbers');
-        }
-        
-        // Validate eventHandle
-        if (!options.eventHandle) {
-            throw new Error('Event handle is required');
-        }
-        if (typeof options.eventHandle !== 'string') {
-            throw new Error('Event handle must be a string');
-        }
+        // Use OptsValidator to validate all required options
+        OptsValidator.validate(options, {
+            position: { type: 'position', required: true },
+            size: { type: 'size', required: true },
+            eventHandle: { type: 'string', required: true },
+            placeholder: { type: 'string' },
+            initialValue: { type: 'string' },
+            maxLength: { type: 'number' },
+            textStyle: { type: 'object' }
+        });
     }
     
     /**

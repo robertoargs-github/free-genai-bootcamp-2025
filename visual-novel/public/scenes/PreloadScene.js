@@ -35,14 +35,13 @@ class PreloadScene extends Phaser.Scene {
         this.loadCharacterAssets(); // Load character images
         this.loadBackgroundAssets(); // Load background images
         this.loadAudioAssets(); // Load audio assets
-        this.loadDialogAudioAssets(); // Load audio assets for dialog
         this.loadStoryData();  // Load story data
     }
 
     create() {
         // Complete initialization of global managers now that all assets are loaded
         this.finalizeGlobalManagers();
-        
+
         // Start the menu scene
         this.scene.start('Menu');
     }
@@ -65,22 +64,19 @@ class PreloadScene extends Phaser.Scene {
         }
     }
     
-
-    
     loadUIAssets() {
         // Load UI assets using AssetLoader
         this.assetLoader.preloadImages([
             { id: 'menu-bg', path: 'ui/menu-background.png' },
             { id: 'black-sq', path: 'ui/black-sq.png' },
             { id: 'play-button', path: 'ui/play-button2.png' },
+            { id: 'pause-button', path: 'ui/pause-button.png' },
+            { id: 'stop-button', path: 'ui/stop-button.png' },
             { id: 'button', path: 'ui/button.png' },
             { id: 'button-hover', path: 'ui/button-hover.png' },
             { id: 'small-button', path: 'ui/small-button.png' },
             { id: 'small-button-hover', path: 'ui/small-button.png' },
         ]);
-        
-        // Create placeholder UI elements if they don't exist
-        this.createPlaceholderUI();
     }
     
     loadCharacterAssets() {
@@ -121,21 +117,12 @@ class PreloadScene extends Phaser.Scene {
             { id: 'transition', path: 'transition.wav' },
             { id: 'bg-music', path: 'bg.wav' }
         ];
+        window.audioAssets = audioAssets;
         
         // Load audio assets using AssetLoader
         this.assetLoader.preloadAudio(audioAssets);
     }
 
-    loadDialogAudioAssets() {
-        // Define audio assets to load
-        const audioAssets = [
-            { id: 'dialog-wake-up', path: 'dialog/wake_up.wav' },
-        ];
-        
-        // Load audio assets using AssetLoader
-        this.assetLoader.preloadAudio(audioAssets);
-    }
-    
     loadStoryData() {
         // Define data files to load
         const dataFiles = [
@@ -147,63 +134,5 @@ class PreloadScene extends Phaser.Scene {
         
         // Load data files using AssetLoader
         this.assetLoader.preloadData(dataFiles);
-    }
-    
-    createPlaceholderUI() {
-        // This function would generate placeholder UI elements if they don't exist
-        // Similar to what we did in the BootScene
-        
-        // In a real implementation, you would check if files exist and create them if not
-        // For this demo, we'll assume they don't exist and create basic placeholders
-        
-        // For example, creating a dialog box placeholder:
-        const dialogBox = document.createElement('canvas');
-        dialogBox.width = 1000;
-        dialogBox.height = 200;
-        const dialogCtx = dialogBox.getContext('2d');
-        dialogCtx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        dialogCtx.fillRect(0, 0, 1000, 200);
-        dialogCtx.strokeStyle = '#ffffff';
-        dialogCtx.lineWidth = 2;
-        dialogCtx.strokeRect(2, 2, 996, 196);
-        
-        // Add the dialog box to the texture manager
-        this.textures.addCanvas('dialog-box', dialogBox);
-        
-        // Create next button placeholder
-        const nextButton = document.createElement('canvas');
-        nextButton.width = 80;
-        nextButton.height = 50;
-        const nextButtonCtx = nextButton.getContext('2d');
-        nextButtonCtx.fillStyle = '#0077cc';
-        nextButtonCtx.fillRect(0, 0, 80, 50);
-        nextButtonCtx.strokeStyle = '#ffffff';
-        nextButtonCtx.lineWidth = 2;
-        nextButtonCtx.strokeRect(2, 2, 76, 46);
-        nextButtonCtx.fillStyle = '#ffffff';
-        nextButtonCtx.font = '18px Arial';
-        nextButtonCtx.textAlign = 'center';
-        nextButtonCtx.textBaseline = 'middle';
-        nextButtonCtx.fillText('Next', 40, 25);
-        this.textures.addCanvas('next-button', nextButton);
-
-        // Create next button hover placeholder
-        const nextButtonHover = document.createElement('canvas');
-        nextButtonHover.width = 80;
-        nextButtonHover.height = 50;
-        const nextButtonHoverCtx = nextButtonHover.getContext('2d');
-        nextButtonHoverCtx.fillStyle = '#00aaff';
-        nextButtonHoverCtx.fillRect(0, 0, 80, 50);
-        nextButtonHoverCtx.strokeStyle = '#ffffff';
-        nextButtonHoverCtx.lineWidth = 2;
-        nextButtonHoverCtx.strokeRect(2, 2, 76, 46);
-        nextButtonHoverCtx.fillStyle = '#ffffff';
-        nextButtonHoverCtx.font = '18px Arial';
-        nextButtonHoverCtx.textAlign = 'center';
-        nextButtonHoverCtx.textBaseline = 'middle';
-        nextButtonHoverCtx.fillText('Next', 40, 25);
-        this.textures.addCanvas('next-button-hover', nextButtonHover);
-        
-        // Similarly for other UI elements...
     }
 }

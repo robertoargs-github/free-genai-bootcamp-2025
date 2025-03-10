@@ -6,10 +6,10 @@ class MenuScene extends BaseScene {
     create() {
         // Set up audio
         this.g.audio.updateScene(this);
-        this.g.audio.createBgm();
+        this.g.audio.create();
         this.g.audio.playBgm();
 
-        // Set up UI
+        // Set up U
         this.g.ui.updateScene(this);
 
         // Get screen dimensions
@@ -71,40 +71,49 @@ class MenuScene extends BaseScene {
         super.create();
     }
 
+
+
     registerEvents() {
-        this.g.eventBus.on('ui:button:new-game:pointdown',this.startGame);
-        this.g.eventBus.on('ui:button:continue:pointdown',this.continueGame);
-        this.g.eventBus.on('ui:button:load:pointdown',this.loadGame);
-        this.g.eventBus.on('ui:button:settings:pointdown',this.openSettings);
-        this.g.eventBus.on('ui:button:settings-close:pointdown',this.closeSettings);
+        this.g.eventBus.on('ui:button:new-game:pointerdown',this.startGame);
+        this.g.eventBus.on('ui:button:continue:pointerdown',this.continueGame);
+        this.g.eventBus.on('ui:button:load:pointerdown',this.loadGame);
+        this.g.eventBus.on('ui:button:settings:pointerdown',this.openSettings);
+        this.g.eventBus.on('ui:button:settings-close:pointerdown',this.closeSettings);
     }
 
     deregisterEvents() {
-        this.g.eventBus.off('ui:button:new-game:pointdown',this.startGame);
-        this.g.eventBus.off('ui:button:continue:pointdown',this.continueGame);
-        this.g.eventBus.off('ui:button:load:pointdown',this.loadGame);
-        this.g.eventBus.off('ui:button:settings:pointdown',this.openSettings);
-        this.g.eventBus.off('ui:button:settings-close:pointdown',this.closeSettings);
+        this.g.eventBus.off('ui:button:new-game:pointerdown',this.startGame);
+        this.g.eventBus.off('ui:button:continue:pointrdown',this.continueGame);
+        this.g.eventBus.off('ui:button:load:pointerdown',this.loadGame);
+        this.g.eventBus.off('ui:button:settings:pointerdown',this.openSettings);
+        this.g.eventBus.off('ui:button:settings-close:pointerdown',this.closeSettings);
     }
 
 
     startGame(ev) {
+        ev.scene.g.saves.new();   
         ev.scene.g.audio.playSoundEffect('click')
         ev.scene.cameras.main.fadeOut(300, 0, 0, 0)
         ev.scene.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
-            ev.scene.time.delayedCall(600, () => {
-                ev.scene.changeScene('Game', { slot: 'new' });
-            })
+            const sceneId = ev.scene.g.saves.get('sceneId');           
+            const dialogData = DialogManager.loadSceneData(sceneId,ev.scene);
+            ev.scene.changeScene('Load', {
+                sceneId: sceneId,
+                dialogData: dialogData
+            });
         })
     }
 
     loadGame(ev){
         ev.scene.g.audio.playSoundEffect('click')
+        //this.g.save.load(slot)
+        ev.scene.changeScene('Load');
     }
 
     continueGame(ev){
         ev.scene.g.audio.playSoundEffect('click')
-        ev.scene.changeScene('Game');
+        //this.g.save.load(slot)
+        ev.scene.changeScene('Load');
     }
 
     openSettings(ev) {

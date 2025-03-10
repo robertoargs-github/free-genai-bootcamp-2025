@@ -14,8 +14,9 @@ class UIMessage extends UIItem{
 
         const width = this.scene.cameras.main.width;
         this.maxWidth = width / 2;
-        this.japaneseText = null;
-        this.englishText = null;
+        this.mainText = null;
+        this.mainTextWords = null;
+        this.subText = null;
         this.nameText = null;
         this.create();
     }
@@ -23,9 +24,26 @@ class UIMessage extends UIItem{
     create() {
         this.createBubble();
         this.createNameText();
-        this.createJapaneseText();
-        this.createEnglishText();
+        this.createMainText();
+        this.createMainTextWithHighlighting();
+        this.createSubText();
         this.createPlayButton();
+        this.registerEvents();
+    }
+
+    registerEvents() {
+        this.scene.g.eventBus.on('ui:sentence:update-highlighting', this.updateHighlighting, this);
+        this.scene.g.eventBus.on('ui:sentence:reset-highlighting', this.resetHighlighting, this);
+    }
+
+    // Update word highlighting based on current audio time
+    updateHighlighting(ev) {
+        const currentTime = ev.dialogAudio.seek;
+        this.mainTextWithHighlighting.highlightWord(currentTime);
+    }
+
+    resetHighlighting() {
+        this.mainTextWithHighlighting.resetHighlighting();
     }
 
     setPosition(x, y) {
@@ -36,19 +54,37 @@ class UIMessage extends UIItem{
 
     update(options){
         this.nameText.setText(options.name);
-        if (options.japaneseText) {
-            this.japaneseText.setText(options.japaneseText);
-            this.japaneseText.setVisible(true);
+        if (options.mainText) {
+            if (options.mainTextWords) {
+                this.mainTextWithHighlighting.setVisible(true)
+                this.mainTextWithHighlighting.set(options.mainTextWords);
+                this.mainText.setText(options.mainText);
+                this.mainText.setVisible(false);
+            } else {
+                this.mainTextWithHighlighting.setVisible(false)
+                this.mainTextWithHighlighting.clear();
+                this.mainText.setText(options.mainText);
+                this.mainText.setVisible(true);
+            }
+
         } else {
-            this.japaneseText.setText('');
-            this.japaneseText.setVisible(false);
+            this.mainText.setText('');
+            this.mainText.setVisible(false);
         }
-        if (options.englishText) {
-            this.englishText.setText(options.englishText);
-            this.englishText.setVisible(true);
+        
+        // there is subText show it, if not hide it
+        if (options.subText) {
+            this.subText.setText(options.subText);
+            this.subText.setVisible(true);
         } else {
-            this.englishText.setText('');
-            this.englishText.setVisible(false);
+            this.subText.setText('');
+            this.subText.setVisible(false);
+        }
+        const audioKey = this.scene.dialogManager.dialogNode.audio
+        if (audioKey) {
+            this.playButton.setVisible(true)
+        } else {
+            this.playButton.setVisible(false)
         }
         this.bubblePanel.autoResizePanel();
     }
@@ -58,6 +94,7 @@ class UIMessage extends UIItem{
             position: [this.x, this.y],
             layout: 'vertical',
             spacing: 8,
+            minWidth: 400,
             padding: 16,
             origin: [0,0],
             panelOptions: {
@@ -67,12 +104,9 @@ class UIMessage extends UIItem{
     }
 
     createPlayButton(){
-        this.playButton = this.scene.g.ui.createButton({
+        this.playButton = this.scene.g.ui.createPlayButton({
             position: [0,0],
-            image: 'play-button',
-            image_hover: 'play-button',
-            text: '',
-            size: [64,64],
+            mode: 'play2stop',
             eventHandle: 'dialog-play'
         })
         this.bubblePanel.addItem(this.playButton);
@@ -91,9 +125,9 @@ class UIMessage extends UIItem{
         this.bubblePanel.addItem(this.nameText);
     }
 
-    createJapaneseText() {
+    createMainText() {
         const width = this.scene.cameras.main.width * 0.8;
-        this.japaneseText = this.scene.g.ui.createLabel({
+        this.mainText = this.scene.g.ui.createLabel({
             position: [0,0],
             text: '',
             style: {
@@ -103,12 +137,20 @@ class UIMessage extends UIItem{
                 wordWrap: { width: width, useAdvancedWrap: true }
             }
         });
-        this.bubblePanel.addItem(this.japaneseText);
+        this.bubblePanel.addItem(this.mainText);
     }
 
-    createEnglishText() {
+    createMainTextWithHighlighting() {
         const width = this.scene.cameras.main.width * 0.8;
-        this.englishText = this.scene.g.ui.createLabel({
+        this.mainTextWithHighlighting = new UISentence(this.scene,{
+            wordWrap: width
+        })
+        this.bubblePanel.addItem(this.mainTextWithHighlighting);
+    }
+
+    createSubText() {
+        const width = this.scene.cameras.main.width * 0.8;
+        this.subText = this.scene.g.ui.createLabel({
             position: [0,0],
             text: '',
             style: {
@@ -118,18 +160,21 @@ class UIMessage extends UIItem{
                 wordWrap: { width: width, useAdvancedWrap: true }
             }
         });
-        this.bubblePanel.addItem(this.englishText);
+        this.bubblePanel.addItem(this.subText);
     }
 
+     /**
+     * Validates the options passed to the constructor
+     * @param {object} options - The options to validate
+     */
     validateOptions(options) {
-        // Validate position
-        if (!options.position) {
-            throw new Error('Position is required');
-        }
-        if (!Array.isArray(options.position) || options.position.length !== 2 ||
-            typeof options.position[0] !== 'number' || typeof options.position[1] !== 'number') {
-            throw new Error('Position must be an array of two numbers');
-        }
+        OptsValidator.validate(options, {
+            position: { type: 'position', required: true },
+            size: { type: 'size' },
+            backgroundImage: { type: 'string' },
+            textStyle: { type: 'object' },
+            padding: { type: 'number' }
+        });
     }
 
     getDimensions() {

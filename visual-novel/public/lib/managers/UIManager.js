@@ -46,4 +46,14 @@ class UIManager {
         const textInput = new UITextInput(this.scene, options);
         return textInput;
     }
+
+    createMessage(options) {
+        const message = new UIMessage(this.scene, options);
+        return message;
+    }
+
+    createPlayButton(options) {
+        const playButton = new UIPlayButton(this.scene, options);
+        return playButton;
+    }
 }
